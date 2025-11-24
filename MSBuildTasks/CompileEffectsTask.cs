@@ -13,12 +13,12 @@ namespace Monod.MSBuild;
 public class CompileEffectsTask : Task
 {
     /// <summary>
-    /// List of <see cref="File"/> paths, relative to <see cref="PathToContent"/>, of files which should be compiled
+    /// List of <see cref="File"/> paths, relative to <see cref="PathToContent"/>, of files which should be compiled.
     /// </summary>
     public string? Effects { get; set; }
 
     /// <summary>
-    /// Absolute <see cref="Directory"/> path, where assets should be outputted, before their own path
+    /// Absolute <see cref="Directory"/> path, where assets should be outputted, before their own path.
     /// </summary>
     public string? OutputPath { get; set; }
 
@@ -28,31 +28,31 @@ public class CompileEffectsTask : Task
     public string? PathToContent { get; set; }
 
     /// <summary>
-    /// Constant to track changes
+    /// Constant value to track changes.
     /// </summary>
     public const string Version = "1.2";
 
     /// <summary>
-    /// Executes the task, called by MSBuild
+    /// Executes the task, called by MSBuild.
     /// </summary>
-    /// <returns><see langword="true"/> on success, <see langword="false"/> otherwise</returns>
+    /// <returns><see langword="true"/> on success, <see langword="false"/> otherwise.</returns>
     public override bool Execute()
     {
         if (Effects is null)
         {
-            Log.LogMessage(MessageImportance.High, "Effects was not specified! Must be list of file paths, relative to *PathToContent*, of files which should be compile");
+            Log.LogMessage(MessageImportance.High, "Effects was not specified! Must be list of file paths, relative to *PathToContent*, of files which should be compiled");
             Environment.Exit(3);
             return false;
         }
         if (OutputPath is null)
         {
-            Log.LogMessage(MessageImportance.High, "OutputPath was not specified! Must be absolute directory path, where assets should be outputted, before their own path");
+            Log.LogMessage(MessageImportance.High, "OutputPath was not specified! Must be absolute directory path, that is root path to assets. Assets' own relative path is appended to this to get a final output directory.");
             Environment.Exit(3);
             return false;
         }
         if (PathToContent is null)
         {
-            Log.LogMessage(MessageImportance.High, "PathToContent was not specified! Must be bsolute directory path, where assets are located, before their own path.");
+            Log.LogMessage(MessageImportance.High, "PathToContent was not specified! Must be absolute directory path, where assets are located, without their own relative path.");
             Environment.Exit(3);
             return false;
         }
@@ -94,7 +94,7 @@ public class CompileEffectsTask : Task
                 int exit = 1;
                 if (exception is Win32Exception) //Probably "The system cannot find the file specified"? I hope that's the only case.
                 {
-                    Log.LogMessage(MessageImportance.High, "(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD (global dotnet tools dir should be at PATH).");
+                    Log.LogMessage(MessageImportance.High, "(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD via 'mgfxc' (global dotnet tools dir should be at PATH).");
                     exit = 2;
                 }
                 Log.LogMessage(MessageImportance.High, exception.ToString());

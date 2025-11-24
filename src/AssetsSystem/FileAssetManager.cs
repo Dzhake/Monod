@@ -16,7 +16,7 @@ namespace Monod.AssetsSystem;
 /// <summary>
 ///     <para>Represents an asset manager, that loads assets from a directory in the file system.</para>
 /// </summary>
-/*public class FileAssetManager : AssetManager
+public class FileAssetManager : AssetManager
 {
     /// <summary>
     ///   <para>Gets the full path to the directory that this asset manager loads assets from.</para>
@@ -165,4 +165,4 @@ namespace Monod.AssetsSystem;
         /// </summary>
         public readonly AssetType type = type;
     }
-}*/
+}

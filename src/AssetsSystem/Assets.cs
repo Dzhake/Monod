@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.Utils.Collections;
@@ -25,15 +26,56 @@ public static class Assets
     public static readonly Dictionary<string, AssetManager> Managers = new();
     
     /// <summary>
-    /// List of <see cref="IAssetLoader"/>s, that are currently reloading some assets. Used to determine whether the game should pause and wait until assets are reloaded.
+    /// List of <see cref="AssetLoader"/>s, that are currently reloading some assets. Used to determine whether the game should pause and wait until assets are reloaded.
     /// </summary>
-    public static readonly HashSet<IAssetLoader> ReloadingAssetLoaders = new();
+    public static readonly HashSet<AssetLoader> ReloadingAssetLoaders = new();
 
     /// <summary>
-    /// Event that is raised when some <see cref="IAssetLoader"/>s finish reloading assets. Use it to get new assets after the reload.
+    /// Lock for <see cref="ReloadingAssetLoaders"/>, <see cref="ReloadedAssets"/> and <see cref="TotalReloadingAssets"/>. Required because <see cref="FileSystemWatcher"/> might raise event during the <see cref="Update"/>, causing race condition, leading to <see cref="AssetLoader"/> thinking that reload is currently ongoing even if it's not.
+    /// </summary>
+    public static readonly ReaderWriterLockSlim ReloadingInfoLock = new();
+
+    /// <summary>
+    /// Amount of assets that were reloaded since reload started. May be non-zero even if the reload is finished.
+    /// </summary>
+    public static int ReloadedAssets;
+    
+    /// <summary>
+    /// Amount of assets that <see cref="ReloadingAssetLoaders"/> want to reload during this reload (including already reloaded). May be non-zero even if the reload is finished.
+    /// </summary>
+    public static int TotalReloadingAssets;
+    
+    /// <summary>
+    /// Whether systems should reload assets from the asset cache this frame. Set in <see cref="Update"/>.
+    /// </summary>
+    public static bool ReloadThisFrame;
+
+    /// <summary>
+    /// Event that is raised when some <see cref="AssetLoader"/>s finish reloading assets. Use <see cref="ReloadThisFrame"/> (recommended) or this to determine when to reload assets.
     /// </summary>
     public static EventBus OnReload = new();
-    
+
+
+    /// <summary>
+    /// Update <see cref="Assets"/>.
+    /// </summary>
+    public static void Update()
+    {
+        try
+        {
+            ReloadingInfoLock.EnterReadLock();
+            if (ReloadingAssetLoaders.Count != 0 && ReloadedAssets == TotalReloadingAssets)
+            { //finished reloading
+                InvokeReload();
+                ReloadThisFrame = true;
+            }
+        }
+        finally
+        {
+            ReloadingInfoLock.ExitReadLock();
+        }
+        
+    }
 
     /// <summary>
     ///   <para>Adds the specified asset <paramref name="assetManager"/> to the global registry under the specified <paramref name="prefix"/>.</para>

@@ -13,7 +13,7 @@ using Serilog;
 namespace Monod;
 
 /// <summary>
-/// Class containing similar code for all apps made with MonodEngine, to reduce repetitve code. Every app must have a class inheriting from <see cref="MonodGame"/>.
+/// Class containing similar code for all apps made with MonodEngine, to reduce repetitive code. Every app must have a class inheriting from <see cref="MonodGame"/>.
 /// </summary>
 public abstract class MonodGame : Game
 {
@@ -47,7 +47,7 @@ public abstract class MonodGame : Game
         Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
 
         string contentPath = $"{AppContext.BaseDirectory}Content";
-        //TODO MainAssetManager = new FileAssetManager(contentPath);
+        //TODO MainAssetManager = new FileAssetManager(contentPath); Requires finished assets system.
         if (MainAssetManager is null) throw new InvalidOperationException("Couldn't create MainAssetManager");
         Assets.RegisterAssetManager(MainAssetManager, "");
         MainAssetManager.LoadAssets();
@@ -64,6 +64,8 @@ public abstract class MonodGame : Game
         MainThread.Update();
 
         ModManager.Update();
+
+        if (ModManager.InProgress || Assets.ReloadingAssetLoaders.Count != 0) return;
         //DevConsole.Update(); TODO dev console in-game w/ Console class support like in DD.
 
         UpdateM();
@@ -78,8 +80,13 @@ public abstract class MonodGame : Game
         GraphicsDevice.Clear(Color.Black);
         if (ModManager.InProgress)
         {
-            //font.DrawText("Loading mods.", Renderer.spriteBatch, Vector2.Zero); TODO have some sort of default font or something
+            //font.DrawText("Loading mods.", Renderer.spriteBatch, Vector2.Zero); TODO have some sort of default font or something. Requires MainAssetManager.
             return;
+        }
+
+        if (Assets.ReloadingAssetLoaders.Count != 0)
+        {
+            //TODO render loading assets progress bar. Requires default font.
         }
         
         DrawM();

@@ -17,9 +17,9 @@ public class AssetManager : IDisposable
     public IAssetFilter? Filter;
 
     /// <summary>
-    /// <see cref="IAssetLoader"/> used for this <see cref="AssetManager"/>.
+    /// <see cref="AssetLoader"/> used for this <see cref="AssetManager"/>.
     /// </summary>
-    public IAssetLoader Loader;
+    public AssetLoader Loader;
 
     
 
@@ -53,7 +53,7 @@ public class AssetManager : IDisposable
     /// </summary>
     /// <returns>The string representation of this asset manager.</returns>
     public override string ToString()
-        => Prefix is null ? $"{DisplayName} (no prefix)" : $"{DisplayName} ({Prefix}:/)";
+        => Prefix is null ? $"(no prefix) {DisplayName}" : $"({Prefix}:/) {DisplayName}";
 
     /// <summary>
     /// Returns asset at the specified <paramref name="path"/>.
