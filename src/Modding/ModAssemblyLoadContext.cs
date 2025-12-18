@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
 using Monod;
+using Monod.Utils.General;
 
 namespace Monod.ModSystem;
 
@@ -35,7 +36,7 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
     public ModAssemblyLoadContext(Mod mod) : base(isCollectible: true)
     {
         ModConfig config = mod.Config;
-        if (config.AssemblyFile is null) throw new InvalidOperationException("Trying to create ModAssemblyLoadContext with config which has null AssemblyFile");
+        if (config.AssemblyFile is null) Guard.ThrowInvalidOperationException("Trying to create ModAssemblyLoadContext with config which has null AssemblyFile");
         this.mod = mod;
 
         if (!MonodMain.HotReload) return;

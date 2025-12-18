@@ -20,7 +20,10 @@ public class FileAssetLoader : AssetLoader
     public override string DisplayName => $"{DirectoryPath}{Path.DirectorySeparatorChar}**";
 
     /// <inheritdoc />
-    public override void LoadAssetManifests() => throw new System.NotImplementedException();
+    public override void LoadAssetManifests()
+    {
+        string[] manifests = Directory.GetFiles(DirectoryPath, "assets.json");
+    }
 
     /// <inheritdoc />
     public override void LoadAssets() => throw new System.NotImplementedException();

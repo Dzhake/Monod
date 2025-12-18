@@ -25,7 +25,7 @@ public static class SaveManager
     {
         if (!File.Exists(saveLocation)) return default(T);
         string data = File.ReadAllText(saveLocation);
-        return JsonSerializer.Deserialize<T>(data, Json.Common);
+        return JsonSerializer.Deserialize<T>(data, Json.SerializeCommon);
     }
 
     /// <summary>
@@ -36,6 +36,6 @@ public static class SaveManager
     /// <typeparam name="T">Type of the <paramref name="data"/>.</typeparam>
     public static void Save<T>(string saveLocation, T data)
     {
-        File.WriteAllText(saveLocation, JsonSerializer.Serialize(data, Json.Common));
+        File.WriteAllText(saveLocation, JsonSerializer.Serialize(data, Json.SerializeCommon));
     }
 }

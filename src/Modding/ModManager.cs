@@ -362,7 +362,7 @@ public static class ModManager
         using var configStream = File.OpenRead(configPath);
         try
         {
-            ModConfig? result = JsonSerializer.Deserialize<ModConfig>(configStream, Json.Common);
+            ModConfig? result = JsonSerializer.Deserialize<ModConfig>(configStream, Json.SerializeCommon);
             if (result is not null) return result;
             AddModToDict(FailedToLoadMod.ConfigDeserializeNull(configPath, Path.GetFileName(Path.GetDirectoryName(configPath) ?? ""))); //invalid mod config
             return null;

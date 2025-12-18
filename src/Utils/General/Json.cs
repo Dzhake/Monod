@@ -10,15 +10,22 @@ public static class Json
     /// <summary>
     /// Common <see cref="JsonSerializerOptions"/> for use when you [de]serialize with <see cref="JsonSerializer"/>.
     /// </summary>
-    public static readonly JsonSerializerOptions Common = new() { AllowTrailingCommas = true};
+    public static readonly JsonSerializerOptions SerializeCommon = new() { AllowTrailingCommas = true};
 
     /// <summary>
-    /// <see cref="Common"/> for cases when you want to write clean and readable JSON.
+    /// <see cref="SerializeCommon"/> for cases when you want to write clean and readable JSON.
     /// </summary>
-    public static readonly JsonSerializerOptions Readable = new(Common) { WriteIndented = true, RespectNullableAnnotations = true};
+    public static readonly JsonSerializerOptions SerializeReadable = new(SerializeCommon) { WriteIndented = true, RespectNullableAnnotations = true};
 
     /// <summary>
-    /// <see cref="Readable"/>, but includes serializing and deserializing fields.
+    /// <see cref="SerializeReadable"/>, but includes serializing and deserializing fields.
     /// </summary>
-    public static readonly JsonSerializerOptions WithFields = new(Readable) { IncludeFields = true };
+    public static readonly JsonSerializerOptions SerializeWithFields = new(SerializeReadable) { IncludeFields = true };
+
+    
+    
+    /// <summary>
+    /// Common <see cref="JsonSerializerOptions"/> for use when you [de]serialize with <see cref="JsonSerializer"/>.
+    /// </summary>
+    public static readonly JsonDocumentOptions DocumentCommon = new() { AllowTrailingCommas = true };
 }

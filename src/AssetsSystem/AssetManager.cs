@@ -69,8 +69,8 @@ public class AssetManager : IDisposable
         {
             null => Assets.NotFoundPolicy switch
             {
-                Assets.NotFoundPolicyType.Exception => throw new AssetNotFoundException(this, path),
-                Assets.NotFoundPolicyType.Fallback => GetDefault<T>() ?? throw new AssetFallbackNotFoundException(this, typeof(T)),
+                NotFoundPolicyType.Exception => throw new AssetNotFoundException(this, path),
+                NotFoundPolicyType.Fallback => GetDefault<T>() ?? throw new AssetFallbackNotFoundException(this, typeof(T)),
                 _ => throw new IndexOutOfRangeException($"{nameof(Assets)}.{nameof(Assets.NotFoundPolicy)} was not any known type: {Assets.NotFoundPolicy}")
             },
             T castedAsset => castedAsset,

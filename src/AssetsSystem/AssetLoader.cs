@@ -1,3 +1,8 @@
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using Monod.Utils.General;
+
 namespace Monod.AssetsSystem;
 
 /// <summary>
@@ -30,6 +35,8 @@ public abstract class AssetLoader
     /// </summary>
     public int LoadedAssets;
 
+    public MatcherInfo[] Matchers;
+
     /// <summary>
     /// String that will be shown as name of the asset manager.
     /// </summary>
@@ -42,6 +49,26 @@ public abstract class AssetLoader
     /// Load all "assets.json" for this <see cref="AssetLoader"/> asynchronously, can be used for reloading.
     /// </summary>
     public abstract void LoadAssetManifests();
+
+    protected static void LoadAssetManifest(Stream manifest, string relativePath)
+    {
+        var document = JsonDocument.Parse(manifest, Json.DocumentCommon);
+
+        var matchers = new List<MatcherInfo>();
+
+        foreach (var match in document.RootElement.EnumerateObject())
+        {
+            var properties = new Dictionary<int, object>();
+
+            foreach (var inner in match.Value.EnumerateObject())
+            {
+                int id = Assets.PropNameToId(inner.Name);
+                properties[id] = Assets.ParseAssetProp(inner.Value.GetRawText(), id);
+            }
+
+            matchers.Add(new MatcherInfo(Globbing.MatcherFromString(match.Name, relativePath), properties));
+        }
+    }
     
     /// <summary>
     /// Load all assets in the cache asynchronously, <b>without replacing</b> already loaded assets.

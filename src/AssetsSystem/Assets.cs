@@ -6,6 +6,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.Utils.Collections;
+using Monod.Utils.General;
 using Serilog;
 
 namespace Monod.AssetsSystem;
@@ -16,9 +17,12 @@ namespace Monod.AssetsSystem;
 public static class Assets
 {
     /// <summary>
-    /// Dictionary, which maps <see cref="File"/> extension <b>(WITH the period)</b> to function which accepts <see cref="FileStream"/> and returns an asset, similar to <see cref="Texture2D.FromStream(GraphicsDevice, Stream)"/>. Use it if you want to load asset of your own format, not supported by MonoPlus. Keep in mind multiply mods might try to add values with same keys to this.
+    /// File name of the file that is considered to be an "assets manifest".
     /// </summary>
-    public static readonly Dictionary<string, Func<FileStream, object>> CustomFormats = new();
+    /// <remarks>
+    /// This name is reserved and can't be used for assets. "Assets manifest" is a metadata file about assets, containing info such as which <see cref="IAssetFilter"/> and <see cref="IAssetParser"/> to use.
+    /// </remarks>
+    public const string MANIFEST_FILENAME = "assets.json";
         
     /// <summary>
     /// All registered <see cref="AssetManager"/>s.
@@ -36,12 +40,12 @@ public static class Assets
     public static readonly ReaderWriterLockSlim ReloadingInfoLock = new();
 
     /// <summary>
-    /// Amount of assets that were reloaded since reload started. May be non-zero even if the reload is finished.
+    /// Amount of assets that were reloaded since reload started.
     /// </summary>
     public static int ReloadedAssets;
     
     /// <summary>
-    /// Amount of assets that <see cref="ReloadingAssetLoaders"/> want to reload during this reload (including already reloaded). May be non-zero even if the reload is finished.
+    /// Amount of assets that <see cref="ReloadingAssetLoaders"/> want to reload during this reload (including already reloaded).
     /// </summary>
     public static int TotalReloadingAssets;
     
@@ -61,13 +65,24 @@ public static class Assets
     /// </summary>
     public static void Update()
     {
+        ReloadingInfoLock.EnterUpgradeableReadLock();
         try
         {
-            ReloadingInfoLock.EnterReadLock();
             if (ReloadingAssetLoaders.Count != 0 && ReloadedAssets == TotalReloadingAssets)
             { //finished reloading
                 InvokeReload();
                 ReloadThisFrame = true;
+                ReloadingInfoLock.EnterWriteLock();
+                try
+                {
+                    ReloadingAssetLoaders.Clear();
+                    ReloadedAssets = 0;
+                    TotalReloadingAssets = 0;
+                }
+                finally
+                {
+                    ReloadingInfoLock.ExitWriteLock();
+                }
             }
         }
         finally
@@ -191,52 +206,41 @@ public static class Assets
     /// <summary>
     /// Invoke all subscribed listeners, to make them reload assets.
     /// </summary>
-    public static void InvokeReload()
-    {
-        OnReload.Emit();
-    }
+    public static void InvokeReload() => OnReload.Emit();
 
-    /// <summary>
-    /// Type of resource program should aim for.
-    /// </summary>
-    public enum ResourcePriorityType
-    {
-        /// <summary>
-        /// Maximum performance, don't care about memory usage.
-        /// </summary>
-        Performance, 
-        
-        /// <summary>
-        /// Minimum memory usage, but probably lower performance.
-        /// </summary>
-        Memory,
-    }
 
     /// <summary>
     /// Whether <see cref="AssetManager"/>s should prefer maximum performance, or lower memory usage. Used in rare cases, where <see cref="ResourcePriorityType.Performance"/> can use a lot of memory.
     /// </summary>
     public static ResourcePriorityType ResourcePriority = ResourcePriorityType.Performance;
     
-    
-
-    /// <summary>
-    /// Types of action <see cref="AssetManager"/> will do if the specified asset was not found.
-    /// </summary>
-    public enum NotFoundPolicyType
-    {
-        /// <summary>
-        /// Throw <see cref="AssetNotFoundException"/>.
-        /// </summary>
-        Exception,
-        
-        /// <summary>
-        /// Fallback to default asset.
-        /// </summary>
-        Fallback,
-    }
-
     /// <summary>
     /// Action <see cref="AssetManager"/> will do if the specified asset was not found.
     /// </summary>
     public static NotFoundPolicyType NotFoundPolicy = NotFoundPolicyType.Fallback;
+
+    /// <summary>
+    /// <see cref="NamedExtEnum"/> with one value being a name of a property an asset can have and it's unique id. Used to speed up search/parse operations.
+    /// </summary>
+    public static NamedExtEnum AssetProperties = new();
+
+    /// <summary>
+    /// Convert property name of an asset to it's unique Id.
+    /// </summary>
+    /// <param name="propertyName">Name of the asset's property.</param>
+    /// <returns>Unique ID associated with that property.</returns>
+    public static int PropNameToId(string propertyName) => AssetProperties.GetValue(propertyName);
+
+    /// <summary>
+    /// Parsers for <see cref="AssetProperties"/>. The key is property's id, the value is the parser. Parser accepts the value of the property, and produces some <see cref="object"/> based on it.
+    /// </summary>
+    public static Dictionary<int, Func<string, object>> AssetPropParsers = new();
+
+    /// <summary>
+    /// Parse asset's property form the given string based on property's id/name.
+    /// </summary>
+    /// <param name="property">Property of the asset from the json, as a string.</param>
+    /// <param name="propertyId">Id/name of the property.</param>
+    /// <returns>Parsed result.</returns>
+    public static object ParseAssetProp(string property, int propertyId) => AssetPropParsers[propertyId](property);
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -13,13 +14,17 @@ public class NamedExtEnum
         return Names.Count - 1;
     }
 
-    public int? GetValue(string name)
+    public int GetValue(string name)
     {
         for (int i = 0; i < Names.Count; i++)
             if (Names[i] == name)
                 return i;
-        return null;
+        Guard.ThrowKeyNotFoundException(name);
+        //unreachable
+        return 0;
     }
+
+    
 
     public bool TryGetValue(string name, [NotNullWhen(true)] out int? value)
     {
