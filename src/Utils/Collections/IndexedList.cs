@@ -89,7 +89,7 @@ public class IndexedList<T> : ICollection<T>
     {
         FindMinFreeIndex();
         T item = handler(MinFreeIndex);
-        if (item is null) throw new Exception("Handler returned null");
+        if (item is null) throw new Exception("Handler returned 'null'.");
         array[MinFreeIndex] = item;
         int index = MinFreeIndex;
         MinFreeIndex++;

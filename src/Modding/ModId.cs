@@ -86,5 +86,5 @@ public readonly struct ModId : IEquatable<ModId>
     }
 
     /// <inheritdoc />
-    public bool Equals(ModId other) => string.Equals(Name, other.Name, StringComparison.InvariantCultureIgnoreCase) && Version.Equals(other.Version);
+    public bool Equals(ModId other) => string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase) && Version.Equals(other.Version);
 }

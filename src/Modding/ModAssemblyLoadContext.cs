@@ -36,7 +36,7 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
     public ModAssemblyLoadContext(Mod mod) : base(isCollectible: true)
     {
         ModConfig config = mod.Config;
-        if (config.AssemblyFile is null) Guard.ThrowInvalidOperationException("Trying to create ModAssemblyLoadContext with config which has null AssemblyFile");
+        if (config.AssemblyFile is null) Guard.InvalidOperationException("Trying to create ModAssemblyLoadContext with config which has null AssemblyFile");
         this.mod = mod;
 
         if (!MonodMain.HotReload) return;

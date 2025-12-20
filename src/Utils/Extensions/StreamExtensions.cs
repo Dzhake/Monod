@@ -98,7 +98,7 @@ public static class StreamExtensions
             // If the stream's size is known, allocate and populate an array
             byte[] array = GC.AllocateUninitializedArray<byte>(byteLength);
             int readCount = await stream.ReadAsync(array);
-            if (readCount != byteLength) throw new InvalidOperationException("readCount doesn't match byteLength");
+            if (readCount != byteLength) throw new InvalidOperationException("readCount doesn't match byteLength.");
             return array;
         }
         // If the stream's size cannot be determined, use a MemoryStream

@@ -8,7 +8,7 @@ using Monod.Utils.General;
 namespace Monod;
 
 /// <summary>
-/// Wrapper around various <see cref="MonoPlus"/> modules.
+/// Wrapper around various <see cref="Monod"/> modules.
 /// </summary>
 public static class MonodMain
 {

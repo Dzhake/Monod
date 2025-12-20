@@ -104,7 +104,7 @@ public static class Assets
         ArgumentNullException.ThrowIfNull(assetManager);
         ArgumentNullException.ThrowIfNull(prefix);
         if (assetManager.Prefix is not null)
-            throw new ArgumentException("The specified manager already has a registered prefix.", nameof(assetManager));
+            throw new ArgumentException("The specified manager already has a registered prefix. Check that this manager was unregistered, if it had to.", nameof(assetManager));
 
         Managers.Add(prefix, assetManager);
         assetManager.Prefix = prefix;
@@ -176,7 +176,7 @@ public static class Assets
     public static AssetManager GetManager(string prefix)
     {
         if (!Managers.TryGetValue(prefix, out AssetManager? manager))
-            throw new ArgumentException("Could not find asset manager with the specified prefix", nameof(prefix));
+            throw new ArgumentException("Could not find asset manager with the specified prefix. Check that the asset manager was registered and that the prefix is correct.", nameof(prefix));
         return manager;
     }
 

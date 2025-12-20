@@ -168,7 +168,7 @@ public static class ModManager
     /// <exception cref="InvalidOperationException">ModManager is not Initialized.</exception>
     public static void LoadMods(string[] modDirs)
     {
-        if (!Initialized) throw new InvalidOperationException("ModManager is not Initialized");
+        if (!Initialized) throw new InvalidOperationException("ModManager is not Initialized.");
         
         SkipLoading = false;
         

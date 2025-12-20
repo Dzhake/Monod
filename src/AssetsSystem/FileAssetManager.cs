@@ -119,8 +119,8 @@ public class FileAssetManager : AssetManager
             case AssetType.Text:
                 return Assets.ResourcePriority switch
                 {
-                    Assets.ResourcePriorityType.Performance => Encoding.UTF8.GetString(info.stream.ToByteArrayDangerous()),
-                    Assets.ResourcePriorityType.Memory => await new StreamReader(info.stream, Encoding.UTF8).ReadToEndAsync(),
+                    ResourcePriorityType.Performance => Encoding.UTF8.GetString(info.stream.ToByteArrayDangerous()),
+                    ResourcePriorityType.Memory => await new StreamReader(info.stream, Encoding.UTF8).ReadToEndAsync(),
                     _ => throw new IndexOutOfRangeException()
                 };
             case AssetType.Binary:
