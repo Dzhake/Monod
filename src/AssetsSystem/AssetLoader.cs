@@ -16,12 +16,12 @@ public abstract class AssetLoader
     public AssetManager Manager;
 
     /// <summary>
-    /// Total amount of "assets.json" files that are loaded or are loading right now.
+    /// Total amount of asset manifests that are loaded or are loading right now.
     /// </summary>
     public int TotalAssetManifests;
 
     /// <summary>
-    /// Amount of currently loaded "assets.json" files.
+    /// Amount of currently loaded asset manifests.
     /// </summary>
     public int LoadedAssetManifests;
 
@@ -35,7 +35,10 @@ public abstract class AssetLoader
     /// </summary>
     public int LoadedAssets;
 
-    public MatcherInfo[] Matchers;
+    /// <summary>
+    /// List of <see cref="MatcherInfo"/>s loaded from asset manifests, in order how they should be applied (first one to match means the one to use).
+    /// </summary>
+    public MatcherInfo[]? Matchers;
 
     /// <summary>
     /// String that will be shown as name of the asset manager.
@@ -46,15 +49,21 @@ public abstract class AssetLoader
     public override string ToString() => DisplayName;
 
     /// <summary>
-    /// Load all "assets.json" for this <see cref="AssetLoader"/> asynchronously, can be used for reloading.
+    /// Load all asset manifests for this <see cref="AssetLoader"/> asynchronously, can be used for reloading.
     /// </summary>
     public abstract void LoadAssetManifests();
 
-    protected static void LoadAssetManifest(Stream manifest, string relativePath)
+    /// <summary>
+    /// Parse matchers from the specified asset manifest (as a <paramref name="stream"/>) with the specified <paramref name="relativePath"/> of the manifest.
+    /// </summary>
+    /// <param name="stream"><see cref="Stream"/> that reads the asset manifest.</param>
+    /// <param name="relativePath">Path of the asset manifest relative to <see cref="AssetManager"/>'s root directory. Used to prefix each match with it, making matchers use subdirectory of the manifest.</param>
+    /// <returns>List of <see cref="MatcherInfo"/>s parsed from the specified asset manifest.</returns>
+    protected static List<MatcherInfo> ParseAssetManifest(Stream stream, string relativePath)
     {
-        var document = JsonDocument.Parse(manifest, Json.DocumentCommon);
+        var document = JsonDocument.Parse(stream, Json.DocumentCommon);
 
-        var matchers = new List<MatcherInfo>();
+        List<MatcherInfo> result = new();
 
         foreach (var match in document.RootElement.EnumerateObject())
         {
@@ -66,8 +75,10 @@ public abstract class AssetLoader
                 properties[id] = Assets.ParseAssetProp(inner.Value.GetRawText(), id);
             }
 
-            matchers.Add(new MatcherInfo(Globbing.MatcherFromString(match.Name, relativePath), properties));
+            result.Add(new MatcherInfo(Globbing.MatcherFromString(match.Name, relativePath), properties));
         }
+
+        return result;
     }
     
     /// <summary>

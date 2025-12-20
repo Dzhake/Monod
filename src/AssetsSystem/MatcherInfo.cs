@@ -5,19 +5,19 @@ using Microsoft.Extensions.FileSystemGlobbing;
 namespace Monod.AssetsSystem;
 
 /// <summary>
-/// Struct that contains one entry in assets.json: a path matcher, and properties for assets matched by it.
+/// Struct that contains one entry in asset manifest: a path matcher, and properties for assets matched by it.
 /// </summary>
-public struct MatcherInfo
+public readonly struct MatcherInfo : IEquatable<MatcherInfo>
 {
     /// <summary>
     /// Path matcher, if matched by asset's path, then asset should use <see cref="Properties"/>.
     /// </summary>
-    public Matcher PathMatcher;
+    public readonly Matcher PathMatcher;
     
     /// <summary>
     /// Properties that asset should use if it matches the <see cref="PathMatcher"/>.
     /// </summary>
-    public Dictionary<int, object> Properties;
+    public readonly Dictionary<int, object> Properties;
 
     /// <summary>
     /// Initialize a new <see cref="MatcherInfo"/> with the specific <see cref="PathMatcher"/> and <see cref="Properties"/>.
@@ -35,4 +35,10 @@ public struct MatcherInfo
     {
         return HashCode.Combine(PathMatcher, Properties);
     }
+
+    /// <inheritdoc />
+    public bool Equals(MatcherInfo other) => PathMatcher.Equals(other.PathMatcher) && Properties.Equals(other.Properties);
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) => obj is MatcherInfo other && Equals(other);
 }

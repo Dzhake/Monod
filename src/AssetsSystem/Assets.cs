@@ -17,10 +17,10 @@ namespace Monod.AssetsSystem;
 public static class Assets
 {
     /// <summary>
-    /// File name of the file that is considered to be an "assets manifest".
+    /// File name of the file that is considered to be an "asset manifest".
     /// </summary>
     /// <remarks>
-    /// This name is reserved and can't be used for assets. "Assets manifest" is a metadata file about assets, containing info such as which <see cref="IAssetFilter"/> and <see cref="IAssetParser"/> to use.
+    /// This name is reserved and can't be used for assets. "Assets manifest" is a metadata file about assets, containing info such as which <see cref="IAssetFilter"/> and <see cref="AssetParser"/> to use.
     /// </remarks>
     public const string MANIFEST_FILENAME = "assets.json";
         

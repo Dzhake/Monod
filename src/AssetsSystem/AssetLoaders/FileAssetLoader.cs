@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Monod.Utils.General;
 
 namespace Monod.AssetsSystem.AssetLoaders;
 
@@ -22,7 +25,24 @@ public class FileAssetLoader : AssetLoader
     /// <inheritdoc />
     public override void LoadAssetManifests()
     {
-        string[] manifests = Directory.GetFiles(DirectoryPath, "assets.json");
+        string[] manifests = Directory.GetFiles(DirectoryPath, Assets.MANIFEST_FILENAME);
+        
+        FileWithDepth[] files = new FileWithDepth[manifests.Length];
+        for (int i = 0; i < manifests.Length; i++)
+            files[i] = new(manifests[i]);
+        files.Sort();
+        List<MatcherInfo> matchers = new();
+        
+        // Sort by depth: higher depth (more slashes) - lower index, meaning "more specific" manifests will be earlier in the list, so they will be matched earlier and properties from them will be used.
+        foreach (FileWithDepth file in files)
+        {
+            string manifest = file.FilePath;
+            Stream manifestStream = File.Open(manifest, FileMode.Open, FileAccess.Read, FileShare.Read);
+            string relativePath = Path.GetRelativePath(DirectoryPath, manifest);
+            matchers.AddRange(ParseAssetManifest(manifestStream, relativePath));
+        }
+
+        Matchers = matchers.ToArray();
     }
 
     /// <inheritdoc />
