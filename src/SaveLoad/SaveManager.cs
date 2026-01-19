@@ -16,7 +16,7 @@ public static class SaveManager
     public static string SavesLocation = Environment.GetEnvironmentVariable("SavesDir") ?? Path.Join(AppContext.BaseDirectory, "Saves");
     
     /// <summary>
-    /// Deserializes <see cref="File"/> at the specified <paramref name="saveLocation"/> as <typeparamref name="T"/> , and returns the deserialized value, or <see langword="null"/> if file not found.
+    /// Deserializes <see cref="File"/> at the specified <paramref name="saveLocation"/> as <typeparamref name="T"/> , and returns the deserialized value, or null if file not found.
     /// </summary>
     /// <param name="saveLocation"><see cref="File"/> path to the file with serialized <typeparamref name="T"/>.</param>
     /// <typeparam name="T">Type of the serialized object.</typeparam>

@@ -6,12 +6,12 @@ using Monod.Utils.Collections;
 namespace Monod.Utils.General;
 
 /// <summary>
-/// Helper class for keeping track of <see cref="Tasks"/>, and throwing exceptions to main thread.
+/// Helper class for keeping track of <see cref="Tasks"/>, and throwing exceptions on main thread to make them catch-able.
 /// </summary>
 public static class MainThread
 {
-    private static IndexedList<Task> Tasks = new();
-    private static List<Exception> Exceptions = new(2);
+    private static readonly IndexedList<Task> Tasks = new();
+    private static readonly List<Exception> Exceptions = new(2);
 
     /// <summary>
     /// Updates all tasks managed by <see cref="MainThread"/>.

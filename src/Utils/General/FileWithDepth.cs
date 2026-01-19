@@ -54,4 +54,26 @@ public readonly struct FileWithDepth : IComparable<FileWithDepth>, IEquatable<Fi
 
     /// <inheritdoc />
     public override int GetHashCode() => FilePath.GetHashCode();
+
+    /// <summary>
+    /// Indicates whether the one object is equal to another object of the same type.
+    /// </summary>
+    /// <param name="left">First object.</param>
+    /// <param name="right">Second object.</param>
+    /// <returns>Whether first and second objects are equal.</returns>
+    public static bool operator ==(FileWithDepth left, FileWithDepth right)
+    {
+        return left.Equals(right);
+    }
+
+    /// <summary>
+    /// Indicates whether the one object is not equal to another object of the same type.
+    /// </summary>
+    /// <param name="left">First object.</param>
+    /// <param name="right">Second object.</param>
+    /// <returns>Whether first and second objects are not equal.</returns>
+    public static bool operator !=(FileWithDepth left, FileWithDepth right)
+    {
+        return !(left == right);
+    }
 }

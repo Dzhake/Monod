@@ -32,7 +32,7 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
     /// Instances a new <see cref="ModAssemblyLoadContext"/>.
     /// </summary>
     /// <param name="mod">Mod related to the newly created assembly context.</param>
-    /// <exception cref="InvalidOperationException"><paramref name="mod.Config.AssemblyFile"/> is <see langword="null"/></exception>
+    /// <exception cref="InvalidOperationException"><paramref name="mod.Config.AssemblyFile"/> is null</exception>
     public ModAssemblyLoadContext(Mod mod) : base(isCollectible: true)
     {
         ModConfig config = mod.Config;

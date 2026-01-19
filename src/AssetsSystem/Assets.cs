@@ -30,24 +30,24 @@ public static class Assets
     public static readonly Dictionary<string, AssetManager> Managers = new();
     
     /// <summary>
-    /// List of <see cref="AssetLoader"/>s, that are currently reloading some assets. Used to determine whether the game should pause and wait until assets are reloaded.
+    /// List of <see cref="AssetLoader"/>s, that are currently reloading some assets. Used to determine whether the game should pause and wait until assets are reloaded. Cleared automatically by <see cref="Assets"/> when reload ends. Access only with <see cref="LoadingInfoLock"/>.
     /// </summary>
-    public static readonly HashSet<AssetLoader> ReloadingAssetLoaders = new();
+    public static readonly HashSet<AssetLoader> LoadingAssetLoaders = new();
 
     /// <summary>
-    /// Lock for <see cref="ReloadingAssetLoaders"/>, <see cref="ReloadedAssets"/> and <see cref="TotalReloadingAssets"/>. Required because <see cref="FileSystemWatcher"/> might raise event during the <see cref="Update"/>, causing race condition, leading to <see cref="AssetLoader"/> thinking that reload is currently ongoing even if it's not.
+    /// Lock for <see cref="LoadingAssetLoaders"/>, <see cref="LoadedAssets"/>, <see cref="TotalAssets"/>, <see cref="ReloadQueue"/>. Required because <see cref="FileSystemWatcher"/> might raise event during the <see cref="Update"/>, causing race condition, leading to <see cref="AssetLoader"/> thinking that reload is currently ongoing even if it's not.
     /// </summary>
-    public static readonly ReaderWriterLockSlim ReloadingInfoLock = new();
+    public static readonly ReaderWriterLockSlim LoadingInfoLock = new();
 
     /// <summary>
-    /// Amount of assets that were reloaded since reload started.
+    /// Amount of assets that were reloaded since reload started. Incremented in <see cref="AssetLoader.LoadAsset"/>. Access only with <see cref="LoadingInfoLock"/>.
     /// </summary>
-    public static int ReloadedAssets;
+    public static int LoadedAssets;
     
     /// <summary>
-    /// Amount of assets that <see cref="ReloadingAssetLoaders"/> want to reload during this reload (including already reloaded).
+    /// Amount of assets that <see cref="LoadingAssetLoaders"/> want to reload during this reload (including already reloaded). Incremented in <see cref="AssetLoader.LoadAssets"/>. Access only with <see cref="LoadingInfoLock"/>.
     /// </summary>
-    public static int TotalReloadingAssets;
+    public static int TotalAssets;
     
     /// <summary>
     /// Whether systems should reload assets from the asset cache this frame. Set in <see cref="Update"/>.
@@ -55,41 +55,77 @@ public static class Assets
     public static bool ReloadThisFrame;
 
     /// <summary>
+    /// Whether some asset loader currently reload assets. Used to distinguish loading assets from reloading, to know whether to do reload-only actions.
+    /// </summary>
+    public static bool Reloading;
+
+    /// <summary>
     /// Event that is raised when some <see cref="AssetLoader"/>s finish reloading assets. Use <see cref="ReloadThisFrame"/> (recommended) or this to determine when to reload assets.
     /// </summary>
     public static EventBus OnReload = new();
 
+    /// <summary>
+    /// Queue for assets that need to be reloaded. Access only with <see cref="LoadingInfoLock"/>.
+    /// </summary>
+    public static HashSet<(AssetLoader, string)>? ReloadQueue;
+
+    /// <summary>
+    /// Dictionary of asset types and parsers that should be able to parse the specified format. Should be used if the loaded asset doesn't specify some custom parser.
+    /// </summary>
+    public static readonly Dictionary<AssetType, AssetParser> DefaultParsers = new();
+
+    /// <summary>
+    /// Initialize <see cref="Assets"/>. Should be called only once.
+    /// </summary>
+    public static void Initialize()
+    {
+        if (MonodMain.HotReload)
+            ReloadQueue = new();
+        DefaultParsers.AddRange([
+            new(AssetType.Binary, AssetParsers.Binary),
+            new(AssetType.Text, AssetParsers.Text),
+            new(AssetType.Image, AssetParsers.Image),
+            new(AssetType.Audio, AssetParsers.Audio),
+            new(AssetType.Effect, AssetParsers.Effect),
+            new(AssetType.Localization, AssetParsers.Localization),
+        ]);
+    }
 
     /// <summary>
     /// Update <see cref="Assets"/>.
     /// </summary>
     public static void Update()
     {
-        ReloadingInfoLock.EnterUpgradeableReadLock();
         try
         {
-            if (ReloadingAssetLoaders.Count != 0 && ReloadedAssets == TotalReloadingAssets)
-            { //finished reloading
-                InvokeReload();
-                ReloadThisFrame = true;
-                ReloadingInfoLock.EnterWriteLock();
+            LoadingInfoLock.EnterUpgradeableReadLock();
+            if (LoadingAssetLoaders.Count != 0 && LoadedAssets == TotalAssets) //finished loading
+            {
+                if (Reloading)
+                {
+                    InvokeReload();
+                    ReloadThisFrame = true;    
+                }
+                
+                Log.Information("Finished loading {TotalAssets} assets", TotalAssets);
+                
+                LoadingInfoLock.EnterWriteLock();
                 try
                 {
-                    ReloadingAssetLoaders.Clear();
-                    ReloadedAssets = 0;
-                    TotalReloadingAssets = 0;
+                    LoadingAssetLoaders.Clear();
+                    LoadedAssets = 0;
+                    TotalAssets = 0;
                 }
                 finally
                 {
-                    ReloadingInfoLock.ExitWriteLock();
+                    LoadingInfoLock.ExitWriteLock();
                 }
             }
         }
         finally
         {
-            ReloadingInfoLock.ExitReadLock();
+            LoadingInfoLock.ExitUpgradeableReadLock();
         }
-        
     }
 
     /// <summary>
@@ -97,7 +133,7 @@ public static class Assets
     /// </summary>
     /// <param name="assetManager">The asset manager to register under the specified <paramref name="prefix"/>.</param>
     /// <param name="prefix">The global prefix to register the specified asset <paramref name="assetManager"/> under.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="assetManager"/> or <paramref name="prefix"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="assetManager"/> or <paramref name="prefix"/> is null.</exception>
     /// <exception cref="ArgumentException"><paramref name="assetManager"/> already has a registered prefix, or the specified prefix is already occupied by another asset manager.</exception>
     public static void RegisterAssetManager(AssetManager assetManager, string prefix)
     {
@@ -153,7 +189,7 @@ public static class Assets
     }
 
     /// <summary>
-    ///   <para>Same as <see cref="Get{T}"/>, but returns <see langword="null"/> if asset was not found, instead of using <see cref="Assets.NotFoundPolicy"/>.</para>
+    ///   <para>Same as <see cref="Get{T}"/>, but returns null if asset was not found, instead of using <see cref="Assets.NotFoundPolicy"/>.</para>
     /// </summary>
     /// <typeparam name="T">The type of the asset to load.</typeparam>
     /// <param name="fullPath">Full path to the asset (Asset Manager's name + ":" + Relative asset's path)</param>
@@ -199,7 +235,7 @@ public static class Assets
         }
         // <prefix> ':' <path>
         prefix = query[..separatorIndex];
-        path = query[(separatorIndex + 2)..];
+        path = query[(separatorIndex + 1)..];
     }
     
 
@@ -219,28 +255,5 @@ public static class Assets
     /// </summary>
     public static NotFoundPolicyType NotFoundPolicy = NotFoundPolicyType.Fallback;
 
-    /// <summary>
-    /// <see cref="NamedExtEnum"/> with one value being a name of a property an asset can have and it's unique id. Used to speed up search/parse operations.
-    /// </summary>
-    public static NamedExtEnum AssetProperties = new();
-
-    /// <summary>
-    /// Convert property name of an asset to it's unique Id.
-    /// </summary>
-    /// <param name="propertyName">Name of the asset's property.</param>
-    /// <returns>Unique ID associated with that property.</returns>
-    public static int PropNameToId(string propertyName) => AssetProperties.GetValue(propertyName);
-
-    /// <summary>
-    /// Parsers for <see cref="AssetProperties"/>. The key is property's id, the value is the parser. Parser accepts the value of the property, and produces some <see cref="object"/> based on it.
-    /// </summary>
-    public static Dictionary<int, Func<string, object>> AssetPropParsers = new();
-
-    /// <summary>
-    /// Parse asset's property form the given string based on property's id/name.
-    /// </summary>
-    /// <param name="property">Property of the asset from the json, as a string.</param>
-    /// <param name="propertyId">Id/name of the property.</param>
-    /// <returns>Parsed result.</returns>
-    public static object ParseAssetProp(string property, int propertyId) => AssetPropParsers[propertyId](property);
+    
 }

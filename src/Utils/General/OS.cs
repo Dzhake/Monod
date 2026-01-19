@@ -8,7 +8,7 @@ namespace Monod.Utils.General;
 public static class OS
 {
     /// <summary>
-    /// Current <see cref="OSPlatform"/>, or <see langword="null"/> if failed to detect
+    /// Current <see cref="OSPlatform"/>, or null if failed to detect
     /// </summary>
     public static OSPlatform? Platform;
 

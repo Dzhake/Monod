@@ -3,7 +3,9 @@ using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.AssetsSystem;
+using Monod.AssetsSystem.AssetLoaders;
 using Monod.GraphicsSystem;
+using Monod.GraphicsSystem.Components;
 using Monod.InputSystem;
 using Monod.ModSystem;
 using Monod.TimeSystem;
@@ -38,6 +40,7 @@ public abstract class MonodGame : Game
     protected override void Initialize()
     {
         MonodMain.OnGameInitialize(this);
+        Assets.Initialize();
         base.Initialize();
     }
 
@@ -47,11 +50,9 @@ public abstract class MonodGame : Game
         Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
 
         string contentPath = $"{AppContext.BaseDirectory}Content";
-        //TODO MainAssetManager = new FileAssetManager(contentPath); Requires finished assets system.
-        if (MainAssetManager is null) throw new InvalidOperationException("Couldn't create MainAssetManager");
+        MainAssetManager = new AssetManager(new FileAssetLoader((contentPath)));
         Assets.RegisterAssetManager(MainAssetManager, "");
         MainAssetManager.LoadAssets();
-        Log.Information("Started loading content");
     }
 
     /// <inheritdoc/> 
@@ -64,8 +65,14 @@ public abstract class MonodGame : Game
         MainThread.Update();
 
         ModManager.Update();
+        Assets.Update();
 
-        if (ModManager.InProgress || Assets.ReloadingAssetLoaders.Count != 0) return;
+        if (Assets.LoadingAssetLoaders.Count != 0) //Don't care about thread safety, readonly with no side effects other than one frame delay
+        {
+            return;
+        }
+
+        if (ModManager.InProgress || Assets.LoadingAssetLoaders.Count != 0) return;
         //DevConsole.Update(); TODO dev console in-game w/ Console class support like in DD.
 
         UpdateM();
@@ -84,9 +91,14 @@ public abstract class MonodGame : Game
             return;
         }
 
-        if (Assets.ReloadingAssetLoaders.Count != 0)
+        if (Assets.LoadingAssetLoaders.Count != 0)
         {
             //TODO render loading assets progress bar. Requires default font.
+            float width = Window.ClientBounds.Width;
+            float height = Window.ClientBounds.Height;
+            Renderer.Begin();
+            ProgressBar.Draw((float)Assets.LoadedAssets / Assets.TotalAssets, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
+            Renderer.End();
         }
         
         DrawM();

@@ -25,26 +25,15 @@ public static class AssetsUtils
     [Pure]
     public static AssetType DetectTypeByExtension(ReadOnlySpan<char> extension)
     {
-        extension = extension[1..]; //ok yes this is a crime but it saves a dot per each 
+        extension = extension[1..]; //remove the dot
         return extension switch
         {
-            "mp3" => AssetType.Audio,
-            "ogg" => AssetType.Audio,
-            "wav" => AssetType.Audio,
-
-            "png" => AssetType.Image,
-            "jpg" or "jpeg" => AssetType.Image,
-
-            "txt" => AssetType.Text,
-            "csv" => AssetType.Text,
-            "json" => AssetType.Text,
-            "yaml" => AssetType.Text,
-            "xml" => AssetType.Text,
-
             "bin" or "bytes" => AssetType.Binary,
-
+            "txt" or "csv" or "json" or "yaml" or "xml" => AssetType.Text,
+            "png" or "jpg" or "jpeg" => AssetType.Image,
+            "mp3" or "ogg" or "wav" => AssetType.Audio,
             "mgfx" => AssetType.Effect,
-
+            "ftl" => AssetType.Localization,
             _ => AssetType.Unknown,
         };
     }

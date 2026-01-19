@@ -12,12 +12,32 @@ public class NamedExtEnum
     /// <summary>
     /// List of registered names, where index is a value, and the value (object) in the list is value's name.
     /// </summary>
-    private readonly List<string> Names = new();
+    private readonly List<string> Names;
 
     /// <summary>
     /// Dictionary of registered values, where key is value's name, and the value in the dictionary is the value.
     /// </summary>
-    private readonly Dictionary<string, int> Values = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, int> Values;
+
+    /// <summary>
+    /// Initialize a new instance of the <see cref="NamedExtEnum"/> with default values.
+    /// </summary>
+    public NamedExtEnum()
+    {
+        Names = new();
+        Values = new(StringComparer.Ordinal);
+    }
+
+    /// <summary>
+    /// Initialize a new instance of the <see cref="NamedExtEnum"/> with the specified <paramref name="names"/>.
+    /// </summary>
+    /// <param name="names">List of names the enum should start with. Same as using <see cref="AddValue"/> for each value specified in the list, but more performant.</param>
+    public NamedExtEnum(List<string> names)
+    {
+        Names = names;
+        Values = new(StringComparer.Ordinal);
+        for (int i = 0; i < names.Count; i++) Values.Add(names[i], i);
+    }
 
     /// <summary>
     /// Add a new value with the specified <see cref="name"/>.

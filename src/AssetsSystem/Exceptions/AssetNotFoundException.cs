@@ -19,7 +19,7 @@ public sealed class AssetNotFoundException : Exception
     public string RelativePath { get; }
 
     /// <inheritdoc/>
-    public override string Message => $"Asset '{RelativePath}' could not be found in {AssetManager}.";
+    public override string Message => $"Asset at path '{RelativePath}' could not be found in asset manager '{AssetManager}'.";
 
     /// <summary>
     ///   <para>Initializes a new instance of the <see cref="AssetNotFoundException"/> class with the specified <paramref name="assetManager"/> and <paramref name="relativePath"/>.</para>

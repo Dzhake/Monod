@@ -9,29 +9,29 @@ namespace Monod.AssetsSystem;
 /// <summary>
 /// Class for loading, storing, caching, and accessing various assets.
 /// </summary>
-public class AssetManager : IDisposable
+public sealed class AssetManager : IDisposable
 {
     /// <summary>
     /// <see cref="IAssetFilter"/> used for this <see cref="AssetManager"/>.
     /// </summary>
-    public IAssetFilter? Filter;
+    public readonly IAssetFilter? Filter;
 
     /// <summary>
     /// <see cref="AssetLoader"/> used for this <see cref="AssetManager"/>.
     /// </summary>
-    public AssetLoader Loader;
+    public readonly AssetLoader Loader;
 
     
 
     /// <summary>
     /// Whether this asset manager has been disposed.
     /// </summary>
-    protected bool disposed;
+    private bool disposed;
 
     /// <summary>
     /// Unique prefix for this <see cref="AssetManager"/>, which should be used for <see cref="Assets.Get{T}"/>
     /// </summary>
-    public string? Prefix = null;
+    public string? Prefix;
 
     /// <summary>
     /// Whether this <see cref="AssetManager"/> is capable of reloading assets. Should be <see langword="false"/> for <see cref="AssetManager"/> with name "fallbacks", to prevent issues when reloading fallbacks.
@@ -55,6 +55,13 @@ public class AssetManager : IDisposable
     public override string ToString()
         => Prefix is null ? $"(no prefix) {DisplayName}" : $"({Prefix}:/) {DisplayName}";
 
+    public AssetManager(AssetLoader loader, IAssetFilter? filter = null)
+    {
+        Loader = loader;
+        loader.Manager = this;
+        Filter = filter;
+    }
+
     /// <summary>
     /// Returns asset at the specified <paramref name="path"/>.
     /// </summary>
@@ -70,7 +77,7 @@ public class AssetManager : IDisposable
             null => Assets.NotFoundPolicy switch
             {
                 NotFoundPolicyType.Exception => throw new AssetNotFoundException(this, path),
-                NotFoundPolicyType.Fallback => GetDefault<T>() ?? throw new AssetFallbackNotFoundException(this, typeof(T)),
+                NotFoundPolicyType.Fallback => GetFallback<T>() ?? throw new AssetFallbackNotFoundException(this, typeof(T)),
                 _ => throw new IndexOutOfRangeException($"{nameof(Assets)}.{nameof(Assets.NotFoundPolicy)} was not any known type: {Assets.NotFoundPolicy}")
             },
             T castedAsset => castedAsset,
@@ -79,11 +86,11 @@ public class AssetManager : IDisposable
     }
 
     /// <summary>
-    /// Same as <see cref="Get{T}"/>, but returns <see langword="null"/> if asset was not found, instead of using <see cref="Assets.NotFoundPolicy"/>.
+    /// Same as <see cref="Get{T}"/>, but returns null if asset was not found, instead of using <see cref="Assets.NotFoundPolicy"/>.
     /// </summary>
     /// <typeparam name="T"><see cref="Type"/> of the asset to return. Throws an exception if types of asset in memory and requested types don't match.</typeparam>
     /// <param name="path">Path of the asset in this <see cref="AssetManager"/>.</param>
-    /// <returns>Asset at the specified <paramref name="path"/>, or <see langword="null"/> if not found.</returns>
+    /// <returns>Asset at the specified <paramref name="path"/>, or null if not found.</returns>
     /// <exception cref="AssetTypeMismatchException"><typeparamref name="T"/> does not match type of the loaded asset.</exception>
     public T? GetOrDefault<T>(string path)
     {
@@ -97,46 +104,34 @@ public class AssetManager : IDisposable
     }
     
     /// <summary>
-    /// Returns default (fallback) asset with the specified <typeparamref name="T"/> for asset that you could not be found.
+    /// Get fallback asset with the specified <typeparamref name="T"/> for asset that could not be found.
     /// </summary>
     /// <typeparam name="T">Type of the fallback.</typeparam>
     /// <returns>Fallback asset for that type.</returns>
     /// <exception cref="AssetFallbackNotFoundException">Thrown if asset fallback was not found, or could not be loaded.</exception>
-    public static T? GetDefault<T>()
+    public static T? GetFallback<T>()
     {
         return Assets.GetOrDefault<T>($"fallbacks:/{typeof(T)}");
     }
-
-    /// <summary>
-    /// Reload all assets loaded by this <see cref="AssetManager"/>.
-    /// </summary>
-    public void ReloadAllAssets()
-    {
-        ObjectDisposedException.ThrowIf(disposed, this);
-        if (!MonodMain.HotReload) return;
-        
-        Loader.LoadAssetManifests();
-        LoadAssets();
-    }
-    
     
     /// <summary>
-    /// Loads all assets related to this manager, e.g. all files from its directory for file-based all manager.
+    /// Loads all assets related to this manager asynchronously, replacing already loaded assets.
     /// </summary>
     public void LoadAssets()
     {
         ObjectDisposedException.ThrowIf(disposed, this);
+        Loader.LoadAssetManifests();
         Loader.LoadAssets();
         Log.Information("{AssetManager} is loading assets", this);
-        /*LoadedAmount = 0;
-        string[] assetPaths = GetAllAssetsPaths();
-        if (Filter != null) assetPaths = assetPaths.Where(Filter.ShouldLoad).ToArray();
-        TotalAmount = assetPaths.Length;
-        foreach (string assetPath in assetPaths)
-            MainThread.Add(Task.Run(async () => await LoadIntoCacheAsync(Path.GetFileNameWithoutExtension(assetPath))));*/
     }
 
+    /// <summary>
+    /// Load asset at the specified path in the cache synchronously, replacing already loaded assets. Useful for quickly loading fonts for the startup loading screen.
+    /// </summary>
+    public void LoadAsset(string path) => Loader.LoadAsset(path);
+
     
+
 
 
     /// <inheritdoc/> 
@@ -151,10 +146,10 @@ public class AssetManager : IDisposable
     ///   <para>Releases the unmanaged resources used by the asset manager and optionally releases the managed resources.</para>
     /// </summary>
     /// <param name="disposing">Whether to release managed resources too.</param>
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         Assets.UnRegisterAssetsManager(this);
-        if (!disposing) return;
+        //if (!disposing) return;
     }
 
     /// <summary>

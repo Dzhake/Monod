@@ -31,7 +31,7 @@ public static class TaskExtensions
     /// <typeparam name="T">The type of the result produced by the task.</typeparam>
     /// <param name="source">The task completion source to transition to a completion state.</param>
     /// <param name="func">The function whose result should be used as a completion state for the <paramref name="source"/>'s underlying task.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="func"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="func"/> is null.</exception>
     /// <exception cref="InvalidOperationException">The <paramref name="source"/>'s underlying task has already completed.</exception>
     public static void SetFromFunc<T>(this TaskCompletionSource<T> source, [InstantHandle] Func<T> func)
     {
@@ -45,7 +45,7 @@ public static class TaskExtensions
     /// <param name="source">The task completion source to transition to a completion state.</param>
     /// <param name="func">The function whose result should be used as a completion state for the <paramref name="source"/>'s underlying task.</param>
     /// <returns><see langword="true"/>, if the operation was successful; otherwise, <see langword="false"/>.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="func"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="source"/> or <paramref name="func"/> is null.</exception>
     [MustUseReturnValue]
     public static bool TrySetFromFunc<T>(this TaskCompletionSource<T> source, [InstantHandle] Func<T> func)
     {

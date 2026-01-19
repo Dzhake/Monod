@@ -21,12 +21,12 @@ public static class Renderer
     public static GraphicsDevice device = null!;
     
     /// <summary>
-    /// Current <see cref="RenderTarget2D"/> for <see cref="device"/>, or <see langword="null"/> if drawing to BackBuffer. Private field for <see cref="RenderTarget"/>.
+    /// Current <see cref="RenderTarget2D"/> for <see cref="device"/>, or null if drawing to BackBuffer. Private field for <see cref="RenderTarget"/>.
     /// </summary>
     private static RenderTarget2D? renderTarget = null;
 
     /// <summary>
-    /// Current <see cref="RenderTarget2D"/> for <see cref="device"/>, or <see langword="null"/> if drawing to BackBuffer.
+    /// Current <see cref="RenderTarget2D"/> for <see cref="device"/>, or null if drawing to BackBuffer.
     /// </summary>
     public static RenderTarget2D? RenderTarget => renderTarget;
 

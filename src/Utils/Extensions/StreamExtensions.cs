@@ -31,7 +31,7 @@ public static class StreamExtensions
     /// <param name="stream">The stream to retrieve the byte length of.</param>
     /// <param name="byteLength">When this method returns, contains the specified <paramref name="stream"/>'s <see cref="Stream.Length"/>, if the operation was successful, or 0 if the operation failed.</param>
     /// <returns><see langword="true"/>, if the specified <paramref name="stream"/>'s <see cref="Stream.Length"/> was successfully retrieved; otherwise, <see langword="false"/>.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
     [Pure]
     public static bool TryGetLength(this Stream stream, out long byteLength)
     {
@@ -54,7 +54,7 @@ public static class StreamExtensions
     /// </summary>
     /// <param name="stream">The stream to read the content of.</param>
     /// <returns>A byte array containing the specified <paramref name="stream"/>'s content.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
     /// <exception cref="InvalidOperationException">The <paramref name="stream"/>'s content length did not match the retrieved length.</exception>
     /// <exception cref="OverflowException">The <paramref name="stream"/>'s length is greater than <see cref="int.MaxValue"/>.</exception>
     [Pure]
@@ -112,7 +112,7 @@ public static class StreamExtensions
     /// </summary>
     /// <param name="stream">The stream to read the content of.</param>
     /// <returns>A byte array containing the specified <paramref name="stream"/>'s content.</returns>
-    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
     /// <exception cref="InvalidOperationException">The <paramref name="stream"/>'s content length did not match the retrieved length.</exception>
     /// <exception cref="OverflowException">The <paramref name="stream"/>'s length is greater than <see cref="int.MaxValue"/>.</exception>
     [Pure]
