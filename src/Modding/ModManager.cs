@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Monod.AssetsSystem;
+using Monod.AssetsSystem.AssetLoaders;
 using Monod.SaveSystem;
 using Monod.Utils.General;
 using Serilog;
@@ -321,7 +322,7 @@ public static class ModManager
         string contentDir = GetContentDirectory(modDir);
         if (Directory.Exists(contentDir))
         {
-            //TODO mod.Assets = new FileAssetManager(contentDir);
+            mod.Assets = new(new FileAssetLoader(contentDir));
             Assets.RegisterAssetManager(mod.Assets, mod.Config.Id.Name);
             mod.ContentType |= ModContentType.Assets;
         }

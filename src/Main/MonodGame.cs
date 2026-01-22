@@ -6,11 +6,11 @@ using Monod.AssetsSystem;
 using Monod.AssetsSystem.AssetLoaders;
 using Monod.GraphicsSystem;
 using Monod.GraphicsSystem.Components;
+using Monod.GraphicsSystem.Fonts;
 using Monod.InputSystem;
 using Monod.ModSystem;
 using Monod.TimeSystem;
 using Monod.Utils.General;
-using Serilog;
 
 namespace Monod;
 
@@ -91,14 +91,23 @@ public abstract class MonodGame : Game
             return;
         }
 
+        //if (true)
         if (Assets.LoadingAssetLoaders.Count != 0)
         {
-            //TODO render loading assets progress bar. Requires default font.
+            IFont? font = GlobalFonts.MenuFont;
             float width = Window.ClientBounds.Width;
             float height = Window.ClientBounds.Height;
-            Renderer.Begin();
+
+            Renderer.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp);
+
+            if (font is not null)
+            {
+                font.DrawText("Loading assets:", new(width * 0.1f, height * 0.6f), scale: new(3));
+                font.DrawText($"{Assets.LoadedAssets}/{Assets.TotalAssets}", new(width * 0.1f, height * 0.7f), scale: new(3));
+            }
             ProgressBar.Draw((float)Assets.LoadedAssets / Assets.TotalAssets, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
             Renderer.End();
+            return;
         }
         
         DrawM();

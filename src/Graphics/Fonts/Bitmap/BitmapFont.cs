@@ -2,13 +2,14 @@
 using System.Text.Json.Serialization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Monod.GraphicsSystem.Fonts;
 
 namespace Monod.GraphicsSystem.BitmapFonts;
 
 /// <summary>
 /// Represents a font, which contains a <see cref="Texture"/> with all the glyphs in a row of same <see cref="GlyphSize"/>, and a definition of <see cref="Glyphs"/> to match where in <see cref="Texture"/> is which glyph.
 /// </summary>
-public class BitmapFont
+public class BitmapFont : IFont
 {
     /// <summary>
     /// Represents serializable information about <see cref="BitmapFont"/>. <see cref="Texture"/> is not included.
@@ -97,7 +98,7 @@ public class BitmapFont
         RenderTarget2D renderTarget = Renderer.CreateRenderTarget(stringSize.X, stringSize.Y);
 
         Renderer.SetRenderTarget(renderTarget);
-        DrawText(text, Renderer.spriteBatch, Vector2.Zero, color, rotation, origin, scale, effects, layerDepth);
+        DrawText(text, Vector2.Zero, color, rotation, origin, scale, effects, layerDepth);
 
         Renderer.SetRenderTarget(previousRenderTarget);
 
@@ -105,7 +106,7 @@ public class BitmapFont
     }
 
     /// <summary>
-    /// Draws <paramref name="text"/> via <paramref name="spriteBatch"/> with specified options using this <see cref="BitmapFont"/>. <paramref name="spriteBatch"/> must be active.
+    /// Draws <paramref name="text"/> via <see cref="Renderer"/> with specified options using this <see cref="BitmapFont"/>. <see cref="Renderer"/> must be active.
     /// </summary>
     /// <param name="text">Text to draw.</param>
     /// <param name="spriteBatch">Active <see cref="SpriteBatch"/>, which will draw the text.</param>
@@ -116,7 +117,7 @@ public class BitmapFont
     /// <param name="scale">A scaling of this sprite.</param>
     /// <param name="effects">Modificators for drawing. Can be combined.</param>
     /// <param name="layerDepth">A depth of the layer of this sprite.</param>
-    public void DrawText(string text, SpriteBatch spriteBatch, Vector2 position, Color? color = null, float rotation = 0f, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
+    public void DrawText(string text, Vector2 position, Color? color = null, float rotation = 0, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
     {
         color ??= Color.White;
         scale ??= Vector2.One;
@@ -140,7 +141,7 @@ public class BitmapFont
                 }
             }
             
-            spriteBatch.Draw(Texture, currentPos, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effects, layerDepth);
+            Renderer.DrawTexture(Texture, currentPos, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effects, layerDepth);
             currentPos.X += (GlyphSize.X + Spacing.X) * scale.Value.X;
         }
     }

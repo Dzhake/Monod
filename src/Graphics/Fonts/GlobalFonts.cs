@@ -8,5 +8,5 @@ public class GlobalFonts
     /// <summary>
     /// Font used for menus (including loading screens).
     /// </summary>
-    public static IFont MenuFont;
+    public static IFont? MenuFont;
 }

@@ -29,6 +29,7 @@ public static class AssetsUtils
         return extension switch
         {
             "bin" or "bytes" => AssetType.Binary,
+            "fx" => AssetType.Ignore,
             "txt" or "csv" or "json" or "yaml" or "xml" => AssetType.Text,
             "png" or "jpg" or "jpeg" => AssetType.Image,
             "mp3" or "ogg" or "wav" => AssetType.Audio,

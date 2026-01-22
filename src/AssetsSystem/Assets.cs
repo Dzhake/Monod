@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.Utils.Collections;
@@ -92,6 +93,24 @@ public static class Assets
     }
 
     /// <summary>
+    /// Reset all info about loading with <see cref="LoadingInfoLock"/>.
+    /// </summary>
+    private static void ResetLoadInfo()
+    {
+        try
+        {
+            LoadingInfoLock.EnterWriteLock();
+            LoadingAssetLoaders.Clear();
+            LoadedAssets = 0;
+            TotalAssets = 0;
+        }
+        finally
+        {
+            LoadingInfoLock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
     /// Update <see cref="Assets"/>.
     /// </summary>
     public static void Update()
@@ -99,32 +118,60 @@ public static class Assets
         try
         {
             LoadingInfoLock.EnterUpgradeableReadLock();
+
+            if (ReloadQueue?.Count != 0 && TotalAssets == 0)
+            {
+                StartReload();
+            }
+
             if (LoadingAssetLoaders.Count != 0 && LoadedAssets == TotalAssets) //finished loading
             {
+                Log.Information("Finished loading {TotalAssets} assets", TotalAssets);
+
+                if (ReloadQueue?.Count != 0)
+                {
+                    StartReload();
+                    return;
+                }
+
                 if (Reloading)
                 {
-                    InvokeReload();
+                    EmitReloadEvent();
                     ReloadThisFrame = true;    
                 }
                 
-                Log.Information("Finished loading {TotalAssets} assets", TotalAssets);
-                
-                LoadingInfoLock.EnterWriteLock();
-                try
-                {
-                    LoadingAssetLoaders.Clear();
-                    LoadedAssets = 0;
-                    TotalAssets = 0;
-                }
-                finally
-                {
-                    LoadingInfoLock.ExitWriteLock();
-                }
+                ResetLoadInfo();
             }
         }
         finally
         {
             LoadingInfoLock.ExitUpgradeableReadLock();
+        }
+    }
+
+    /// <summary>
+    /// Reset load info, and load all assets from <see cref="ReloadQueue"/>, then empty it.
+    /// </summary>
+    private static void StartReload()
+    {
+        ResetLoadInfo();
+        if (ReloadQueue is null) return;
+
+        try
+        {
+            LoadingInfoLock.EnterWriteLock();
+            foreach ((AssetLoader assetLoader, string path) in ReloadQueue)
+            {
+                MainThread.Add(Task.Run(() => assetLoader.LoadAsset(path)));
+                LoadingAssetLoaders.Add(assetLoader);
+            }
+
+            TotalAssets += ReloadQueue.Count;
+            ReloadQueue.Clear();
+        }
+        finally
+        {
+            LoadingInfoLock.ExitWriteLock();
         }
     }
 
@@ -242,7 +289,7 @@ public static class Assets
     /// <summary>
     /// Invoke all subscribed listeners, to make them reload assets.
     /// </summary>
-    public static void InvokeReload() => OnReload.Emit();
+    public static void EmitReloadEvent() => OnReload.Emit();
 
 
     /// <summary>

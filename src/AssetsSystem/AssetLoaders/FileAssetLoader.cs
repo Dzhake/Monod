@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Monod.Utils.General;
+using Serilog;
 
 namespace Monod.AssetsSystem.AssetLoaders;
 
@@ -58,7 +59,10 @@ public sealed class FileAssetLoader : AssetLoader
     /// <param name="e">Arguments of the event.</param>
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
-        ReloadAsset(Path.GetRelativePath(DirectoryPath, e.FullPath));
+        string relPath = Path.GetRelativePath(DirectoryPath, e.FullPath);
+        if (Assets.ReloadQueue?.Contains((this, relPath)) ?? false)
+            return;
+        ReloadAsset(relPath);
     }
 
     /// <summary>
@@ -88,7 +92,16 @@ public sealed class FileAssetLoader : AssetLoader
     /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
     private void ReloadAsset(string path)
     {
-        Assets.ReloadQueue?.Add((this, path));
+        try
+        {
+            Assets.LoadingInfoLock.EnterWriteLock();
+            Assets.ReloadQueue?.Add((this, path));
+            Assets.Reloading = true;
+        }
+        finally
+        {
+            Assets.LoadingInfoLock.ExitWriteLock();
+        }
     }
 
     /// <inheritdoc />
@@ -141,6 +154,14 @@ public sealed class FileAssetLoader : AssetLoader
         string fullPath = Path.Join(DirectoryPath, path);
         if (!File.Exists(fullPath))
             return null;
-        return new(File.OpenRead(fullPath), AssetsUtils.DetectTypeByPath(path));
+        try
+        {
+            return new(File.OpenRead(fullPath), AssetsUtils.DetectTypeByPath(path));
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception, "An exception occured while trying to open a file:");
+            return null;
+        }
     }
 }

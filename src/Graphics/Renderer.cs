@@ -215,7 +215,7 @@ public static class Renderer
     public static void DrawText(BitmapFont font, string text, Vector2 position, Color? color = null,
     float rotation = 0f, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None,
     float layerDepth = 0) =>
-        font.DrawText(text, spriteBatch, position, color, rotation, origin, scale, effects, layerDepth);
+        font.DrawText(text, position, color, rotation, origin, scale, effects, layerDepth);
 
 
     //Drawing shapes

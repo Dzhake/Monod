@@ -30,7 +30,7 @@ public class CompileEffectsTask : Task
     /// <summary>
     /// Constant value to track changes.
     /// </summary>
-    public const string Version = "1.2";
+    public const string Version = "1.3";
 
     /// <summary>
     /// Executes the task, called by MSBuild.
@@ -58,36 +58,39 @@ public class CompileEffectsTask : Task
         }
 
         Log.LogMessage(MessageImportance.High, $"Running CompileEffectsTask v{Version}");
-        Log.LogMessage(MessageImportance.High, $"Effects: {Effects}");
 
         Effects = Effects.Replace('\\', '/');
         OutputPath = OutputPath.Replace('\\', '/');
         PathToContent = PathToContent.Replace('\\', '/');
 
-        string[] effects = Effects.Split(';');
+        Log.LogMessage(MessageImportance.High, $"Effects: {Effects}");
 
-        foreach (string effect in effects)
+        string[] effectFiles = Effects.Split(';');
+        Process[] processes = new Process[effectFiles.Length];
+
+        //Start compile processes
+        for (int i = 0; i < processes.Length; i++)
         {
+            string effect = effectFiles[i];
             string inputPath = Path.Combine(PathToContent, effect);
             string outputPath = Path.ChangeExtension(Path.Combine(OutputPath, effect), ".mgfx");
-            if (File.GetLastWriteTimeUtc(inputPath) < File.GetLastWriteTimeUtc(outputPath)) return true;
+            if (File.GetLastWriteTimeUtc(inputPath) < File.GetLastWriteTimeUtc(outputPath)) continue;
 
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? "");
             try
             { 
-                Process mgfxcProcess = new();
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "mgfxc",
                     Arguments = $"\"{inputPath}\" \"{outputPath}\"",
                     WindowStyle = ProcessWindowStyle.Hidden
                 };
-                mgfxcProcess.StartInfo = startInfo;
-                mgfxcProcess.Start();
 
-                mgfxcProcess.WaitForExit();
-
-                Log.LogMessage(MessageImportance.High, $"Compiled {inputPath}  {outputPath}");
+                processes[i] = new()
+                {
+                    StartInfo = startInfo
+                };
+                processes[i].Start();
             }
             catch (Exception exception)
             {
@@ -102,6 +105,28 @@ public class CompileEffectsTask : Task
                 return false;
             }
         }
+
+        for (int i = 0; i < effectFiles.Length; i++)
+        {
+            try
+            {
+                processes[i]?.WaitForExit();
+            }
+            catch (Exception exception)
+            {
+                int exit = 1;
+                if (exception is Win32Exception) //Probably "The system cannot find the file specified"? I hope that's the only case.
+                {
+                    Log.LogMessage(MessageImportance.High, "(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD via 'mgfxc' (global dotnet tools dir should be at PATH).");
+                    exit = 2;
+                }
+                Log.LogMessage(MessageImportance.High, exception.ToString());
+                Environment.Exit(exit);
+                return false;
+            }
+        }
+
+        Log.LogMessage(MessageImportance.High, "Finished compiling effects");
         return true;
     }
 }

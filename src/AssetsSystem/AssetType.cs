@@ -10,9 +10,14 @@ namespace Monod.AssetsSystem;
 public enum AssetType
 {
     /// <summary>
-    /// Unknown asset type, not supported by <see cref="Monod.AssetsSystem"/>.
+    /// Unknown asset type, not supported by <see cref="AssetsSystem"/>.
     /// </summary>
     Unknown,
+
+    /// <summary>
+    /// Type of the asset that should be completely ignored by the <see cref="AssetsSystem"/>. Used to make specific files ignored engine-wide.
+    /// </summary>
+    Ignore,
 
     /// <summary>
     /// Binary asset type, converted into <see cref="T:byte[]"/>.

@@ -181,8 +181,9 @@ public abstract class AssetLoader
     /// </summary>
     public void LoadAsset(string path)
     {
+        Log.Information("{Path}", path);
         AssetStream? assetStream = LoadAssetStream(path);
-        if (assetStream is null)
+        if (assetStream is null || assetStream.Value.Type == AssetType.Ignore)
         {
             RemoveFromCache(path); //When asset was deleted/renamed.
             AddLoadingAssetsCount();
@@ -207,6 +208,7 @@ public abstract class AssetLoader
 
         LoadIntoCache(path, asset);
         AddLoadingAssetsCount();
+        assetInfo.AssetStream.Close();
     }
 
     private void AddLoadingAssetsCount()
