@@ -51,10 +51,15 @@ public sealed class AssetManager : IDisposable
     /// <summary>
     ///   <para>Returns the string representation of this asset manager: its display name along with the registered prefix.</para>
     /// </summary>
-    /// <returns>The string representation of this asset manager.</returns>
+    /// <returns>The string representation of this asset manager.</returns>0
     public override string ToString()
         => Prefix is null ? $"(no prefix) {DisplayName}" : $"({Prefix}:/) {DisplayName}";
 
+    /// <summary>
+    /// Create a new instance of <see cref="AssetManager"/> with the specified parameters.
+    /// </summary>
+    /// <param name="loader"><see cref="AssetLoader"/> that this asset manager will use.</param>
+    /// <param name="filter">IAssetFilter that this manager will use.</param>
     public AssetManager(AssetLoader loader, IAssetFilter? filter = null)
     {
         Loader = loader;

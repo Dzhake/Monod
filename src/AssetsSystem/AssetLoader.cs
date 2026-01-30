@@ -19,7 +19,7 @@ public abstract class AssetLoader
     /// <summary>
     /// Manager that uses this <see cref="AssetLoader"/>.
     /// </summary>
-    public AssetManager Manager;
+    public AssetManager Manager = null!;
 
     /// <summary>
     /// Total amount of asset manifests that are loaded or are loading right now.

@@ -36,7 +36,7 @@ public abstract class MonodGame : Game
         Window.AllowUserResizing = true;
     }
 
-    /// <inheritdoc/> 
+    /// <inheritdoc/>
     protected override void Initialize()
     {
         MonodMain.OnGameInitialize(this);
@@ -44,7 +44,7 @@ public abstract class MonodGame : Game
         base.Initialize();
     }
 
-    /// <inheritdoc/> 
+    /// <inheritdoc/>
     protected override void LoadContent()
     {
         Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -55,7 +55,7 @@ public abstract class MonodGame : Game
         MainAssetManager.LoadAssets();
     }
 
-    /// <inheritdoc/> 
+    /// <inheritdoc/>
     protected override void Update(GameTime gameTime)
     {
         Time.Update(gameTime, IsActive);
