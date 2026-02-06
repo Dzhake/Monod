@@ -7,7 +7,7 @@ using Monod.AssetsSystem.AssetLoaders;
 using Monod.GraphicsSystem;
 using Monod.GraphicsSystem.Components;
 using Monod.GraphicsSystem.Fonts;
-using Monod.InputSystem;
+using Monod.InputModule;
 using Monod.ModSystem;
 using Monod.TimeSystem;
 using Monod.Utils.General;

@@ -40,16 +40,16 @@ public class NamedExtEnum
     }
 
     /// <summary>
-    /// Add a new value with the specified <see cref="name"/>.
+    /// Add a new value with the specified <paramref name="name"/>, or return an existing one with the given <paramref name="name"/>.
     /// </summary>
     /// <param name="name">Name of the new value. Must be unique for this value.</param>
-    /// <returns>Value associated with the game.</returns>
+    /// <returns>Value associated with the name.</returns>
     public int AddValue(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
-        
-        if (Values.ContainsKey(name))
-            Guard.DuplicateKeyException(name);
+
+        if (Values.TryGetValue(name, out int existingValue))
+            return existingValue;
 
         int value = Names.Count;
         Names.Add(name);
@@ -66,7 +66,7 @@ public class NamedExtEnum
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (Values.TryGetValue(name, out var value))
+        if (Values.TryGetValue(name, out int value))
             return value;
 
         Guard.KeyNotFoundException(name);

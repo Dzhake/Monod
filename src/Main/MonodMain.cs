@@ -1,7 +1,7 @@
 ﻿using Monod.LogSystem;
 using Microsoft.Xna.Framework;
 using Monod.GraphicsSystem;
-using Monod.InputSystem;
+using Monod.InputModule;
 using Monod.LocalizationSystem;
 using Monod.Utils.General;
 
