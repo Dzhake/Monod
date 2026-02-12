@@ -24,7 +24,7 @@ public static class Input
     /// <summary>
     /// All players currently playing the game.
     /// </summary>
-    public static Player[] Players = new Player[1];
+    public static Player[] Players = [ new() ];
 
     /// <summary>
     /// Default/fallback settings for <see cref="Players"/>.
@@ -46,8 +46,14 @@ public static class Input
     /// </summary>
     private static List<(int playerIndex, Key key)> BlockedKeys = new();
 
+    /// <summary>
+    /// Default/backup input map for all players. Should not be modified, and should be used for "restore to defaults".
+    /// </summary>
     public static InputMap DefaultMap = new();
 
+    /// <summary>
+    /// Enum of all possible actions, to be used with <see cref="InputMap"/>, to have a way to globally define an action (for serialization/getting input action for the given player by name).
+    /// </summary>
     public static NamedExtEnum ActionNames = new();
 
     #region RequiredToCall
@@ -93,6 +99,7 @@ public static class Input
             if (keyboard.GetPressedKeys().Length != 0) player.LastUsedDeviceIsGamepad = false;
             if (player.GamepadIndex >= 0 && GamepadStateChanged(player.GamepadIndex)) player.LastUsedDeviceIsGamepad = true;
         }
+        IsGamepadKey(Key.A);
     }
 
     [Pure]

@@ -91,7 +91,6 @@ public abstract class MonodGame : Game
             return;
         }
 
-        //if (true)
         if (Assets.LoadingAssetLoaders.Count != 0)
         {
             IFont? font = GlobalFonts.MenuFont;

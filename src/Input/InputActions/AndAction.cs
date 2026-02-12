@@ -33,4 +33,15 @@ public class AndAction : InputAction
         foreach (InputAction action in Actions) if (!action.IsActive(playerIndex)) return false;
         return true;
     }
+
+    /// <summary>
+    /// Name of this input action in serialization.
+    /// </summary>
+    public static readonly string NAME = "And";
+
+    ///<inheritdoc/>
+    public override string ToString()
+    {
+        return $"{NAME}({string.Join(", ", Actions.Select(a => a.ToString()))})";
+    }
 }

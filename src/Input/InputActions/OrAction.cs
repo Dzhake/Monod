@@ -33,4 +33,15 @@ public class OrAction : InputAction
         foreach (InputAction action in Actions) if (action.IsActive(playerIndex)) return true;
         return false;
     }
+
+    /// <summary>
+    /// Name of this input action in serialization.
+    /// </summary>
+    public static readonly string NAME = "Or";
+
+    ///<inheritdoc/>
+    public override string ToString()
+    {
+        return $"{NAME}({string.Join(", ", Actions.Select(a => a.ToString()))})";
+    }
 }
