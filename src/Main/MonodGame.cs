@@ -1,16 +1,17 @@
-using System;
-using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monod.AssetsSystem;
-using Monod.AssetsSystem.AssetLoaders;
-using Monod.GraphicsSystem;
-using Monod.GraphicsSystem.Components;
-using Monod.GraphicsSystem.Fonts;
+using Monod.AssetsModule;
+using Monod.AssetsModule.AssetLoaders;
+using Monod.Graphics;
+using Monod.Graphics.Components;
+using Monod.Graphics.Fonts;
 using Monod.InputModule;
-using Monod.ModSystem;
-using Monod.TimeSystem;
-using Monod.Utils.General;
+using Monod.Localization;
+using Monod.Modding.ModdingOld;
+using Monod.Shared;
+using Monod.TimeModule;
+using System;
+using System.Globalization;
 
 namespace Monod;
 
@@ -31,7 +32,7 @@ public abstract class MonodGame : Game
     {
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
-        MonodMain.OnGameCreated(this);
+        Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
     }
@@ -39,8 +40,10 @@ public abstract class MonodGame : Game
     /// <inheritdoc/>
     protected override void Initialize()
     {
-        MonodMain.OnGameInitialize(this);
+        Renderer.Initialize(this);
+        Input.Initialize(this);
         Assets.Initialize();
+        Locale.Initialize();
         base.Initialize();
     }
 
@@ -108,7 +111,7 @@ public abstract class MonodGame : Game
             Renderer.End();
             return;
         }
-        
+
         DrawM();
         base.Draw(gameTime);
     }

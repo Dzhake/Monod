@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>preview</LangVersion>
+		<DebugType>embedded</DebugType>
+		<RootNamespace>Monod.Modding</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Assets\Monod.Assets.csproj" />
+		<ProjectReference Include="..\Shared\Monod.Shared.csproj" />
+		<PackageReference Include="Lib.Harmony" Version="2.3.6" />
+		<PackageReference Include="Chasm.SemanticVersioning" Version="2.8.2" />
+	</ItemGroup>
+</Project>
