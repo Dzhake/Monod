@@ -1,41 +1,13 @@
-# MonoPlus
-Sorry, I'm bad at naming things. This has nothing to do with mono. This is my personal set of libraries related to MonoGame.
+# Monod
+My personal engine on top of MonoGame. It's not really modular, but I hope this will help someone.
 
 # Usage
-[Use as submodule / clone it folder next to your game (app)'s folder (recommended)].
+Use as a submodule / clone it's folder next to your game (app)'s folder (recommended).
 
 # Usage requirements
 
-## MonoPlus.Graphics
+Your "Game" must inherit MonodGame
 
-`Game.ctor`:
-`Renderer.OnGameCreated(this);`
-
-`Game.Initialize`:
-`Renderer.Initialize(this);`
-
-`Game.LoadContent`:
-`Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);`
-
-`Game.Update`: (at very start)
-`if (GraphicsSettings.PauseOnFocusLoss && !IsActive) return;`
-
-`Game.Draw`: (at very start)
-if (GraphicsSettings.PauseOnFocusLoss && !IsActive) return;
-
-## MonoPlus.Input
-
-`Game.Initialize`:
-`Input.Initialize(this);`
-
-`Game.Update`:
-```cs
-Input.Update();
-// your logic here
-Input.PostUpdate();
-```
-
-## MonoPlus.Time
-
-`Game.Update`:
-`Time.Update(gameTime);` // if used with MonoPlus.Input, `Time.Update` should be between `Input.Update` and `Input.PostUpdate`.
+# Licensing
+All files in this project are licensed with license in the "LICENSE.txt" file, unless stated otherwise in the file header.
+All files in "src/SDL3-CS" are by "flibitijibibo", licensed with license in the "src/SDL3-CS/LICENSE" file. The library was not altered in any way.
