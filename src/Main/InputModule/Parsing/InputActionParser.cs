@@ -59,9 +59,8 @@ public static class InputActionParser
         {
             int errorStart = parser.position;
             SkipToNextSeparator(ref parser);
-            int errorEnd = parser.position;
-            return Invalid("Expected action name", errorStart, errorEnd - errorStart,
-                parser.source.Slice(errorStart, errorEnd - errorStart));
+            return Invalid("Expected action name", errorStart, 1,
+                parser.source[errorStart..parser.position]);
         }
 
         int nameLength = parser.position - nameStart;
@@ -71,10 +70,10 @@ public static class InputActionParser
         if (!IsKnownActionName(actionName))
         {
             int errorStart = nameStart;
-            SkipToNextSeparator(ref parser);
             int errorEnd = parser.position;
+            SkipToNextSeparator(ref parser);
             return Invalid("Unknown action name", errorStart, errorEnd - errorStart,
-                parser.source.Slice(errorStart, errorEnd - errorStart));
+                parser.source[errorStart..parser.position]);
         }
 
         // Known name: now we expect '('
@@ -84,8 +83,8 @@ public static class InputActionParser
             int errorStart = nameStart;
             SkipToNextSeparator(ref parser);
             int errorEnd = parser.position;
-            return Invalid($"Expected '(' after {actionName.ToString()}", errorStart, errorEnd - errorStart,
-                parser.source.Slice(errorStart, errorEnd - errorStart));
+            return Invalid($"Expected '(' after {actionName}", errorStart, errorEnd - errorStart,
+                parser.source[errorStart..errorEnd]);
         }
 
         parser.SkipWhitespaces();
@@ -160,7 +159,6 @@ public static class InputActionParser
                 if (parser.Skip(','))
                 {
                     parser.SkipWhitespaces();
-                    continue;
                 }
                 else if (parser.Skip(')'))
                 {
@@ -172,8 +170,7 @@ public static class InputActionParser
                     int errStart = parser.position;
                     SkipToNextSeparator(ref parser);
                     int errEnd = parser.position;
-                    actions.Add(Invalid("Expected ',' or ')'", errStart, errEnd - errStart,
-                        parser.source.Slice(errStart, errEnd - errStart)));
+                    actions.Add(Invalid("Expected ',' or ')'", errStart, 1, parser.source.Slice(errStart, errEnd - errStart)));
 
                     // After consuming, we should be at a separator; try again
                     parser.SkipWhitespaces();
@@ -227,11 +224,11 @@ public static class InputActionParser
             if (!Enum.TryParse(keySpan, out Key key))
             {
                 // Invalid key – skip to separator and return error covering from name start
-                int errorStart = nameStart;
+                int errorStart = keyStart;
                 SkipToNextSeparator(ref parser);
-                int errorEnd = parser.position;
+                int errorEnd = parser.position - 1;
                 return Invalid("Invalid key name", errorStart, errorEnd - errorStart,
-                    parser.source[errorStart..errorEnd]);
+                    parser.source[nameStart..parser.position]);
             }
 
             if (actionName.SequenceEqual("Down".AsSpan())) return new DownAction(key);
@@ -243,9 +240,9 @@ public static class InputActionParser
             // Should never reach here because we already checked known names
             int unknownStart = nameStart;
             SkipToNextSeparator(ref parser);
-            int unknownEnd = parser.position;
+            int unknownEnd = keyStart - 1;
             return Invalid("Unknown action name", unknownStart, unknownEnd - unknownStart,
-                parser.source.Slice(unknownStart, unknownEnd - unknownStart));
+                parser.source[unknownStart..unknownEnd]);
         }
     }
 
