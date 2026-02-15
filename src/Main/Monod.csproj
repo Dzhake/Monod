@@ -13,12 +13,21 @@
     </PropertyGroup>
     
     <ItemGroup>
-		<ProjectReference Include="../Shared/Monod.Shared.csproj" />
 		<ProjectReference Include="..\SDL3-CS\SDL3\SDL3.Core.csproj" />
 
 		<PackageReference Include="Chasm.SemanticVersioning" Version="2.8.2" />
 		<PackageReference Include="Lib.Harmony" Version="2.3.6" />
 		<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.0" />
 		<PackageReference Include="Linguini.Bundle" Version="0.9.1" />
+		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.3" />
+		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
+			<IncludeAssets>build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+		<PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+		<PackageReference Include="MonoGame.Extended" Version="4.0.0"/>
+		<PackageReference Include="FontStashSharp.MonoGame" Version="1.3.3"/>
     </ItemGroup>
 </Project>

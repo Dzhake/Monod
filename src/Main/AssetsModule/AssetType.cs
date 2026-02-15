@@ -10,12 +10,12 @@ namespace Monod.AssetsModule;
 public enum AssetType
 {
     /// <summary>
-    /// Unknown asset type, not supported by <see cref="AssetsSystem"/>.
+    /// Unknown asset type, not supported by <see cref="AssetsModule"/>.
     /// </summary>
     Unknown,
 
     /// <summary>
-    /// Type of the asset that should be completely ignored by the <see cref="AssetsSystem"/>. Used to make specific files ignored engine-wide.
+    /// Type of the asset that should be completely ignored by <see cref="AssetsModule"/>. Used to make specific files ignored engine-wide.
     /// </summary>
     Ignore,
 
@@ -43,9 +43,14 @@ public enum AssetType
     /// Effect asset type, converted into <see cref="Microsoft.Xna.Framework.Graphics.Effect"/>.
     /// </summary>
     Effect,
-    
+
     /// <summary>
     /// Localization asset type, loaded into <see cref="FluentBundle"/>.
     /// </summary>
     Localization,
+
+    /// <summary>
+    /// Font asset type, loaded as <see cref="T:byte[]"/>.
+    /// </summary>
+    Font,
 }

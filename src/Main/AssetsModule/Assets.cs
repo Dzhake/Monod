@@ -85,6 +85,7 @@ public static class Assets
             new(AssetType.Audio, AssetParsers.Audio),
             new(AssetType.Effect, AssetParsers.Effect),
             new(AssetType.Localization, AssetParsers.Localization),
+            new(AssetType.Font, AssetParsers.Font),
         ]);
     }
 

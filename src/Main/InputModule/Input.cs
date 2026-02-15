@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monod.Shared.Enums;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -182,7 +180,7 @@ public static class Input
     /// Apply setting to the given <paramref name="value"/> of <paramref name="playerIndex"/>'s gamepad stick, for positive values on the axis if <paramref name="positiveValues"/> is <see langword="true"/> or negative ones if <paramref name="positiveValues"/> is <see langword="false"/>.
     /// </summary>
     /// <param name="value">Stick's position, between -1 and 1. If <paramref name="positiveValues"/> is <see langword="true"/>, then negative value is ignored, and vice versa.</param>
-    /// <param name="playerIndex">Index of the player in <paramref name="Players"/>.</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
     /// <param name="positiveValues">Whether method should only accept positives values or negative ones.</param>
     /// <returns>Value, after applying settings to it, always non-negative.</returns>
     [Pure]

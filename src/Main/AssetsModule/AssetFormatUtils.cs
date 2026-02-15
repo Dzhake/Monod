@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics.Contracts;
-using System.IO;
+﻿using System.Diagnostics.Contracts;
 
 namespace Monod.AssetsModule;
 
@@ -34,6 +32,7 @@ public static class AssetsUtils
             "mp3" or "ogg" or "wav" => AssetType.Audio,
             "mgfx" => AssetType.Effect,
             "ftl" => AssetType.Localization,
+            "ttf" => AssetType.Font,
             _ => AssetType.Unknown,
         };
     }

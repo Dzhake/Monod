@@ -59,7 +59,6 @@ public static class InputActionParser
     /// <param name="name">Name of the <see cref="InputAction"/>.</param>
     /// <param name="inner">Arguments to that <see cref="InputAction"/>'s ctor.</param>
     /// <param name="innerStartIndex">Starting index of the <paramref name="inner"/> part in some global span.</param>
-    /// <param name="errors">A list of all parsing errors that occurred before, might be modified to add new errors.</param>
     /// <returns>Parsed <see cref="InputAction"/> (possibly <see cref="InvalidInputAction"/> if parsing failed)</returns>
     private static InputAction ParseByName(ReadOnlySpan<char> s, int startingIndex, ReadOnlySpan<char> name, ReadOnlySpan<char> inner, int innerStartIndex)
     {

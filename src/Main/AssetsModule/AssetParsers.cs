@@ -13,7 +13,7 @@ namespace Monod.AssetsModule;
 public static class AssetParsers
 {
     /// <summary>
-    /// Parse <see cref="AssetType.Binary"/> as a <see cref="byte[]"/> that represents given asset.
+    /// Parse <see cref="AssetType.Binary"/> as a <see cref="T:byte[]"/> that represents given asset.
     /// </summary>
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
@@ -83,5 +83,16 @@ public static class AssetParsers
         //TODO Locale.AddManager(manager);
         Locale.Load(new StreamReader(info.AssetStream), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
         return null;
+    }
+
+    /// <summary>
+    /// Parse <see cref="AssetType.Font"/> as a <see cref="T:byte[]"/> that represents given asset.
+    /// </summary>
+    /// <param name="info">Asset info to parse.</param>
+    /// <param name="_">Unused.</param>
+    /// <returns>Parsed asset.</returns>
+    public static byte[] Font(AssetInfo info, AssetManager _)
+    {
+        return info.AssetStream.ToByteArrayDangerous();
     }
 }
