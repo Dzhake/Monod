@@ -1,4 +1,5 @@
-﻿using Monod.InputModule.InputActions;
+﻿using Chasm.Formatting;
+using Monod.InputModule.InputActions;
 
 namespace Monod.InputModule.Parsing;
 
@@ -13,122 +14,256 @@ namespace Monod.InputModule.Parsing;
 /// </remarks>
 public static class InputActionParser
 {
+    /// <summary>
+    /// List of all errors for the last <see cref="TryParse"/>.
+    /// </summary>
     public readonly static List<ActionParseError> Errors = new();
 
     /// <summary>
-    /// Attempts to parse the specified text into an <see cref="InputAction"/>. Use <see cref="Errors"/> to access occurred errors.
+    /// Try to parse an <see cref="InputAction"/> from the <paramref name="text"/>.
     /// </summary>
-    /// <param name="text">The input text to parse.</param>
-    /// <returns>
-    /// The parsed <see cref="InputAction"/> instance.
-    /// If parsing fails, an <see cref="InvalidInputAction"/> is returned.
-    /// </returns>
+    /// <param name="text">Text to parse.</param>
+    /// <returns>Parsed <see cref="InputAction"/>.</returns>
     public static InputAction TryParse(string text)
     {
         Errors.Clear();
-        var span = text.AsSpan().Trim();
-        var result = Parse(span, 0);
+
+        SpanParser parser = new SpanParser(text);
+        InputAction result = ParseExpression(ref parser, text);
+        parser.SkipWhitespaces();
+        if (parser.CanRead() && result is not InvalidInputAction)
+        {
+            int start = parser.position;
+            int length = parser.source.Length - start;
+            return Invalid("Unexpected characters after expression", start, length, parser.source.Slice(start, length));
+        }
         return result;
     }
 
     /// <summary>
-    /// Recursively parses a span of characters into an <see cref="InputAction"/>.
+    /// Recursively parses a single expression starting at the current parser position.
     /// </summary>
-    /// <param name="s">Span to parse.</param>
-    /// <param name="startingIndex">Starting index of the given span in some global span, to record error's indexes correctly.</param>
-    private static InputAction Parse(ReadOnlySpan<char> s, int startingIndex)
+    private static InputAction ParseExpression(ref SpanParser parser, string originalText)
     {
-        s = s.Trim();
-        if (s.IsEmpty) return Invalid("Empty input", startingIndex, 1, s);
+        int exprStart = parser.position;
+        parser.SkipWhitespaces();
+        if (!parser.CanRead())
+            return Invalid("Unexpected end of input", parser.position, 0, default);
 
-        int open = s.IndexOf('(');
-        if (open < 0) return Invalid("No opening bracket", startingIndex, s.Length, s);
-        if (!s.EndsWith(")")) return Invalid("No closing bracket", startingIndex, s.Length, s);
+        // Try to read an action name (ASCII letters)
+        int nameStart = parser.position;
+        ReadOnlySpan<char> nameSpan = ReadWhile(ref parser, static c => char.IsAsciiLetter(c));
 
-        var name = s[..open].Trim();
-        var inner = s[(open + 1)..^1];
-        int innerStartIndex = startingIndex + open + 1;
-        return ParseByName(s, startingIndex, name, inner, innerStartIndex);
+        // No name found – unexpected character
+        if (nameSpan.IsEmpty)
+        {
+            int errorStart = parser.position;
+            SkipToNextSeparator(ref parser);
+            int errorEnd = parser.position;
+            return Invalid("Expected action name", errorStart, errorEnd - errorStart,
+                parser.source.Slice(errorStart, errorEnd - errorStart));
+        }
+
+        int nameLength = parser.position - nameStart;
+        ReadOnlySpan<char> actionName = parser.source.Slice(nameStart, nameLength);
+
+        // Unknown action name
+        if (!IsKnownActionName(actionName))
+        {
+            int errorStart = nameStart;
+            SkipToNextSeparator(ref parser);
+            int errorEnd = parser.position;
+            return Invalid("Unknown action name", errorStart, errorEnd - errorStart,
+                parser.source.Slice(errorStart, errorEnd - errorStart));
+        }
+
+        // Known name: now we expect '('
+        parser.SkipWhitespaces();
+        if (!parser.Skip('('))
+        {
+            int errorStart = nameStart;
+            SkipToNextSeparator(ref parser);
+            int errorEnd = parser.position;
+            return Invalid($"Expected '(' after {actionName.ToString()}", errorStart, errorEnd - errorStart,
+                parser.source.Slice(errorStart, errorEnd - errorStart));
+        }
+
+        parser.SkipWhitespaces();
+        // Delegate to argument parser based on action name
+        return ParseActionArguments(ref parser, originalText, nameStart, nameLength);
     }
 
     /// <summary>
-    /// Parse an <see cref="InputAction"/> based on it's name and the arguments.
+    /// Checks if a span matches any of the predefined action names.
     /// </summary>
-    /// <param name="s">Span to parse.</param>
-    /// <param name="startingIndex">Starting index of the given span in some global span, to record error's indexes correctly.</param>
-    /// <param name="name">Name of the <see cref="InputAction"/>.</param>
-    /// <param name="inner">Arguments to that <see cref="InputAction"/>'s ctor.</param>
-    /// <param name="innerStartIndex">Starting index of the <paramref name="inner"/> part in some global span.</param>
-    /// <returns>Parsed <see cref="InputAction"/> (possibly <see cref="InvalidInputAction"/> if parsing failed)</returns>
-    private static InputAction ParseByName(ReadOnlySpan<char> s, int startingIndex, ReadOnlySpan<char> name, ReadOnlySpan<char> inner, int innerStartIndex)
+    private static bool IsKnownActionName(ReadOnlySpan<char> name)
     {
         return name switch
         {
-            "Down" => ParseSingle(inner, innerStartIndex, s, static k => new DownAction(k)),
-            "Pressed" => ParseSingle(inner, innerStartIndex, s, static k => new PressedAction(k)),
-            "Up" => ParseSingle(inner, innerStartIndex, s, static k => new UpAction(k)),
-            "Released" => ParseSingle(inner, innerStartIndex, s, static k => new ReleasedAction(k)),
-            "Held" => ParseSingle(inner, innerStartIndex, s, static k => new HeldAction(k)),
-            "Or" => ParseArray(inner, innerStartIndex, s, static a => new OrAction(a)),
-            "And" => ParseArray(inner, innerStartIndex, s, static a => new AndAction(a)),
-            _ => Invalid("Unknown action", startingIndex, s.Length, s),
+            "Or" or "And" or "Down" or "Up" or "Pressed" or "Released" or "Held" => true,
+            _ => false
         };
     }
 
     /// <summary>
-    /// Parses a single-key action such as <c>Down(D1)</c>.
+    /// Skips characters until the next top‑level comma or closing parenthesis.
+    /// Handles nested parentheses to avoid stopping inside a subexpression.
+    /// The parser is left positioned just before the separator (i.e., the next character
+    /// will be either ',' or ')').
     /// </summary>
-    private static InputAction ParseSingle(ReadOnlySpan<char> s, int innerStartIndex, ReadOnlySpan<char> fullSpan, Func<Key, InputAction> ctor)
+    private static void SkipToNextSeparator(ref SpanParser parser)
     {
-        s = s.Trim();
-        if (!Enum.TryParse(s, out Key key)) return Invalid("Invalid key", innerStartIndex, s.Length, fullSpan);
-        return ctor(key);
+        int depth = 0;
+        while (parser.CanRead())
+        {
+            char c = parser.Peek();
+            if (c == '(')
+                depth++;
+            else if (c == ')')
+            {
+                if (depth == 0)
+                    break;
+                depth--;
+            }
+            else if (c == ',' && depth == 0)
+                break;
+
+            parser.Read();
+        }
     }
 
-    /// <summary>
-    /// Parses an array action such as <c>Or(A, B)</c>.
-    /// </summary>
-    private static InputAction ParseArray(ReadOnlySpan<char> s, int innerStartIndex, ReadOnlySpan<char> fullSpan, Func<InputAction[], InputAction> ctor)
+    private static InputAction ParseActionArguments(ref SpanParser parser, string originalText,
+        int nameStart, int nameLength)
     {
-        var list = new List<InputAction>();
-        int depth = 0;
-        int start = 0;
+        ReadOnlySpan<char> actionName = parser.source.Slice(nameStart, nameLength);
 
-        for (int i = 0; i <= s.Length - 1; i++)
+        if (actionName.SequenceEqual("Or".AsSpan()) || actionName.SequenceEqual("And".AsSpan()))
         {
-            if (s[i] == '(') depth++;
-            if (s[i] == ')') depth--;
-
-            if (s[i] == ',' && depth == 0)
+            parser.SkipWhitespaces();
+            if (parser.Peek() == ')')
             {
-                var part = s[start..i].Trim();
-                if (!part.IsEmpty)
-                {
-                    int localIndex = innerStartIndex + start;
-                    list.Add(Parse(part, localIndex));
-                }
-                start = i + 1;
+                parser.Skip(')');
+                return actionName.SequenceEqual("Or".AsSpan())
+                    ? new OrAction(Array.Empty<InputAction>())
+                    : new AndAction(Array.Empty<InputAction>());
             }
-        }
 
-        var ending = s[start..].Trim();
-        if (!ending.IsEmpty)
+            var actions = new List<InputAction>();
+            while (true)
+            {
+                parser.SkipWhitespaces();
+                // Recursively parse each argument – may return Invalid
+                InputAction arg = ParseExpression(ref parser, originalText);
+                actions.Add(arg);
+
+                parser.SkipWhitespaces();
+                if (parser.Skip(','))
+                {
+                    parser.SkipWhitespaces();
+                    continue;
+                }
+                else if (parser.Skip(')'))
+                {
+                    break;
+                }
+                else
+                {
+                    // Unexpected character – consume until next separator and add an error
+                    int errStart = parser.position;
+                    SkipToNextSeparator(ref parser);
+                    int errEnd = parser.position;
+                    actions.Add(Invalid("Expected ',' or ')'", errStart, errEnd - errStart,
+                        parser.source.Slice(errStart, errEnd - errStart)));
+
+                    // After consuming, we should be at a separator; try again
+                    parser.SkipWhitespaces();
+                    if (parser.Skip(','))
+                    {
+                        parser.SkipWhitespaces();
+                    }
+                    else if (parser.Skip(')'))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        // Still not a separator – give up and return the last error
+                        return actions.Last();
+                    }
+                }
+            }
+
+            return actionName.SequenceEqual("Or".AsSpan())
+                ? new OrAction(actions.ToArray())
+                : new AndAction(actions.ToArray());
+        }
+        else
         {
-            int localIndex = innerStartIndex + start;
-            list.Add(Parse(ending, localIndex));
-        }
+            // Simple actions: expect a key name
+            parser.SkipWhitespaces();
+            int keyStart = parser.position;
+            ReadOnlySpan<char> keySpan = ReadWhile(ref parser, static c => char.IsAsciiLetterOrDigit(c));
+            if (keySpan.IsEmpty)
+            {
+                // No key name – skip to separator and return error covering from name start
+                int errorStart = nameStart;
+                SkipToNextSeparator(ref parser);
+                int errorEnd = parser.position;
+                return Invalid("Expected key name", errorStart, errorEnd - errorStart,
+                    parser.source[errorStart..errorEnd]);
+            }
 
-        if (list.Count == 0) return Invalid("Empty array", innerStartIndex, s.Length, fullSpan);
-        return ctor(list.ToArray());
+            parser.SkipWhitespaces();
+            if (!parser.Skip(')'))
+            {
+                // Missing ')' – skip to separator and return error covering from name start
+                int errorStart = nameStart;
+                SkipToNextSeparator(ref parser);
+                int errorEnd = parser.position;
+                return Invalid("Expected ')' after key", errorStart, errorEnd - errorStart,
+                    parser.source[errorStart..errorEnd]);
+            }
+
+            if (!Enum.TryParse(keySpan, out Key key))
+            {
+                // Invalid key – skip to separator and return error covering from name start
+                int errorStart = nameStart;
+                SkipToNextSeparator(ref parser);
+                int errorEnd = parser.position;
+                return Invalid("Invalid key name", errorStart, errorEnd - errorStart,
+                    parser.source[errorStart..errorEnd]);
+            }
+
+            if (actionName.SequenceEqual("Down".AsSpan())) return new DownAction(key);
+            if (actionName.SequenceEqual("Up".AsSpan())) return new UpAction(key);
+            if (actionName.SequenceEqual("Pressed".AsSpan())) return new PressedAction(key);
+            if (actionName.SequenceEqual("Released".AsSpan())) return new ReleasedAction(key);
+            if (actionName.SequenceEqual("Held".AsSpan())) return new HeldAction(key);
+
+            // Should never reach here because we already checked known names
+            int unknownStart = nameStart;
+            SkipToNextSeparator(ref parser);
+            int unknownEnd = parser.position;
+            return Invalid("Unknown action name", unknownStart, unknownEnd - unknownStart,
+                parser.source.Slice(unknownStart, unknownEnd - unknownStart));
+        }
+    }
+
+    private static ReadOnlySpan<char> ReadWhile(ref SpanParser parser, Func<char, bool> predicate)
+    {
+        int start = parser.position;
+        while (parser.CanRead() && predicate(parser.Peek()))
+            parser.Read();
+        return parser.source.Slice(start, parser.position - start);
     }
 
     /// <summary>
     /// Creates an <see cref="InvalidInputAction"/> and records a parsing error.
     /// </summary>
-    private static InputAction Invalid(string message, int startIndex, int length, ReadOnlySpan<char> s)
+    private static InvalidInputAction Invalid(string message, int startIndex, int length, ReadOnlySpan<char> errorousSpan)
     {
         Errors.Add(new ActionParseError(message, startIndex, length));
-        return new InvalidInputAction(s.ToString());
+        return new InvalidInputAction(errorousSpan.ToString());
     }
 }
 

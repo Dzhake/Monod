@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MLEM.Font;
 using Monod.AssetsModule;
 using Monod.AssetsModule.AssetLoaders;
 using Monod.Graphics;
@@ -10,7 +11,6 @@ using Monod.Localization;
 using Monod.Modding.ModdingOld;
 using Monod.Shared;
 using Monod.TimeModule;
-using System;
 using System.Globalization;
 
 namespace Monod;
@@ -96,7 +96,7 @@ public abstract class MonodGame : Game
 
         if (Assets.LoadingAssetLoaders.Count != 0)
         {
-            IFont? font = GlobalFonts.MenuFont;
+            GenericFont? font = GlobalFonts.MenuFont;
             float width = Window.ClientBounds.Width;
             float height = Window.ClientBounds.Height;
 
@@ -104,8 +104,8 @@ public abstract class MonodGame : Game
 
             if (font is not null)
             {
-                font.DrawText("Loading assets:", new(width * 0.1f, height * 0.6f), scale: new(3));
-                font.DrawText($"{Assets.LoadedAssets}/{Assets.TotalAssets}", new(width * 0.1f, height * 0.7f), scale: new(3));
+                font.DrawString(Renderer.spriteBatch, "Loading assets:", new(width * 0.1f, height * 0.6f), Color.White);
+                font.DrawString(Renderer.spriteBatch, $"{Assets.LoadedAssets}/{Assets.TotalAssets}", new(width * 0.1f, height * 0.7f), Color.White);
             }
             ProgressBar.Draw((float)Assets.LoadedAssets / Assets.TotalAssets, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
             Renderer.End();

@@ -13,12 +13,14 @@ namespace MLEM.Formatting.Codes
 
         private readonly float thickness;
         private readonly float yOffset;
+        private readonly Color? underlineColor;
 
         /// <inheritdoc />
-        public UnderlineCode(Match match, Regex regex, float thickness, float yOffset) : base(match, regex)
+        public UnderlineCode(Match match, Regex regex, float thickness, float yOffset, Color? color) : base(match, regex)
         {
             this.thickness = thickness;
             this.yOffset = yOffset;
+            this.underlineColor = color;
         }
 
         /// <inheritdoc />
@@ -28,7 +30,7 @@ namespace MLEM.Formatting.Codes
             if (codePoint == ' ' && token.DisplayString.Length > indexInToken + 1 && token.DisplayString[indexInToken + 1] == '\n')
                 return false;
             var finalPos = font.TransformSingleCharacter(stringPos, charPosOffset + new Vector2(0, (this.yOffset - this.thickness) * charSize.Y), rotation, origin, scale, effects, stringSize, charSize);
-            batch.Draw(batch.GetBlankTexture(), new RectangleF(finalPos.X, finalPos.Y, charSize.X * scale.X, this.thickness * charSize.Y * scale.Y), null, color, rotation, Vector2.Zero, SpriteEffects.None, depth);
+            batch.Draw(batch.GetBlankTexture(), new RectangleF(finalPos.X, finalPos.Y, charSize.X * scale.X, this.thickness * charSize.Y * scale.Y), null, underlineColor ?? color, rotation, Vector2.Zero, SpriteEffects.None, depth);
             return false;
         }
 

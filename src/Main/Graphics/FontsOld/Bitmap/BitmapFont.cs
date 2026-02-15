@@ -1,15 +1,13 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Monod.Graphics;
+using System.Text.Json.Serialization;
 
 namespace Monod.Graphics.Fonts.Bitmap;
 
 /// <summary>
 /// Represents a font, which contains a <see cref="Texture"/> with all the glyphs in a row of same <see cref="GlyphSize"/>, and a definition of <see cref="Glyphs"/> to match where in <see cref="Texture"/> is which glyph.
 /// </summary>
-public class BitmapFont : IFont
+public class BitmapFont
 {
     /// <summary>
     /// Represents serializable information about <see cref="BitmapFont"/>. <see cref="Texture"/> is not included.
@@ -26,7 +24,7 @@ public class BitmapFont : IFont
         /// Amount of empty pixels between letters. X spacing is between letters in same line, Y spacing is between lines.
         /// </summary>
         [JsonInclude] public Point Spacing;
-        
+
         /// <summary>
         /// List of glyphs in <see cref="Texture"/>.
         /// </summary>
@@ -74,7 +72,7 @@ public class BitmapFont : IFont
     /// </summary>
     /// <param name="texture">Texture with all the glyphs in a row of same <see cref="GlyphSize"/>.</param>
     /// <param name="info">Information about bitmap font.</param>
-    public BitmapFont(Texture2D texture, Info info) : this(texture, info.GlyphSize, info.Spacing,info.Glyphs) {}
+    public BitmapFont(Texture2D texture, Info info) : this(texture, info.GlyphSize, info.Spacing, info.Glyphs) { }
 
     /// <summary>
     /// Get texture of rendered <paramref name="text"/> for caching. Uses <see cref="Renderer.spriteBatch"/>.
@@ -126,7 +124,7 @@ public class BitmapFont : IFont
         foreach (char glyph in text)
         {
             Rectangle sourceRectangle = GetGlyphSourceRectangle(glyph);
-            
+
             if (sourceRectangle.X < 0) //Glyph not found.
             {
                 switch (glyph)
@@ -140,7 +138,7 @@ public class BitmapFont : IFont
                         break;
                 }
             }
-            
+
             Renderer.DrawTexture(Texture, currentPos, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effects, layerDepth);
             currentPos.X += (GlyphSize.X + Spacing.X) * scale.Value.X;
         }

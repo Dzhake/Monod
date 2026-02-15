@@ -38,6 +38,6 @@ public sealed class ActionParseError
     /// </summary>
     public override string ToString()
     {
-        return $"{StartIndex}-{StartIndex + Length}: {Message}";
+        return $"{StartIndex}-{StartIndex + Length - 1}: {Message}";
     }
 }
