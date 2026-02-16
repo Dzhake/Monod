@@ -1,6 +1,4 @@
 using Monod.Shared.Exceptions;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Monod.Shared.Enums;
@@ -13,7 +11,7 @@ public class NamedExtEnum
     /// <summary>
     /// List of registered names, where index is a value, and the value (object) in the list is value's name.
     /// </summary>
-    private readonly List<string> Names;
+    private readonly List<string> InternalNames;
 
     /// <summary>
     /// Dictionary of registered values, where key is value's name, and the value in the dictionary is the value.
@@ -21,11 +19,21 @@ public class NamedExtEnum
     private readonly Dictionary<string, int> Values;
 
     /// <summary>
+    /// Readonly list of all names stored in this enum. Useful for iterating over names/debug purposes.
+    /// </summary>
+    public IReadOnlyList<string> Names => InternalNames.AsReadOnly();
+
+    /// <summary>
+    /// Maximum value of a value stored in this enum. All values less than or equal this one are guaranteed to be available, and all values above this are not.
+    /// </summary>
+    public int MaxValue => InternalNames.Count;
+
+    /// <summary>
     /// Initialize a new instance of the <see cref="NamedExtEnum"/> with default values.
     /// </summary>
     public NamedExtEnum()
     {
-        Names = new();
+        InternalNames = new();
         Values = new(StringComparer.Ordinal);
     }
 
@@ -35,7 +43,7 @@ public class NamedExtEnum
     /// <param name="names">List of names the enum should start with. Same as using <see cref="AddValue"/> for each value specified in the list, but more performant.</param>
     public NamedExtEnum(List<string> names)
     {
-        Names = names;
+        InternalNames = names;
         Values = new(StringComparer.Ordinal);
         for (int i = 0; i < names.Count; i++) Values.Add(names[i], i);
     }
@@ -52,8 +60,8 @@ public class NamedExtEnum
         if (Values.TryGetValue(name, out int existingValue))
             return existingValue;
 
-        int value = Names.Count;
-        Names.Add(name);
+        int value = InternalNames.Count;
+        InternalNames.Add(name);
         Values[name] = value;
         return value;
     }
@@ -94,9 +102,9 @@ public class NamedExtEnum
     public string GetName(int value)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(value);
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(value, Names.Count);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(value, InternalNames.Count);
 
-        return Names[value];
+        return InternalNames[value];
     }
 
     /// <summary>
@@ -107,9 +115,9 @@ public class NamedExtEnum
     /// <returns>Whether the name was found.</returns>
     public bool TryGetName(int value, [NotNullWhen(true)] out string? name)
     {
-        if ((uint)value < (uint)Names.Count)
+        if ((uint)value < (uint)InternalNames.Count)
         {
-            name = Names[value];
+            name = InternalNames[value];
             return true;
         }
 

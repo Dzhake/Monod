@@ -1,8 +1,11 @@
-﻿namespace Monod.InputModule.InputActions;
+﻿using System.Text.Json.Serialization;
+
+namespace Monod.InputModule.InputActions;
 
 /// <summary>
 /// An object that may be active or inactive and has a value based on certain inputs.
 /// </summary>
+[JsonConverter(typeof(InputActionConverter))]
 public abstract class InputAction
 {
     /// <summary>

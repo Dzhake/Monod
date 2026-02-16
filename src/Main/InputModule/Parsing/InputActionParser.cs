@@ -9,22 +9,28 @@ namespace Monod.InputModule.Parsing;
 /// <remarks>
 /// Example syntax:
 /// <code>
-/// Or(Pressed(D1), And(Down(Ctrl), Pressed(D2)))
+/// Or(Pressed(D1), And(Down(LeftControl), Pressed(D2)))
 /// </code>
 /// </remarks>
 public static class InputActionParser
 {
     /// <summary>
-    /// List of all errors for the last <see cref="TryParse"/>.
+    /// List of all errors for the last <see cref="Parse"/>.
     /// </summary>
     public readonly static List<ActionParseError> Errors = new();
 
     /// <summary>
-    /// Try to parse an <see cref="InputAction"/> from the <paramref name="text"/>.
+    /// Parse <see cref="InputAction"/> from the <paramref name="text"/>.
     /// </summary>
     /// <param name="text">Text to parse.</param>
     /// <returns>Parsed <see cref="InputAction"/>.</returns>
-    public static InputAction TryParse(string text)
+    /// <remarks>
+    /// Example syntax:
+    /// <code>
+    /// Or(Pressed(D1), And(Down(LeftControl), Pressed(D2)))
+    /// </code>
+    /// </remarks>
+    public static InputAction Parse(string text)
     {
         Errors.Clear();
 

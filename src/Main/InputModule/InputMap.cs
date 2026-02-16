@@ -1,10 +1,12 @@
 ﻿using Monod.InputModule.InputActions;
+using System.Text.Json.Serialization;
 
 namespace Monod.InputModule;
 
 /// <summary>
 /// Manages multiple <see cref="InputActions"/>, providing wrapper methods general for all actions.
 /// </summary>
+[JsonConverter(typeof(InputMapConverter))]
 public sealed class InputMap
 {
     /// <summary>

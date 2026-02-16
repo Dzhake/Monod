@@ -76,7 +76,7 @@ public abstract class AssetLoader
     /// <returns>List of <see cref="MatcherInfo"/>s parsed from the specified asset manifest.</returns>
     protected static List<MatcherInfo> ParseAssetManifest(Stream stream, string relativePath)
     {
-        var document = JsonDocument.Parse(stream, Json.DocumentCommon);
+        var document = JsonDocument.Parse(stream, Json.DCommon);
 
         List<MatcherInfo> result = new();
 
