@@ -121,9 +121,9 @@ public static class Assets
                 StartReload();
             }
 
-            if (LoadingAssetLoaders.Count != 0 && LoadedAssets == TotalAssets) //finished loading
+            if (LoadingAssetLoaders.Count != 0 && !LoadingAssetLoaders.Any(assetLoader => assetLoader.IsLoading)) //finished loading
             {
-                Log.Information("Finished loading {TotalAssets} assets", TotalAssets);
+                Log.Information("Finished un/re/loading {TotalAssets} assets/dirs", TotalAssets);
 
                 if (ReloadQueue?.Count != 0)
                 {
@@ -159,11 +159,19 @@ public static class Assets
             LoadingInfoLock.EnterWriteLock();
             foreach ((AssetLoader assetLoader, string path) in ReloadQueue)
             {
-                MainThread.Add(Task.Run(() => assetLoader.LoadAsset(path)));
+                if (assetLoader.IsDir(path)) //directory
+                    MainThread.Add(Task.Run(() => assetLoader.LoadAssetsInDir(path)));
+                else if (assetLoader.GetAsset(path) is null) //deleted directory or not-yet-loaded-but-deleted file
+                    MainThread.Add(Task.Run(() => assetLoader.RemoveDirFromCache(path)));
+                else //file
+                {
+                    MainThread.Add(Task.Run(() => assetLoader.LoadAsset(path)));
+                    TotalAssets++;
+                }
+
+
                 LoadingAssetLoaders.Add(assetLoader);
             }
-
-            TotalAssets += ReloadQueue.Count;
             ReloadQueue.Clear();
         }
         finally
@@ -219,7 +227,7 @@ public static class Assets
 
 
     /// <summary>
-    ///   Get asset at the specified <see cref="fullPath"/> from the cache.
+    ///   Get asset at the <paramref name="fullPath"/> from the cache.
     /// </summary>
     /// <typeparam name="T">The type of the asset to load.</typeparam>
     /// <param name="fullPath">Full path to the asset (Asset Manager's name + ":" + Relative asset's path)</param>

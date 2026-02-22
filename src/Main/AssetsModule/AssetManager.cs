@@ -42,16 +42,11 @@ public sealed class AssetManager : IDisposable
     public bool ShouldReload => CanReload && MonodSettings.HotReload;
 
     /// <summary>
-    ///   Get the asset manager's display name.
-    /// </summary>
-    public string DisplayName => Loader.DisplayName;
-
-    /// <summary>
     ///   <para>Returns the string representation of this asset manager: its display name along with the registered prefix.</para>
     /// </summary>
     /// <returns>The string representation of this asset manager.</returns>0
     public override string ToString()
-        => Prefix is null ? $"(no prefix) {DisplayName}" : $"({Prefix}:/) {DisplayName}";
+        => Prefix is null ? "(no prefix)" : $"{Prefix}:/";
 
     /// <summary>
     /// Create a new instance of <see cref="AssetManager"/> with the specified parameters.
@@ -136,7 +131,11 @@ public sealed class AssetManager : IDisposable
     /// <summary>
     /// Load asset at the specified path in the cache synchronously, replacing already loaded assets. Useful for quickly loading fonts for the startup loading screen.
     /// </summary>
-    public void LoadAsset(string path) => Loader.LoadAsset(path);
+    public void LoadAsset(string path)
+    {
+        Loader.LoadAsset(path);
+        Interlocked.Add(ref Loader.TotalAssets, 1);
+    }
 
 
 

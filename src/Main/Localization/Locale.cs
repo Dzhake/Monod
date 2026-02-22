@@ -73,6 +73,7 @@ public static class Locale
         if (!ShouldLoad(fileNameNoExt, out bool fallback)) return;
         FileStream stream = new(file, FileMode.Open, FileAccess.Read, FileShare.Read);
         Load(new StreamReader(stream), fallback);
+        stream.Close();
     }
 
     /// <summary>
@@ -94,7 +95,7 @@ public static class Locale
     }
 
     /// <summary>
-    /// Loads resources from specified <paramref name="stream"/> into <see cref="MainBundle"/>.
+    /// Loads resources from specified <paramref name="stream"/> into <see cref="MainBundle"/>, and disposes the <paramref name="stream"/>.
     /// </summary>
     /// <param name="stream">Stream, reading .ftl asset.</param>
     /// <param name="fallback">Whether load to fallback bundle. Does nothing if <see cref="UseFallbackBundle"/> is false.</param>
@@ -112,6 +113,7 @@ public static class Locale
             if (MainBundle is null) throw new InvalidOperationException("Bundle is null");
             MainBundle.AddResourceOverriding(stream);
         }
+        stream.Dispose();
     }
 
     /// <summary>

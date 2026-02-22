@@ -13,9 +13,6 @@ public sealed class FileAssetLoader : AssetLoader
     /// </summary>
     public readonly string DirectoryPath;
 
-    /// <inheritdoc />
-    public override string DisplayName => $"{DirectoryPath}{Path.DirectorySeparatorChar}**";
-
     /// <summary>
     /// <see cref="FileSystemWatcher"/>, used to detect changes in files that are stored in <see cref="DirectoryPath"/>.
     /// </summary>
@@ -39,9 +36,11 @@ public sealed class FileAssetLoader : AssetLoader
     {
         Watcher = new(DirectoryPath);
 
+        Watcher.IncludeSubdirectories = true;
+
         Watcher.Changed += OnFileChanged;
         Watcher.Created += OnFileChanged;
-        Watcher.Deleted += OnFileDeleted;
+        Watcher.Deleted += OnFileChanged;
         Watcher.Renamed += OnFileRenamed;
 
         Watcher.EnableRaisingEvents = true;
@@ -52,22 +51,14 @@ public sealed class FileAssetLoader : AssetLoader
     /// </summary>
     /// <param name="sender">Event sender, usually <see cref="Watcher"/>.</param>
     /// <param name="e">Arguments of the event.</param>
-    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    private void OnFileChanged(object sender, FileSystemEventArgs e) => OnFileChanged(e.FullPath);
+
+    private void OnFileChanged(string path)
     {
-        string relPath = Path.GetRelativePath(DirectoryPath, e.FullPath);
+        string relPath = Path.GetRelativePath(DirectoryPath, path);
         if (Assets.ReloadQueue?.Contains((this, relPath)) ?? false)
             return;
         ReloadAsset(relPath);
-    }
-
-    /// <summary>
-    /// Event for <see cref="Watcher"/> to call when a file is deleted.
-    /// </summary>
-    /// <param name="sender">Event sender, usually <see cref="Watcher"/>.</param>
-    /// <param name="e">Arguments of the event.</param>
-    private void OnFileDeleted(object sender, FileSystemEventArgs e)
-    {
-        RemoveFromCache(Path.GetRelativePath(DirectoryPath, e.FullPath));
     }
 
     /// <summary>
@@ -77,8 +68,8 @@ public sealed class FileAssetLoader : AssetLoader
     /// <param name="e">Arguments of the event.</param>
     private void OnFileRenamed(object sender, RenamedEventArgs e)
     {
-        RemoveFromCache(Path.GetRelativePath(DirectoryPath, e.OldFullPath));
-        ReloadAsset(Path.GetRelativePath(DirectoryPath, e.FullPath));
+        OnFileChanged(e.OldFullPath);
+        OnFileChanged(e.FullPath);
     }
 
     /// <summary>
@@ -102,7 +93,7 @@ public sealed class FileAssetLoader : AssetLoader
     /// <inheritdoc />
     public override void LoadAssetManifests()
     {
-        string[] manifests = Directory.GetFiles(DirectoryPath, Assets.MANIFEST_FILENAME, SearchOption.AllDirectories);
+        string[] manifests = Directory.GetFiles(DirectoryPath, Assets.MANIFEST_FILENAME, SearchOption.AllDirectories).Select(path => path.Replace('\\', '/')).ToArray();
         TotalAssetManifests = manifests.Length;
 
         FileWithDepth[] files = new FileWithDepth[manifests.Length];
@@ -123,10 +114,10 @@ public sealed class FileAssetLoader : AssetLoader
     }
 
     /// <inheritdoc />
-    public override void LoadAssets()
+    public override void LoadAssetsInDir(string dirPath)
     {
-        string[] assetPaths = FilterPaths(Directory.GetFiles(DirectoryPath, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(DirectoryPath, item))).ToArray();
-        TotalAssets += assetPaths.Length;
+        string[] assetPaths = FilterPaths(Directory.GetFiles(Path.Join(DirectoryPath, dirPath), "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(DirectoryPath, item).Replace('\\', '/'))).ToArray();
+        Interlocked.Add(ref TotalAssets, assetPaths.Length);
 
         try
         {
@@ -146,6 +137,7 @@ public sealed class FileAssetLoader : AssetLoader
     /// <inheritdoc />
     protected override AssetStream? LoadAssetStream(string path)
     {
+        path = path.Replace('\\', '/');
         string fullPath = Path.Join(DirectoryPath, path);
         if (!File.Exists(fullPath))
             return null;
@@ -159,4 +151,7 @@ public sealed class FileAssetLoader : AssetLoader
             return null;
         }
     }
+
+    /// <inheritdoc/>
+    public override bool IsDir(string path) => Directory.Exists(Path.Join(DirectoryPath, path));
 }

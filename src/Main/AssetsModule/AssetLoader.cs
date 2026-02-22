@@ -48,20 +48,15 @@ public abstract class AssetLoader
     /// <summary>
     /// Cache of the assets, with key being path of the asset in this <see cref="AssetManager"/> and value is the asset.
     /// </summary>
-    private readonly Dictionary<string, object> Cache = new();
+    protected readonly Dictionary<string, object> Cache = new();
 
     /// <summary>
     /// Lock for <see cref="Cache"/>.
     /// </summary>
-    private ReaderWriterLockSlim CacheRwl = new();
-
-    /// <summary>
-    /// String that will be shown as name of the asset manager.
-    /// </summary>
-    public abstract string DisplayName { get; }
+    protected ReaderWriterLockSlim CacheLock = new();
 
     /// <inheritdoc />
-    public override string ToString() => DisplayName;
+    public override string ToString() => Manager.ToString();
 
     /// <summary>
     /// Load all asset manifests for this <see cref="AssetLoader"/> asynchronously, can be used for reloading.
@@ -128,23 +123,29 @@ public abstract class AssetLoader
         TotalAssets = 0;
         try
         {
-            CacheRwl.EnterWriteLock();
+            CacheLock.EnterWriteLock();
             foreach (object asset in Cache.Values)
                 if (asset is IDisposable disposable) disposable.Dispose();
             Cache.Clear();
         }
         finally
         {
-            CacheRwl.ExitWriteLock();
+            CacheLock.ExitWriteLock();
         }
 
         LoadAssets();
     }
 
     /// <summary>
-    /// Load all assets in the cache asynchronously, <b>without replacing</b> already loaded assets.
+    /// Load all assets from the <paramref name="dirPath"/>.
     /// </summary>
-    public abstract void LoadAssets();
+    /// <param name="dirPath"></param>
+    public abstract void LoadAssetsInDir(string dirPath);
+
+    /// <summary>
+    /// Load all assets in the cache asynchronously, <b>replacing</b> already loaded assets.
+    /// </summary>
+    public void LoadAssets() => LoadAssetsInDir("");
 
     /// <summary>
     /// Filter asset paths for <see cref="LoadAssets"/> using <see cref="AssetManager.Filter"/> and filtering entries that are already in the <see cref="Cache"/>.
@@ -161,12 +162,12 @@ public abstract class AssetLoader
 
         try
         {
-            CacheRwl.EnterReadLock();
+            CacheLock.EnterReadLock();
             return assetPaths.Where(filter);
         }
         finally
         {
-            CacheRwl.ExitReadLock();
+            CacheLock.ExitReadLock();
         }
     }
 
@@ -187,7 +188,7 @@ public abstract class AssetLoader
         AssetParser? parser = GetParser(assetInfo);
         if (parser is null)
         {
-            Log.Warning("Could not find parser for the asset with type: '{Type}'. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type);
+            Log.Warning("Could not find parser for the asset with type {Type} at path {Path}. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type, path);
             AddLoadingAssetsCount();
             return;
         }
@@ -211,7 +212,7 @@ public abstract class AssetLoader
         try
         {
             Assets.LoadingInfoLock.EnterWriteLock();
-            if (Assets.LoadingAssetLoaders.Contains(this)) Assets.LoadedAssets += 1;
+            if (Assets.LoadingAssetLoaders.Contains(this)) Assets.LoadedAssets++;
         }
         finally
         {
@@ -240,12 +241,13 @@ public abstract class AssetLoader
     {
         try
         {
-            CacheRwl.EnterWriteLock();
+            CacheLock.EnterWriteLock();
+            if (Cache.TryGetValue(path, out object? oldAsset) && oldAsset is IDisposable disposable) disposable.Dispose();
             Cache[path] = asset;
         }
         finally
         {
-            CacheRwl.ExitWriteLock();
+            CacheLock.ExitWriteLock();
         }
     }
 
@@ -253,17 +255,74 @@ public abstract class AssetLoader
     /// Remove the specified key (path) from the <see cref="Cache"/>.
     /// </summary>
     /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
-    protected void RemoveFromCache(string path)
+    public void RemoveFromCache(string path)
     {
         try
         {
-            CacheRwl.EnterWriteLock();
+            CacheLock.EnterWriteLock();
+            if (Cache.TryGetValue(path, out object? asset) && asset is IDisposable disposable) disposable.Dispose();
             Cache.Remove(path);
         }
         finally
         {
-            CacheRwl.ExitWriteLock();
+            CacheLock.ExitWriteLock();
         }
+
+        Log.Information("{This}: Unloaded asset at {Path}", this, path);
+    }
+
+    /// <summary>
+    /// Remove all assets in the <paramref name="dirPath"/> from cache (unload them).
+    /// </summary>
+    /// <param name="dirPath">Directory path in this <see cref="AssetLoader"/>.</param>
+    public void RemoveDirFromCache(string dirPath)
+    {
+        Interlocked.Add(ref TotalAssets, 1);
+        if (!dirPath.EndsWith(Path.DirectorySeparatorChar) && !dirPath.EndsWith(Path.AltDirectorySeparatorChar)) dirPath += Path.DirectorySeparatorChar;
+
+        try
+        {
+            int unloadedAssetsCount = 0;
+            CacheLock.EnterWriteLock();
+            foreach (string asset in Cache.Keys)
+            {
+                if (asset.StartsWith(dirPath))
+                {
+                    Cache.Remove(asset);
+                    unloadedAssetsCount++;
+                }
+            }
+
+            Interlocked.Add(ref TotalAssets, -unloadedAssetsCount);
+            Interlocked.Add(ref LoadedAssets, -unloadedAssetsCount);
+            Log.Information("{This}: Unloaded {Count} assets", this, unloadedAssetsCount);
+            Cache.TrimExcess();
+        }
+        finally
+        {
+            CacheLock.ExitWriteLock();
+        }
+    }
+
+    /// <summary>
+    /// Remove all <paramref name="paths"/> from <see cref="Cache"/>.
+    /// </summary>
+    /// <param name="paths">Array of asset paths in this <see cref="AssetLoader"/>.</param>
+    public void RemoveFromCache(string[] paths)
+    {
+        try
+        {
+            CacheLock.EnterWriteLock();
+            foreach (string path in paths)
+                Cache.Remove(path);
+            Cache.TrimExcess();
+            GC.Collect();
+        }
+        finally
+        {
+            CacheLock.ExitWriteLock();
+        }
+        Log.Information("{This}: Unloaded {Count} assets", this, paths.Length);
     }
 
     /// <summary>
@@ -289,12 +348,19 @@ public abstract class AssetLoader
     {
         try
         {
-            CacheRwl.EnterReadLock();
+            CacheLock.EnterReadLock();
             return Cache.GetValueOrDefault(path);
         }
         finally
         {
-            CacheRwl.ExitReadLock();
+            CacheLock.ExitReadLock();
         }
     }
+
+    /// <summary>
+    /// Check whether <paramref name="path"/> is a directory.
+    /// </summary>
+    /// <param name="path">Path of the potential directory in this <see cref="AssetLoader"/>.</param>
+    /// <returns>Whether <paramref name="path"/> is a directory.</returns>
+    public abstract bool IsDir(string path);
 }

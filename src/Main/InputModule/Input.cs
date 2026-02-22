@@ -12,6 +12,11 @@ namespace Monod.InputModule;
 public static class Input
 {
     /// <summary>
+    /// The lowest <see cref="Key"/> value that is an existing value, all values from this one to 0 are guarateed to exist, values above 0 are not.
+    /// </summary>
+    public static readonly Key MIN_EXISTING_KEY = Key.GamepadDPadDown;
+
+    /// <summary>
     /// <see cref="StringBuilder"/> which contains "text input" keys pressed since last update, excluding <see cref="char.IsControl(char)"/> keys.
     /// </summary>
     public static StringBuilder? KeyString;
@@ -42,11 +47,6 @@ public static class Input
     private static InputState PrevState = new(new(), new(), [], 0, 0);
 
     /// <summary>
-    /// List of keys blocked since update start. Keys in this list should be ignored/have zero value when checked for player with index being playerIndex.
-    /// </summary>
-    private static List<(int playerIndex, Key key)> BlockedKeys = new();
-
-    /// <summary>
     /// Default/backup input map for all players. Should not be modified, and should be used for "restore to defaults".
     /// </summary>
     public static InputMap DefaultMap = new();
@@ -55,6 +55,7 @@ public static class Input
     /// Enum of all possible actions, to be used with <see cref="InputMap"/>, to have a way to globally define an action (for serialization/getting input action for the given player by name).
     /// </summary>
     public static NamedExtEnum ActionNames = new();
+
 
     #region RequiredToCall
     /// <summary>
@@ -65,8 +66,9 @@ public static class Input
     {
         KeyString = new StringBuilder();
         GameWindow win = game.Window;
-        win.TextInput += TextInput;
+        win.TextInput += OnTextInput;
     }
+
 
     /// <summary>
     /// Call in <see cref="Game"/>'s <see cref="Game.Update"/>, before anything that uses <see cref="Input"/> ".
@@ -100,11 +102,7 @@ public static class Input
             if (keyboard.GetPressedKeys().Length != 0) player.LastUsedDeviceIsGamepad = false;
             if (player.GamepadIndex >= 0 && GamepadStateChanged(player.GamepadIndex)) player.LastUsedDeviceIsGamepad = true;
         }
-        IsGamepadKey(Key.A);
     }
-
-    [Pure]
-    public static bool GamepadStateChanged(int gamepadIndex) => PrevState.Gamepads[gamepadIndex] != CurState.Gamepads[gamepadIndex];
 
     /// <summary>
     /// Call in <see cref="Game.Update"/>, after everything that uses <see cref="Input"/>.
@@ -112,26 +110,63 @@ public static class Input
     public static void PostUpdate()
     {
         KeyString?.Clear();
-        BlockedKeys.Clear();
     }
     #endregion
 
     #region ReadingInput
-    [Pure]
-    public static bool ShouldIgnore(Key key, int playerIndex = 0)
+    /// <summary>
+    /// Get the first (random/any) key that is down this frame. Can be useful for rebinding (to get the key that's currently down to assign it as a bind).
+    /// </summary>
+    /// <param name="playerIndex">Index of the player for whom to get the first key. Affects how input is checked.</param>
+    /// <returns>First key that is down this frame.</returns>
+    public static Key FirstKeyDown(int playerIndex)
     {
-        return BlockedKeys.Contains((playerIndex, key));
+        if (Players[playerIndex].UsesKeyboard)
+        {
+            Keys[] keyboardKeys = CurState.Keyboard.GetPressedKeys();
+            if (keyboardKeys.Length > 0) return (Key)keyboardKeys[0];
+        }
+
+        for (Key i = MIN_EXISTING_KEY; i < Key.None; i++)
+            if (GetValue(i, playerIndex) != 0) return i;
+
+        return Key.None;
     }
 
+    /// <summary>
+    /// Check whether the <paramref name="key"/> should be considered inactive/up in the <paramref name="state"/> for the <see cref="Player"/> with <paramref name="playerIndex"/>.
+    /// </summary>
+    /// <param name="state">State of the input, in which to check.</param>
+    /// <param name="key">Key to check.</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Whether the <paramref name="key"/> should be considered inactive/up for the <see cref="Player"/> with <paramref name="playerIndex"/>.</returns>
+    [Pure]
+    public static bool ShouldIgnore(InputState state, Key key, int playerIndex)
+    {
+        return state.BlockedKeys.Contains((playerIndex, key));
+    }
+
+    /// <summary>
+    /// Check whether the <paramref name="key"/> is a key on a keyboard.
+    /// </summary>
+    /// <param name="key">Key to check.</param>
+    /// <returns>Whether the <paramref name="key"/> is a key on a keyboard.</returns>
+    [Pure]
+    public static bool IsKeyboardKey(Key key) => key >= 0;
+
+    /// <summary>
+    /// Get value of the <paramref name="key"/> in the <paramref name="state"/> for the <paramref name="playerIndex"/>.
+    /// </summary>
+    /// <param name="state">State, where to check the keys.</param>
+    /// <param name="key">Key, whose value to get.</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Value of the <paramref name="key"/> in the <paramref name="state"/> for the <paramref name="playerIndex"/>.</returns>
     [Pure]
     public static float GetValue(InputState state, Key key, int playerIndex = 0)
     {
-        if (state == CurState && ShouldIgnore(key)) return 0;
-        if (!IsGamepadKey(key))
-        {
-            if (!Players[playerIndex].UsesKeyboard) return 0;
-            else return state.Keyboard.IsKeyDown((Keys)key).ToInputValue();
-        }
+        if (state == CurState && ShouldIgnore(state, key, playerIndex)) return 0;
+        if (!IsGamepadKey(key) && !Players[playerIndex].UsesKeyboard) return 0;
+        if (IsKeyboardKey(key)) return state.Keyboard.IsKeyDown((Keys)key).ToInputValue();
 
         return key switch
         {
@@ -173,8 +208,22 @@ public static class Input
         };
     }
 
+    /// <summary>
+    /// Get <see cref="GamePadState"/> in the <paramref name="state"/> for the <paramref name="playerIndex"/>.
+    /// </summary>
+    /// <param name="state">State to get from.</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns><see cref="GamePadState"/> in the <paramref name="state"/> for the <paramref name="playerIndex"/>.</returns>
     [Pure]
     public static GamePadState GetGamePad(InputState state, int playerIndex) => state.Gamepads[Players[playerIndex].GamepadIndex];
+
+    /// <summary>
+    /// Check whether any button was pressed/released on the gamepad at <paramref name="gamepadIndex"/> compared to previous update.
+    /// </summary>
+    /// <param name="gamepadIndex">Index of the gamepad in monogame.</param>
+    /// <returns>Whether any button was pressed/released on the gamepad at <paramref name="gamepadIndex"/> compared to previous update.</returns>
+    [Pure]
+    public static bool GamepadStateChanged(int gamepadIndex) => PrevState.Gamepads[gamepadIndex] != CurState.Gamepads[gamepadIndex];
 
     /// <summary>
     /// Apply setting to the given <paramref name="value"/> of <paramref name="playerIndex"/>'s gamepad stick, for positive values on the axis if <paramref name="positiveValues"/> is <see langword="true"/> or negative ones if <paramref name="positiveValues"/> is <see langword="false"/>.
@@ -265,6 +314,12 @@ public static class Input
     [Pure]
     public static float GetValue(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex);
 
+    /// <summary>
+    /// Get the current value of the <paramref name="actionIndex"/> for the <paramref name="playerIndex"/>.
+    /// </summary>
+    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/>.</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Current value of the <paramref name="actionIndex"/> for the <paramref name="playerIndex"/>.</returns>
     [Pure]
     public static float GetValue(int actionIndex, int playerIndex) => Players[playerIndex].Map.GetValue(actionIndex, playerIndex);
     #endregion
@@ -275,7 +330,7 @@ public static class Input
     /// </summary>
     /// <param name="sender">Event sender.</param>
     /// <param name="e">Event args.</param>
-    private static void TextInput(object? sender, TextInputEventArgs e)
+    private static void OnTextInput(object? sender, TextInputEventArgs e)
     {
         if (char.IsControl(e.Character)) return;
         KeyString?.Append(e.Character);
@@ -286,6 +341,6 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to block.</param>
     /// <param name="playerIndex">Index of the player for whom to block.</param>
-    public static void Block(Key key, int playerIndex = 0) => BlockedKeys.Add((playerIndex, key));
+    public static void Block(Key key, int playerIndex = 0) => CurState.BlockedKeys.Add((playerIndex, key));
     #endregion
 }

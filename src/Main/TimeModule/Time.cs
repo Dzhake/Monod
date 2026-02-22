@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Monod.Graphics;
-using System;
 
 namespace Monod.TimeModule;
 
@@ -10,12 +9,17 @@ namespace Monod.TimeModule;
 public static class Time
 {
     /// <summary>
-    /// Time since last update.
+    /// Unscaled time since last update.
     /// </summary>
-    public static TimeSpan UnscaledDeltaTime;
+    public static TimeSpan RawDeltaTimeSpan;
 
     /// <summary>
-    /// Time since last update, multiplied by <see cref="TimeScale"/>
+    /// Unscaled time since last update, in seconds.
+    /// </summary>
+    public static float RawDeltaTime;
+
+    /// <summary>
+    /// Time since last update, multiplied by <see cref="TimeScale"/>.
     /// </summary>
     public static TimeSpan DeltaTimeSpan;
 
@@ -27,7 +31,7 @@ public static class Time
     /// <summary>
     /// Time since program started.
     /// </summary>
-    public static TimeSpan UnscaledTotalTime;
+    public static TimeSpan RawTotalDeltaTime;
 
     /// <summary>
     /// Time since program started, multiplied by timescale multipliers at moment those were active.
@@ -59,13 +63,13 @@ public static class Time
         if (GraphicsSettings.FocusLossBehaviour == GraphicsSettings.OnFocusLossBehaviour.Continue) isActive = true;
 
         if (wasActive || GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco)
-            UnscaledDeltaTime = gameTime.ElapsedGameTime;
+            RawDeltaTimeSpan = gameTime.ElapsedGameTime;
         else
-            UnscaledDeltaTime += gameTime.ElapsedGameTime;
+            RawDeltaTimeSpan += gameTime.ElapsedGameTime;
         wasActive = isActive;
 
         if (!isActive) return;
-        UnscaledTotalTime += UnscaledDeltaTime;
+        RawTotalDeltaTime += RawDeltaTimeSpan;
         RunTimeScaleCallbacks();
         UpdateDeltaTime();
         TotalTime += DeltaTimeSpan;
@@ -81,11 +85,12 @@ public static class Time
     }
 
     /// <summary>
-    /// Updates <see cref="DeltaTimeSpan"/> and <see cref="DeltaTime"/> to match <see cref="UnscaledDeltaTime"/>.
+    /// Updates <see cref="DeltaTimeSpan"/> and <see cref="DeltaTime"/> to match <see cref="RawDeltaTimeSpan"/>.
     /// </summary>
     public static void UpdateDeltaTime()
     {
-        DeltaTimeSpan = UnscaledDeltaTime * TimeScale;
+        DeltaTimeSpan = RawDeltaTimeSpan * TimeScale;
         DeltaTime = (float)DeltaTimeSpan.TotalSeconds;
+        RawDeltaTime = (float)RawDeltaTimeSpan.TotalSeconds;
     }
 }

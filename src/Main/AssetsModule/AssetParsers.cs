@@ -31,12 +31,18 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static string Text(AssetInfo info, AssetManager _)
     {
-        return Assets.ResourcePriority switch
+        switch (Assets.ResourcePriority)
         {
-            ResourcePriorityType.Performance => Encoding.UTF8.GetString(info.AssetStream.ToByteArrayDangerous()),
-            ResourcePriorityType.Memory => new StreamReader(info.AssetStream, Encoding.UTF8).ReadToEnd(),
-            _ => throw new IndexOutOfRangeException()
-        };
+            case ResourcePriorityType.Performance:
+                return Encoding.UTF8.GetString(info.AssetStream.ToByteArrayDangerous());
+            case ResourcePriorityType.Memory:
+                StreamReader reader = new(info.AssetStream, Encoding.UTF8);
+                string text = reader.ReadToEnd();
+                reader.Dispose();
+                return text;
+            default:
+                throw new IndexOutOfRangeException();
+        }
     }
 
     /// <summary>
