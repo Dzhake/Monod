@@ -38,7 +38,7 @@ public abstract class AssetLoader
     /// <summary>
     /// Whether this <see cref="AssetLoader"/> is currently loading any assets or asset manifests.
     /// </summary>
-    public bool IsLoading => LoadedAssets != TotalAssets || LoadedAssetManifests != TotalAssetManifests;
+    //public bool IsLoading => LoadedAssets != TotalAssets || LoadedAssetManifests != TotalAssetManifests;
 
     /// <summary>
     /// List of <see cref="MatcherInfo"/>s loaded from asset manifests, in order how they should be applied (first one to match means the one to use).
@@ -53,10 +53,77 @@ public abstract class AssetLoader
     /// <summary>
     /// Lock for <see cref="Cache"/>.
     /// </summary>
-    protected ReaderWriterLockSlim CacheLock = new();
+    protected ReaderWriterLockSlim CacheLock = new(LockRecursionPolicy.SupportsRecursion);
+
+    protected Queue<Func<Task>> Tasks = new();
+    protected Queue<int> TasksPerGroup = new();
+
+    public int ActiveTasksCount;
+    public int TotalTasksCount;
+    public bool IsLoading => TotalTasksCount != 0;
+
+    public ReaderWriterLockSlim TasksLock = new(LockRecursionPolicy.SupportsRecursion);
+
+    public void ResetTasksCount() => TotalTasksCount = 0;
 
     /// <inheritdoc />
     public override string ToString() => Manager.ToString();
+
+    protected void ReduceActiveTasks()
+    {
+        try
+        {
+            TasksLock.EnterWriteLock();
+            ActiveTasksCount--;
+            if (ActiveTasksCount == 0) RunTasks();
+        }
+        finally
+        {
+            TasksLock.ExitWriteLock();
+        }
+    }
+
+    protected void TryAddTasks(ICollection<Func<Task>> tasks)
+    {
+        try
+        {
+            TasksLock.EnterWriteLock();
+            TotalTasksCount += tasks.Count;
+
+            if (ActiveTasksCount == 0)
+            {
+                foreach (var task in tasks) MainThread.Add(task());
+                return;
+            }
+
+            foreach (var task in tasks) Tasks.Enqueue(task);
+            TasksPerGroup.Enqueue(tasks.Count);
+        }
+        finally
+        {
+            TasksLock.ExitWriteLock();
+        }
+    }
+
+    protected void RunTasks()
+    {
+        try
+        {
+            TasksLock.EnterWriteLock();
+            if (Tasks.Count == 0) return;
+            int tasksAmount;
+            if (TasksPerGroup.Count == 0) tasksAmount = Tasks.Count;
+            else tasksAmount = TasksPerGroup.Dequeue();
+
+            ActiveTasksCount += tasksAmount;
+            for (int i = 0; i < tasksAmount; i++)
+                MainThread.Add(Tasks.Dequeue().Invoke());
+        }
+        finally
+        {
+            TasksLock.ExitWriteLock();
+        }
+    }
 
     /// <summary>
     /// Load all asset manifests for this <see cref="AssetLoader"/> asynchronously, can be used for reloading.

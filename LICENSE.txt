@@ -1,9 +1,7 @@
-Most files are licensed with the license below (GPLv3), with the exceptions of files that have an explicit license text at top of the file, that defines license for that file.
-
-GNU GENERAL PUBLIC LICENSE
+                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
- Copyright (C) 2026 Dzhandry
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 

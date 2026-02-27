@@ -134,6 +134,8 @@ public sealed class FileAssetLoader : AssetLoader
             MainThread.Add(Task.Run(() => LoadAsset(assetPath)));
     }
 
+    void LoadAsset(string path) { Tasks.Enqueue(new(() => LoadAsset(path))); }
+
     /// <inheritdoc />
     protected override AssetStream? LoadAssetStream(string path)
     {
