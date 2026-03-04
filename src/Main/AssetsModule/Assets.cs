@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-using Monod.Shared;
+using Monod.AssetsModule.Commands;
 using Monod.Shared.Collections;
 using Monod.Shared.Extensions;
 using Serilog;
@@ -19,7 +19,7 @@ public static class Assets
     /// <remarks>
     /// This name is reserved and can't be used for assets. "Assets manifest" is a metadata file about assets, containing info such as which <see cref="IAssetFilter"/> and <see cref="AssetParser"/> to use.
     /// </remarks>
-    public const string MANIFEST_FILENAME = "assets.json";
+    public static readonly string MANIFEST_FILENAME = "assets.json";
 
     /// <summary>
     /// All registered <see cref="AssetManager"/>s.
@@ -27,24 +27,9 @@ public static class Assets
     public static readonly Dictionary<string, AssetManager> Managers = new();
 
     /// <summary>
-    /// List of <see cref="AssetLoader"/>s, that are currently reloading some assets. Used to determine whether the game should pause and wait until assets are reloaded. Cleared automatically by <see cref="Assets"/> when reload ends. Access only with <see cref="LoadingInfoLock"/>.
-    /// </summary>
-    public static readonly HashSet<AssetLoader> LoadingAssetLoaders = new();
-
-    /// <summary>
     /// Lock for <see cref="LoadingAssetLoaders"/>, <see cref="LoadedAssets"/>, <see cref="TotalAssets"/>, <see cref="ReloadQueue"/>. Required because <see cref="FileSystemWatcher"/> might raise event during the <see cref="Update"/>, causing race condition, leading to <see cref="AssetLoader"/> thinking that reload is currently ongoing even if it's not.
     /// </summary>
     public static readonly ReaderWriterLockSlim LoadingInfoLock = new();
-
-    /// <summary>
-    /// Amount of assets that were reloaded since reload started. Incremented in <see cref="AssetLoader.LoadAsset"/>. Access only with <see cref="LoadingInfoLock"/>.
-    /// </summary>
-    public static int LoadedAssets;
-
-    /// <summary>
-    /// Amount of assets that <see cref="LoadingAssetLoaders"/> want to reload during this reload (including already reloaded). Incremented in <see cref="AssetLoader.LoadAssets"/>. Access only with <see cref="LoadingInfoLock"/>.
-    /// </summary>
-    public static int TotalAssets;
 
     /// <summary>
     /// Whether systems should reload assets from the asset cache this frame. Set in <see cref="Update"/>.
@@ -56,15 +41,15 @@ public static class Assets
     /// </summary>
     public static bool Reloading;
 
+    public static bool IsLoading;
+    public static int CommandsTotal;
+    public static int CommandsFinished;
+    public static AssetLoaderCommand? ActiveCommand;
+
     /// <summary>
     /// Event that is raised when some <see cref="AssetLoader"/>s finish reloading assets. Use <see cref="ReloadThisFrame"/> (recommended) or this to determine when to reload assets.
     /// </summary>
     public static EventBus OnReload = new();
-
-    /// <summary>
-    /// Queue for assets that need to be reloaded. Access only with <see cref="LoadingInfoLock"/>.
-    /// </summary>
-    public static HashSet<(AssetLoader, string)>? ReloadQueue;
 
     /// <summary>
     /// Dictionary of asset types and parsers that should be able to parse the specified format. Should be used if the loaded asset doesn't specify some custom parser.
@@ -76,8 +61,6 @@ public static class Assets
     /// </summary>
     public static void Initialize()
     {
-        if (MonodSettings.HotReload)
-            ReloadQueue = new();
         DefaultParsers.AddRange([
             new(AssetType.Binary, AssetParsers.Binary),
             new(AssetType.Text, AssetParsers.Text),
@@ -97,9 +80,10 @@ public static class Assets
         try
         {
             LoadingInfoLock.EnterWriteLock();
-            LoadingAssetLoaders.Clear();
-            LoadedAssets = 0;
-            TotalAssets = 0;
+            IsLoading = false;
+            CommandsTotal = 0;
+            CommandsFinished = 0;
+            ActiveCommand = null;
         }
         finally
         {
@@ -116,27 +100,33 @@ public static class Assets
         {
             LoadingInfoLock.EnterUpgradeableReadLock();
 
-            if (ReloadQueue?.Count != 0 && TotalAssets == 0)
+            if (!IsLoading)
             {
-                StartReload();
+                foreach (var assetManager in Managers.Values)
+                {
+                    if (!assetManager.Loader.LoadingInactive)
+                    {
+                        IsLoading = true;
+                        break;
+                    }
+                }
+
+                if (!IsLoading) return;
             }
 
-            if (LoadingAssetLoaders.Count != 0 && !LoadingAssetLoaders.Any(assetLoader => assetLoader.IsLoading)) //finished loading
+            foreach (var assetManager in Managers.Values)
             {
-                Log.Information("Finished un/re/loading {TotalAssets} assets/dirs", TotalAssets);
-
-                if (ReloadQueue?.Count != 0)
+                AssetLoaderCommand? command = assetManager.Loader.ActiveCommand;
+                if (command is not null)
                 {
-                    StartReload();
-                    return;
+                    ActiveCommand = command;
+                    break;
                 }
+            }
 
-                if (Reloading)
-                {
-                    EmitReloadEvent();
-                    ReloadThisFrame = true;
-                }
-
+            if (CommandsTotal == CommandsFinished)
+            {
+                Log.Information("Finished executing {Count} commands", CommandsTotal);
                 ResetLoadInfo();
             }
         }
@@ -146,33 +136,25 @@ public static class Assets
         }
     }
 
-    /// <summary>
-    /// Reset load info, and load all assets from <see cref="ReloadQueue"/>, then empty it.
-    /// </summary>
-    private static void StartReload()
+    public static void IncrementTotalCommandsCount()
     {
-        ResetLoadInfo();
-        if (ReloadQueue is null) return;
-
         try
         {
             LoadingInfoLock.EnterWriteLock();
-            foreach ((AssetLoader assetLoader, string path) in ReloadQueue)
-            {
-                if (assetLoader.IsDir(path)) //directory
-                    MainThread.Add(Task.Run(() => assetLoader.LoadAssetsInDir(path)));
-                else if (assetLoader.GetAsset(path) is null) //deleted directory or not-yet-loaded-but-deleted file
-                    MainThread.Add(Task.Run(() => assetLoader.RemoveDirFromCache(path)));
-                else //file
-                {
-                    MainThread.Add(Task.Run(() => assetLoader.LoadAsset(path)));
-                    TotalAssets++;
-                }
+            CommandsTotal++;
+        }
+        finally
+        {
+            LoadingInfoLock.ExitWriteLock();
+        }
+    }
 
-
-                LoadingAssetLoaders.Add(assetLoader);
-            }
-            ReloadQueue.Clear();
+    public static void IncrementFinishedCommandsCount()
+    {
+        try
+        {
+            LoadingInfoLock.EnterWriteLock();
+            CommandsFinished++;
         }
         finally
         {
@@ -306,6 +288,4 @@ public static class Assets
     /// Action <see cref="AssetManager"/> will do if the specified asset was not found.
     /// </summary>
     public static NotFoundPolicyType NotFoundPolicy = NotFoundPolicyType.Fallback;
-
-
 }

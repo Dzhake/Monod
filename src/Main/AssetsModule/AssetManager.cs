@@ -123,8 +123,8 @@ public sealed class AssetManager : IDisposable
     public void LoadAssets()
     {
         ObjectDisposedException.ThrowIf(disposed, this);
-        Loader.LoadAssetManifests();
-        Loader.LoadAssets();
+        Loader.EnqueueLoadAssetManifests();
+        Loader.EnqueueLoadAssets();
         Log.Information("{AssetManager} is loading assets", this);
     }
 
@@ -134,7 +134,6 @@ public sealed class AssetManager : IDisposable
     public void LoadAsset(string path)
     {
         Loader.LoadAsset(path);
-        Interlocked.Add(ref Loader.TotalAssets, 1);
     }
 
 

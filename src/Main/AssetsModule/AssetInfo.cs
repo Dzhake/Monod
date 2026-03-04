@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Monod.AssetsModule.Exceptions;
 
 namespace Monod.AssetsModule;
@@ -19,7 +16,7 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     /// Type of the asset.
     /// </summary>
     public readonly AssetType Type;
-    
+
     /// <summary>
     /// Properties of <see cref="MatcherInfo"/>s that asset's path matched to. Use <see cref="GetProperty"/> to get a property.
     /// </summary>

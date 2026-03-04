@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-
 namespace Monod.AssetsModule;
 
 /// <summary>
 /// Stores info directly about the loaded asset: it's <see cref="Stream"/> and <see cref="Type"/>, but unlike <see cref="AssetInfo"/> doesn't store any other info.
 /// </summary>
-public readonly struct AssetStream : IEquatable<AssetStream>
+public readonly struct AssetStream : IEquatable<AssetStream>, IDisposable
 {
     /// <summary>
     /// <see cref="Stream"/> reading the asset.
@@ -37,7 +33,7 @@ public readonly struct AssetStream : IEquatable<AssetStream>
     /// <param name="path">Path of the asset.</param>
     /// <returns>A new <see cref="AssetInfo"/> with same <see cref="Stream"/> and <see cref="Type"/> and the specified <paramref name="propertiesArray"/>.</returns>
     public AssetInfo ToInfo(Dictionary<int, object>[] propertiesArray, string path) => new AssetInfo(Stream, Type, propertiesArray, path);
-    
+
     /// <inheritdoc />
     public bool Equals(AssetStream other) => Stream.Equals(other.Stream);
 
@@ -46,6 +42,12 @@ public readonly struct AssetStream : IEquatable<AssetStream>
 
     /// <inheritdoc />
     public override int GetHashCode() => Stream.GetHashCode();
+
+    ///<inheritdoc/>
+    public void Dispose()
+    {
+        Stream.Close();
+    }
 
     /// <summary>
     /// Indicates whether two <see cref="AssetInfo"/> are equal.

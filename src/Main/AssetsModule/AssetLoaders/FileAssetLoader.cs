@@ -1,18 +1,12 @@
-using Monod.Shared;
-using Serilog;
-
 namespace Monod.AssetsModule.AssetLoaders;
 
 /// <summary>
 /// Implementation of <see cref="AssetLoader"/> loading assets from the specified <see cref="DirectoryPath"/>.
 /// </summary>
-public sealed class FileAssetLoader : AssetLoader
+/*public sealed class FileAssetLoader : AssetLoader
 {
-    /// <summary>
-    /// The full path to the directory that this asset loader loads assets from.
-    /// </summary>
-    public readonly string DirectoryPath;
 
+    
     /// <summary>
     /// <see cref="FileSystemWatcher"/>, used to detect changes in files that are stored in <see cref="DirectoryPath"/>.
     /// </summary>
@@ -22,10 +16,8 @@ public sealed class FileAssetLoader : AssetLoader
     /// Initialize a new <see cref="FileAssetLoader"/> with the specified <see cref="DirectoryPath"/>.
     /// </summary>
     /// <param name="directoryPath">The full path to the directory that this asset loader loads assets from.</param>
-    public FileAssetLoader(string directoryPath)
+    public FileAssetLoader(string directoryPath) : base(directoryPath)
     {
-        ArgumentNullException.ThrowIfNull(directoryPath);
-        DirectoryPath = Path.GetFullPath(directoryPath);
         if (MonodSettings.HotReload) InitializeWatcher();
     }
 
@@ -89,71 +81,4 @@ public sealed class FileAssetLoader : AssetLoader
             Assets.LoadingInfoLock.ExitWriteLock();
         }
     }
-
-    /// <inheritdoc />
-    public override void LoadAssetManifests()
-    {
-        string[] manifests = Directory.GetFiles(DirectoryPath, Assets.MANIFEST_FILENAME, SearchOption.AllDirectories).Select(path => path.Replace('\\', '/')).ToArray();
-        TotalAssetManifests = manifests.Length;
-
-        FileWithDepth[] files = new FileWithDepth[manifests.Length];
-        for (int i = 0; i < manifests.Length; i++)
-            files[i] = new(manifests[i]);
-        files.Sort();
-        List<MatcherInfo> matchers = new();
-
-        foreach (FileWithDepth file in files)
-        {
-            string manifest = file.FilePath;
-            Stream manifestStream = File.OpenRead(manifest);
-            matchers.AddRange(ParseAssetManifest(manifestStream, Path.GetRelativePath(DirectoryPath, Path.GetDirectoryName(manifest) ?? "")));
-            LoadedAssetManifests++;
-        }
-
-        Matchers = matchers.ToArray();
-    }
-
-    /// <inheritdoc />
-    public override void LoadAssetsInDir(string dirPath)
-    {
-        string[] assetPaths = FilterPaths(Directory.GetFiles(Path.Join(DirectoryPath, dirPath), "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(DirectoryPath, item).Replace('\\', '/'))).ToArray();
-        Interlocked.Add(ref TotalAssets, assetPaths.Length);
-
-        try
-        {
-            Assets.LoadingInfoLock.EnterWriteLock();
-            Assets.LoadingAssetLoaders.Add(this);
-            Assets.TotalAssets += assetPaths.Length;
-        }
-        finally
-        {
-            Assets.LoadingInfoLock.ExitWriteLock();
-        }
-
-        foreach (string assetPath in assetPaths)
-            MainThread.Add(Task.Run(() => LoadAsset(assetPath)));
-    }
-
-    void LoadAsset(string path) { Tasks.Enqueue(new(() => LoadAsset(path))); }
-
-    /// <inheritdoc />
-    protected override AssetStream? LoadAssetStream(string path)
-    {
-        path = path.Replace('\\', '/');
-        string fullPath = Path.Join(DirectoryPath, path);
-        if (!File.Exists(fullPath))
-            return null;
-        try
-        {
-            return new(File.OpenRead(fullPath), AssetsUtils.DetectTypeByPath(path));
-        }
-        catch (Exception exception)
-        {
-            Log.Error(exception, "An exception occured while trying to open a file:");
-            return null;
-        }
-    }
-
-    /// <inheritdoc/>
-    public override bool IsDir(string path) => Directory.Exists(Path.Join(DirectoryPath, path));
-}
+}*/

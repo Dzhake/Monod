@@ -1,5 +1,4 @@
 using Monod.AssetsModule;
-using Monod.AssetsModule.AssetLoaders;
 using Monod.Modding.ModdingOld.Exceptions;
 using Monod.Shared;
 using Monod.Shared.SaveLoad;
@@ -317,7 +316,7 @@ public static class ModManager
         string contentDir = GetContentDirectory(modDir);
         if (Directory.Exists(contentDir))
         {
-            mod.Assets = new(new FileAssetLoader(contentDir));
+            mod.Assets = new(new AssetLoader(contentDir));
             Assets.RegisterAssetManager(mod.Assets, mod.Config.Id.Name);
             mod.ContentType |= ModContentType.Assets;
         }

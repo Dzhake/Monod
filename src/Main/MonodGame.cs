@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
 using Monod.AssetsModule;
-using Monod.AssetsModule.AssetLoaders;
 using Monod.Graphics;
 using Monod.Graphics.Components;
 using Monod.Graphics.Fonts;
@@ -53,7 +52,7 @@ public abstract class MonodGame : Game
         Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
 
         string contentPath = $"{AppContext.BaseDirectory}Content";
-        MainAssetManager = new AssetManager(new FileAssetLoader((contentPath)));
+        MainAssetManager = new AssetManager(new AssetLoader((contentPath)));
         Assets.RegisterAssetManager(MainAssetManager, "");
         MainAssetManager.LoadAssets();
     }
@@ -70,12 +69,12 @@ public abstract class MonodGame : Game
         ModManager.Update();
         Assets.Update();
 
-        if (Assets.LoadingAssetLoaders.Count != 0) //Don't care about thread safety, readonly with no side effects other than one frame delay
+        if (Assets.IsLoading) //Don't care about thread safety, readonly with no side effects other than one frame delay
         {
             return;
         }
 
-        if (ModManager.InProgress || Assets.LoadingAssetLoaders.Count != 0) return;
+        if (ModManager.InProgress) return;
         //DevConsole.Update(); TODO dev console in-game w/ Console class support like in DD.
 
         UpdateM();
@@ -94,7 +93,7 @@ public abstract class MonodGame : Game
             return;
         }
 
-        if (Assets.LoadingAssetLoaders.Count != 0)
+        if (Assets.IsLoading)
         {
             GenericFont? font = GlobalFonts.MenuFont;
             float width = Window.ClientBounds.Width;
@@ -102,12 +101,17 @@ public abstract class MonodGame : Game
 
             Renderer.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp);
 
+            if (Assets.ActiveCommand is null) return;
+
             if (font is not null)
             {
-                font.DrawString(Renderer.spriteBatch, "Loading assets:", new(width * 0.1f, height * 0.6f), Color.White);
-                font.DrawString(Renderer.spriteBatch, $"{Assets.LoadedAssets}/{Assets.TotalAssets}", new(width * 0.1f, height * 0.7f), Color.White);
+                font.DrawString(Renderer.spriteBatch, "Loading assets:", new(width * 0.1f, height * 0.1f), Color.White);
+                font.DrawString(Renderer.spriteBatch, $"{Assets.CommandsFinished}/{Assets.CommandsTotal}", new(width * 0.1f, height * 0.2f), Color.White);
+                font.DrawString(Renderer.spriteBatch, $"{Assets.ActiveCommand.CurrentProgress}/{Assets.ActiveCommand.TotalProgress}", new(width * 0.1f, height * 0.6f), Color.White);
+                font.DrawString(Renderer.spriteBatch, $"{Assets.ActiveCommand.GetText()}", new(width * 0.1f, height * 0.7f), Color.White);
             }
-            ProgressBar.Draw((float)Assets.LoadedAssets / Assets.TotalAssets, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
+            ProgressBar.Draw((float)Assets.CommandsFinished / Assets.CommandsTotal, new(width * 0.1f, height * 0.3f), new(width * 0.8f, height * 0.1f));
+            ProgressBar.Draw((float)Assets.ActiveCommand.CurrentProgress / Assets.ActiveCommand.TotalProgress, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
             Renderer.End();
             return;
         }

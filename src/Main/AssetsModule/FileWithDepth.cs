@@ -1,8 +1,3 @@
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-
 namespace Monod.AssetsModule;
 
 /// <summary>
@@ -14,7 +9,7 @@ public readonly struct FileWithDepth : IComparable<FileWithDepth>, IEquatable<Fi
     /// Absolute path to the file.
     /// </summary>
     public readonly string FilePath;
-    
+
     /// <summary>
     /// Depth of the file (how deep it's directory is relative to drive's root).
     /// </summary>
@@ -23,7 +18,7 @@ public readonly struct FileWithDepth : IComparable<FileWithDepth>, IEquatable<Fi
     /// <summary>
     /// Initialize a new instance of <see cref="FileWithDepth"/> with the specified <paramref name="filePath"/>.
     /// </summary>
-    /// <param name="filePath"></param>
+    /// <param name="filePath">Path of the file.</param>
     public FileWithDepth(string filePath)
     {
         FilePath = filePath;
