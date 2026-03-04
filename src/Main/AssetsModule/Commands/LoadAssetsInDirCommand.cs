@@ -6,6 +6,7 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
 {
     public string Dir = dir;
 
+    ///<inheritdoc/>
     public override string GetText() => $"{Loader} is loading assets from /{Dir}";
 
     ///<inheritdoc/>
@@ -26,9 +27,9 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
             MainThread.Add(Task.Run(() => LoadAsset(assetPath)));
     }
 
-    private void LoadAsset(string assetPath)
+    private async Task LoadAsset(string assetPath)
     {
-        Loader.LoadAsset(assetPath);
+        await Loader.LoadAssetAsync(assetPath);
         Interlocked.Add(ref LoadedAssets, 1);
         if (TotalAssets == LoadedAssets) OnFinished();
     }
