@@ -27,7 +27,7 @@ public static class Assets
     public static readonly Dictionary<string, AssetManager> Managers = new();
 
     /// <summary>
-    /// Lock for <see cref="LoadingAssetLoaders"/>, <see cref="LoadedAssets"/>, <see cref="TotalAssets"/>, <see cref="ReloadQueue"/>. Required because <see cref="FileSystemWatcher"/> might raise event during the <see cref="Update"/>, causing race condition, leading to <see cref="AssetLoader"/> thinking that reload is currently ongoing even if it's not.
+    /// Lock for <see cref="CommandsTotal"/> and <see cref="CommandsFinished"/>.
     /// </summary>
     public static readonly ReaderWriterLockSlim LoadingInfoLock = new();
 
@@ -41,9 +41,24 @@ public static class Assets
     /// </summary>
     public static bool Reloading;
 
+    /// <summary>
+    /// Whether any asset-loading commands are currently active.
+    /// </summary>
     public static bool IsLoading;
+
+    /// <summary>
+    /// Total amount of commands in all registered asset managers. Includes finished commands and commands queue. Access only with <see cref="LoadingInfoLock"/>.
+    /// </summary>
     public static int CommandsTotal;
+
+    /// <summary>
+    /// Amount of commands finished in this load session. Access only with <see cref="LoadingInfoLock"/>.
+    /// </summary>
     public static int CommandsFinished;
+
+    /// <summary>
+    /// Some command from some asset loader, that can be used for having a quickly moving "numbers go up" progress bar. Chosen in a random-ish way.
+    /// </summary>
     public static AssetLoaderCommand? ActiveCommand;
 
     /// <summary>
@@ -136,6 +151,9 @@ public static class Assets
         }
     }
 
+    /// <summary>
+    /// Increment <see cref="CommandsTotal"/> by 1 in a thread-safe way.
+    /// </summary>
     public static void IncrementTotalCommandsCount()
     {
         try
@@ -149,6 +167,9 @@ public static class Assets
         }
     }
 
+    /// <summary>
+    /// Increment <see cref="CommandsFinished"/> by 1 in a thread-safe way.
+    /// </summary>
     public static void IncrementFinishedCommandsCount()
     {
         try

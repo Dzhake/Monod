@@ -20,11 +20,10 @@ public class AssetLoader
     /// </summary>
     public readonly string DirectoryPath;
 
-    public AssetLoader(string directoryPath)
-    {
-        ArgumentNullException.ThrowIfNull(directoryPath);
-        DirectoryPath = Path.GetFullPath(directoryPath);
-    }
+    /// <summary>
+    /// <see cref="FileSystemWatcher"/>, used to detect changes in files that are stored in <see cref="DirectoryPath"/>.
+    /// </summary>
+    private FileSystemWatcher? Watcher;
 
     /// <summary>
     /// Amount of currently loaded assets.
@@ -46,17 +45,103 @@ public class AssetLoader
     /// </summary>
     protected ReaderWriterLockSlim CacheLock = new(LockRecursionPolicy.SupportsRecursion);
 
+    /// <summary>
+    /// Queue of commands to run. Commands are run when a new command is enqueued (by <see cref="TryAddCommand"/>) or when a command is finished (by <see cref="AssetLoaderCommand.OnFinished"/>). Access only with <see cref="CommandsLock"/>.
+    /// </summary>
     protected Queue<AssetLoaderCommand> Commands = new();
+
+    /// <summary>
+    /// Commands that is currently being run on another thread.
+    /// </summary>
     public AssetLoaderCommand? ActiveCommand;
-    public bool LoadingInactive => ActiveCommand?.IsFinished ?? true;
+
+    /// <summary>
+    /// Whether this <see cref="AssetLoader"/> currently doesn't execute any commands.
+    /// </summary>
+    public bool LoadingInactive => (ActiveCommand?.IsFinished ?? true) && CommandsLeft == 0;
+
+    /// <summary>
+    /// Amount of commands left in the queue.
+    /// </summary>
     public int CommandsLeft => Commands.Count;
 
+    /// <summary>
+    /// Lock for <see cref="Commands"/>.
+    /// </summary>
     public ReaderWriterLockSlim CommandsLock = new(LockRecursionPolicy.SupportsRecursion);
 
     /// <inheritdoc />
     public override string ToString() => Manager.ToString();
 
+    /// <summary>
+    /// Create a new instance of the <see cref="AssetLoader"/>, loading from the <paramref name="directoryPath"/>.
+    /// </summary>
+    /// <param name="directoryPath">Directory path, to load assets from.</param>
+    public AssetLoader(string directoryPath)
+    {
+        ArgumentNullException.ThrowIfNull(directoryPath);
+        DirectoryPath = Path.GetFullPath(directoryPath);
+        if (MonodSettings.HotReload) InitializeWatcher();
+    }
 
+    /// <summary>
+    /// Create and initialize <see cref="Watcher"/> to be active.
+    /// </summary>
+    private void InitializeWatcher()
+    {
+        Watcher = new(DirectoryPath);
+
+        Watcher.IncludeSubdirectories = true;
+
+        Watcher.Changed += OnFileChanged;
+        Watcher.Created += OnFileChanged;
+        Watcher.Deleted += OnFileDeleted;
+        Watcher.Renamed += OnFileRenamed;
+
+        Watcher.EnableRaisingEvents = true;
+    }
+
+    private void OnFileRenamed(object sender, RenamedEventArgs e)
+    {
+        string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
+        string relativeOldPath = Path.GetRelativePath(DirectoryPath, e.OldFullPath).Replace('\\', '/');
+        if (Directory.Exists(e.FullPath))
+        {
+            EnqueueReloadAssetsInDir(relativePath);
+            EnqueueReloadAssetsInDir(relativeOldPath);
+            return;
+        }
+
+        EnqueueReloadAsset(relativeOldPath);
+        EnqueueReloadAsset(relativePath);
+    }
+
+    private void OnFileDeleted(object sender, FileSystemEventArgs e)
+    {
+        string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
+        // just reload it both as a dir and as an asset to be safe, there aren't really any reliable way to determine whether a file or dir was deleted
+
+        EnqueueRemoveAssetsInDir(relativePath);
+        if (!Directory.Exists(e.FullPath)) EnqueueReloadAsset(relativePath);
+    }
+
+    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    {
+        string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
+        if (Directory.Exists(e.FullPath))
+        {
+            EnqueueReloadAssetsInDir(relativePath);
+            return;
+        }
+
+        EnqueueReloadAsset(relativePath);
+    }
+
+
+    /// <summary>
+    /// Add the <paramref name="command"/> to the <see cref="Commands"/>, or run it, if <see cref="LoadingInactive"/> is <see langword="true"/>.
+    /// </summary>
+    /// <param name="command"></param>
     protected void TryAddCommand(AssetLoaderCommand command)
     {
         Log.Information("{Text}", command.GetText());
@@ -76,6 +161,9 @@ public class AssetLoader
         }
     }
 
+    /// <summary>
+    /// Run the next command in queue.
+    /// </summary>
     public void RunNextCommand()
     {
         try
@@ -91,20 +179,51 @@ public class AssetLoader
         }
     }
 
+    /// <summary>
+    /// Run the <paramref name="command"/> on another thread.
+    /// </summary>
+    /// <param name="command">Command to run.</param>
     protected void RunCommand(AssetLoaderCommand command)
     {
         ActiveCommand = command;
         MainThread.Add(Task.Run(command.Run));
     }
 
-    public void EnqueueLoadAssetManifests()
-    {
-        TryAddCommand(new LoadAssetManifestsCommand(this));
-    }
 
+    /// <summary>
+    /// Add <see cref="LoadAssetManifestsCommand"/> to queue.
+    /// </summary>
+    public void EnqueueLoadAssetManifests() => TryAddCommand(new LoadAssetManifestsCommand(this));
+
+    /// <summary>
+    /// Add <see cref="LoadAssetsInDirCommand"/> with dir being asset loader's root dir to queue.
+    /// </summary>
     public void EnqueueLoadAssets() => EnqueueLoadAssetsInDir("");
 
+    /// <summary>
+    /// Add <see cref="LoadAssetsInDirCommand"/> to queue.
+    /// </summary>
+    /// <param name="path">Directory path in this asset loader, assets from where to load.</param>
     public void EnqueueLoadAssetsInDir(string path) => TryAddCommand(new LoadAssetsInDirCommand(path, this));
+
+    /// <summary>
+    /// Add <see cref="ReloadAssetsInDirCommand"/> to queue.
+    /// </summary>
+    /// <param name="relativePath">Directory path in this asset loader, assets from where to reload.</param>
+    public void EnqueueReloadAssetsInDir(string relativePath) => TryAddCommand(new ReloadAssetsInDirCommand(relativePath, this));
+
+    /// <summary>
+    /// Add <see cref="ReloadAssetCommand"/> to queue.
+    /// </summary>
+    /// <param name="path">File path in this asset loader of the asset to reload.</param>
+    public void EnqueueReloadAsset(string path) => TryAddCommand(new ReloadAssetCommand(path, this));
+
+    /// <summary>
+    /// Add <see cref="RemoveAssetsInDirCommand"/> to queue.
+    /// </summary>
+    /// <param name="relativePath">Directory path in this asset loader.</param>
+    public void EnqueueRemoveAssetsInDir(string relativePath) => TryAddCommand(new RemoveAssetsInDirCommand(relativePath, this));
+
 
     /// <summary>
     /// Load asset at the specified path in the cache synchronously, <b>replacing</b> already loaded assets. Useful for quickly loading fonts for the startup loading screen.
@@ -115,11 +234,17 @@ public class AssetLoader
         LoadAssetFromAssetStream(path, assetStream);
     }
 
+    /// <summary>
+    /// Load asset at the <paramref name="path"/> asynchronously, <b>replacing</b> existing assets.
+    /// </summary>
+    /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
+    /// <returns>Async task.</returns>
     public async Task LoadAssetAsync(string path)
     {
         using AssetStream? assetStream = await LoadAssetStreamAsync(path);
         LoadAssetFromAssetStream(path, assetStream);
     }
+
 
     private bool LoadAssetFromAssetStream(string path, AssetStream? assetStream)
     {
@@ -146,7 +271,7 @@ public class AssetLoader
         }
 
         object? asset = parser(assetInfo, Manager);
-        if (asset is null) //failed to load (logged by parser)/loaded to somewhere else by parser
+        if (asset is null) //failed to load (logged by parser) / loaded to somewhere else by parser
         {
             return false;
         }
@@ -199,6 +324,7 @@ public class AssetLoader
         }
     }
 
+
     /// <summary>
     /// Matches the given <paramref name="path"/> against <see cref="Matchers"/>.
     /// </summary>
@@ -213,12 +339,13 @@ public class AssetLoader
         return result;
     }
 
+
     /// <summary>
     /// Filter asset paths for <see cref="LoadAssetsInDirCommand"/> using <see cref="AssetManager.Filter"/> and filtering entries that are already in the <see cref="Cache"/>.
     /// </summary>
-    /// <param name="assetPaths"><see cref="IEnumerable{string}"/> containing asset paths in this asset manager.</param>
+    /// <param name="assetPaths"><see cref="IEnumerable{T}">IEnumerable&lt;string&gt;</see> of asset paths in this asset manager.</param>
     /// <returns><paramref name="assetPaths"/> filtered using <see cref="AssetManager.Filter"/> and without entries that are already in the <see cref="Cache"/>.</returns>
-    public IEnumerable<string> FilterPaths(IEnumerable<string> assetPaths)
+    public IEnumerable<string> FilterPathsNonReplacing(IEnumerable<string> assetPaths)
     {
         Func<string, bool> filter;
         if (Manager.Filter is null)
@@ -238,6 +365,20 @@ public class AssetLoader
     }
 
     /// <summary>
+    /// Filter asset paths for <see cref="LoadAssetsInDirCommand"/> using <see cref="AssetManager.Filter"/>.
+    /// </summary>
+    /// <param name="assetPaths"><see cref="IEnumerable{T}">IEnumerable&lt;string&gt;</see> of asset paths in this asset manager.</param>
+    /// <returns><paramref name="assetPaths"/> filtered using <see cref="AssetManager.Filter"/>.</returns>
+    public IEnumerable<string> FilterPaths(IEnumerable<string> assetPaths)
+    {
+        if (Manager.Filter is null)
+            return assetPaths;
+
+        return assetPaths.Where(Manager.Filter.ShouldLoad);
+    }
+
+
+    /// <summary>
     /// Get <see cref="AssetParser"/> based on the specified <paramref name="assetInfo"/>.
     /// </summary>
     /// <param name="assetInfo">Info about asset to get parser for.</param>
@@ -248,6 +389,7 @@ public class AssetLoader
         if (parser is null) Assets.DefaultParsers.TryGetValue(assetInfo.Type, out parser);
         return parser;
     }
+
 
     /// <summary>
     /// Load the specified <paramref name="asset"/> into the cache with the <paramref name="path"/> as key.
@@ -267,6 +409,7 @@ public class AssetLoader
             CacheLock.ExitWriteLock();
         }
     }
+
 
     /// <summary>
     /// Remove the specified key (path) from the <see cref="Cache"/>.
@@ -294,22 +437,15 @@ public class AssetLoader
     /// <param name="dirPath">Directory path in this <see cref="AssetLoader"/>.</param>
     public void RemoveDirFromCache(string dirPath)
     {
-        if (!dirPath.EndsWith(Path.DirectorySeparatorChar) && !dirPath.EndsWith(Path.AltDirectorySeparatorChar)) dirPath += Path.DirectorySeparatorChar;
+        if (!dirPath.EndsWith('/')) dirPath += '/';
 
         try
         {
-            int unloadedAssetsCount = 0;
             CacheLock.EnterWriteLock();
             foreach (string asset in Cache.Keys)
-            {
                 if (asset.StartsWith(dirPath))
-                {
                     Cache.Remove(asset);
-                    unloadedAssetsCount++;
-                }
-            }
 
-            Log.Information("{This}: Unloaded {Count} assets", this, unloadedAssetsCount);
             Cache.TrimExcess();
         }
         finally
@@ -330,7 +466,6 @@ public class AssetLoader
             foreach (string path in paths)
                 Cache.Remove(path);
             Cache.TrimExcess();
-            GC.Collect();
         }
         finally
         {
@@ -339,11 +474,14 @@ public class AssetLoader
         Log.Information("{This}: Unloaded {Count} assets", this, paths.Length);
     }
 
+
+
+
     /// <summary>
     /// Get asset at the specified path from the cache.
     /// </summary>
     /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
-    /// <returns>The asset, or null if asset at the specified <paramref cref="path"/> was not found.</returns>
+    /// <returns>The asset, or null if asset at the specified <paramref name="path"/> was not found.</returns>
     public object? GetAsset(string path)
     {
         try

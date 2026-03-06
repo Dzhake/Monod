@@ -3,11 +3,11 @@
 namespace Monod.AssetsModule.Commands;
 
 /// <summary>
-/// Load all assets from the <paramref name="dir"/> in the <paramref name="loader"/>.
+/// Reload all assets from the <paramref name="dir"/> in the <paramref name="loader"/>.
 /// </summary>
 /// <param name="dir">Directory path in the <paramref name="loader"/>.</param>
 /// <param name="loader">Asset loader which executes this command.</param>
-public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : AssetLoaderCommand(loader)
+public sealed class ReloadAssetsInDirCommand(string dir, AssetLoader loader) : AssetLoaderCommand(loader)
 {
     /// <summary>
     /// Directory path in the <see cref="AssetLoaderCommand.Loader"/>.
@@ -15,7 +15,7 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
     public string Dir = dir;
 
     ///<inheritdoc/>
-    public override string GetText() => $"{Loader} is loading assets at /{Dir}";
+    public override string GetText() => $"{Loader} is reloading assets at /{Dir}";
 
     ///<inheritdoc/>
     public override int TotalProgress => TotalAssets;
@@ -35,7 +35,7 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
             OnFinished();
             return;
         }
-        var assetPaths = Loader.FilterPathsNonReplacing(Directory.GetFiles(fullDir, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(Loader.DirectoryPath, item).Replace('\\', '/'))).ToList();
+        var assetPaths = Loader.FilterPaths(Directory.GetFiles(fullDir, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(Loader.DirectoryPath, item).Replace('\\', '/'))).ToList();
         TotalAssets += assetPaths.Count;
         foreach (string assetPath in assetPaths)
             MainThread.Add(Task.Run(() => LoadAsset(assetPath)));

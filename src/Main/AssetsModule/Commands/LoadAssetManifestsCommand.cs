@@ -3,6 +3,10 @@ using System.Text.Json;
 
 namespace Monod.AssetsModule.Commands;
 
+/// <summary>
+/// Load all asset manifests for the <paramref name="loader"/>.
+/// </summary>
+/// <param name="loader">Asset loader which executes this command.</param>
 public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderCommand(loader)
 {
     ///<inheritdoc/>
@@ -10,9 +14,17 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
     ///<inheritdoc/>
     public override int CurrentProgress => LoadedManifests;
 
-    public int TotalManifests;
-    public int LoadedManifests;
+    /// <summary>
+    /// Total amount of asset manifests that have been loaded and are to be loaded.
+    /// </summary>
+    private int TotalManifests;
 
+    /// <summary>
+    /// Amount of currently loaded asset manifests.
+    /// </summary>
+    private int LoadedManifests;
+
+    ///<inheritdoc/>
     public override string GetText() => $"{Loader} is loading asset manifests";
 
     ///<inheritdoc/>

@@ -7,6 +7,10 @@ namespace Monod.AssetsModule;
 /// </summary>
 public static class AssetProps
 {
+    /// <summary>
+    /// Get default <see cref="Values"/>.
+    /// </summary>
+    /// <returns></returns>
     public static NamedExtEnum DefaultValues()
     {
         return new([nameof(Parser)]);
