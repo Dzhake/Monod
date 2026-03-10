@@ -1,6 +1,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
+using MLEM.Ui;
+using MLEM.Ui.Style;
 using Monod.AssetsModule;
 using Monod.Graphics;
 using Monod.Graphics.Components;
@@ -22,7 +24,9 @@ public abstract class MonodGame : Game
     /// <summary>
     /// Main <see cref="AssetManager"/> for vanilla game.
     /// </summary>
-    public static AssetManager? MainAssetManager;
+    public static AssetManager MainAssetManager = null!;
+
+    public UiSystem MainUiSystem;
 
     /// <summary>
     /// Creates a new <see cref="MonodGame"/>.
@@ -43,18 +47,23 @@ public abstract class MonodGame : Game
         Input.Initialize(this);
         Assets.Initialize();
         Locale.Initialize();
+
+        Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
+
+        string contentPath = $"{AppContext.BaseDirectory}Content";
+        MainAssetManager = new AssetManager(new AssetLoader((contentPath)));
+        Assets.RegisterAssetManager(MainAssetManager, "");
+
         base.Initialize();
     }
 
     /// <inheritdoc/>
     protected override void LoadContent()
     {
-        Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
-
-        string contentPath = $"{AppContext.BaseDirectory}Content";
-        MainAssetManager = new AssetManager(new AssetLoader((contentPath)));
-        Assets.RegisterAssetManager(MainAssetManager, "");
         MainAssetManager.LoadAssets();
+        var style = new UntexturedStyle(Renderer.spriteBatch);
+        style.Font = GlobalFonts.MenuFont;
+        MainUiSystem = new UiSystem(this, style);
     }
 
     /// <inheritdoc/>
@@ -78,6 +87,7 @@ public abstract class MonodGame : Game
         //DevConsole.Update(); TODO dev console in-game w/ Console class support like in DD.
 
         UpdateM();
+        MainUiSystem.Update(gameTime);
 
         Input.PostUpdate();
     }
@@ -117,6 +127,7 @@ public abstract class MonodGame : Game
         }
 
         DrawM();
+        MainUiSystem.Draw(gameTime, Renderer.spriteBatch);
         base.Draw(gameTime);
     }
 

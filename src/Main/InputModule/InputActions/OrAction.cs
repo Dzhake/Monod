@@ -4,13 +4,8 @@ namespace Monod.InputModule.InputActions;
 /// <summary>
 /// Action that is active when any of the <see cref="Actions"/> is active. Can't have non-integer value.
 /// </summary>
-public class OrAction : InputAction
+public class OrAction : ArrayBasedAction
 {
-    /// <summary>
-    /// Actions that are checked.
-    /// </summary>
-    public InputAction[] Actions;
-
     /// <summary>
     /// Create a new instance of the <see cref="OrAction"/> with the given <see cref="Actions"/>.
     /// </summary>
@@ -37,11 +32,7 @@ public class OrAction : InputAction
     /// <summary>
     /// Name of this input action in serialization.
     /// </summary>
-    public static readonly string NAME = "Or";
+    public override string Name => "Or";
 
-    ///<inheritdoc/>
-    public override string ToString()
-    {
-        return $"{NAME}({string.Join(", ", Actions.Select(a => a.ToString()))})";
-    }
+    public override string JoinName => "or";
 }

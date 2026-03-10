@@ -165,7 +165,8 @@ public static class Input
     public static float GetValue(InputState state, Key key, int playerIndex = 0)
     {
         if (state == CurState && ShouldIgnore(state, key, playerIndex)) return 0;
-        if (!IsGamepadKey(key) && !Players[playerIndex].UsesKeyboard) return 0;
+        if (!Players[playerIndex].UsesKeyboard && !IsGamepadKey(key)) return 0;
+        if (IsGamepadKey(key) && Players[playerIndex].GamepadIndex == -1) return 0;
         if (IsKeyboardKey(key)) return state.Keyboard.IsKeyDown((Keys)key).ToInputValue();
 
         return key switch
@@ -278,12 +279,13 @@ public static class Input
     [Pure]
     public static bool Up(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) == 0;
 
+
     /// <summary>
     /// Check whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.
+    /// <returns>Whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.</returns>
     [Pure]
     public static bool Pressed(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) == 0 && GetValue(CurState, key, playerIndex) != 0;
 
@@ -292,7 +294,7 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.
+    /// <returns>Whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.</returns>
     [Pure]
     public static bool Released(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) == 0;
 

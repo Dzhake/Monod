@@ -136,10 +136,12 @@ public static class Locale
             if (message is not null) return message;
         }
 
-        if (MissingStrings.Contains(key)) return $"{{{key}}}";
+        if (MissingStrings.Contains(key)) return key; //return $"{{{key}}}";
 
         Log.Warning("Message with key {Key} not found", key);
         MissingStrings.Add(key);
-        return $"{{{key}}}";
+        return key;
+        //uncomment the following line when testing localization, keep the line above to be able to quickly see how english version would look like for now
+        //return $"{{{key}}}"; 
     }
 }

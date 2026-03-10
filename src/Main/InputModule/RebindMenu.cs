@@ -1,36 +1,133 @@
-﻿using MLEM.Ui.Elements;
+﻿using MLEM.Maths;
+using MLEM.Ui;
+using MLEM.Ui.Elements;
 using Monod.Graphics;
 using Monod.InputModule.InputActions;
+using Monod.Localization;
 using Monod.TimeModule;
 
 namespace Monod.InputModule;
 
 public class RebindMenu
 {
-    public Group Root;
-
-    public float timeout;
+    public Panel Root;
     public int playerIndex;
 
+    /// <summary>
+    /// Timeout after the player pressed "bind" button, to prevent the key that was used to press that button register as the new binding.
+    /// </summary>
+    public float timeout;
     public bool bindingActive;
     public int actionToBind;
 
+    public RebindMenu(UiSystem system)
+    {
+        Root = new Panel(Anchor.AutoInline, new(Renderer.Window.ClientBounds.Width, Renderer.Window.ClientBounds.Height));
+        Root.Padding = new Padding(0, 2);
+        system.Add("RebindMenu", Root);
+        RebuildUI();
+    }
+
     public void RebuildUI()
     {
-        Root = new Group(MLEM.Ui.Anchor.AutoInline, Renderer.Window.ClientBounds.Size.ToVector2());
+        Root.RemoveChildren();
+        float windowWidth = Renderer.Window.ClientBounds.Width;
+        float windowHeight = Renderer.Window.ClientBounds.Height;
+
         for (int actionIndex = 0; actionIndex < Input.ActionNames.MaxValue; actionIndex++)
         {
             string actionName = Input.ActionNames.GetName(actionIndex);
-            InputAction action = Input.Players[playerIndex].Map.Actions[actionIndex];
-            if (action is KeyBasedAction)
-            {
+            Paragraph label = new(Anchor.AutoLeft, 1, actionName, true);
+            Root.AddChild(label);
+            Group actionsGroup = new(Anchor.AutoCenter, new(1, 1));
+            actionsGroup.ChildPadding = new Padding(0, 1);
+            Root.AddChild(actionsGroup);
+            if (Input.Players[playerIndex].Map.Actions.TryGetValue(actionIndex, out var action))
+                AddActionButtons(actionIndex, actionsGroup, action, null);
+            Button startRebindingButton = AddBindButton(actionIndex);
+            actionsGroup.AddChild(startRebindingButton);
+        }
+    }
 
+    private Button AddBindButton(int actionIndex)
+    {
+        Button button = BasicButton();
+        button.AddChild(new Paragraph(Anchor.Center, 1, element => GetAddBindButtonText(actionIndex), true));
+        button.OnPressed += element => StartBinding(actionIndex);
+
+        return button;
+    }
+
+    private string GetAddBindButtonText(int actionIndex)
+    {
+        if (actionIndex == actionToBind && bindingActive) return Locale.Get("Waiting for input");
+        return "+";
+    }
+
+    private void AddActionButtons(int actionIndex, Group actionsGroup, InputAction action, InputAction? parentAction)
+    {
+        if (action is KeyBasedAction keyBasedAction)
+        {
+            Button actionButton = ActionRemovalButton(actionIndex, keyBasedAction);
+            actionsGroup.AddChild(actionButton);
+            if (parentAction is ArrayBasedAction arrayBasedAction)
+                actionButton.OnPressed = element => RemoveInnerAction(arrayBasedAction.Actions.IndexOf(action), arrayBasedAction);
+            else
+                actionButton.OnPressed = element => RemoveTopLevelAction(actionIndex);
+
+        }
+        else if (action is OrAction orAction)
+        {
+            foreach (var innerAction in orAction.Actions)
+            {
+                AddActionButtons(actionIndex, actionsGroup, innerAction, orAction);
+            }
+        }
+        else if (action is AndAction andAction)
+        {
+            foreach (var innerAction in andAction.Actions)
+            {
+                AddActionButtons(actionIndex, actionsGroup, innerAction, andAction);
             }
         }
     }
 
+
+    private static Button ActionRemovalButton(int actionIndex, KeyBasedAction keyBasedAction)
+    {
+        Button actionButton = BasicButton();
+        actionButton.AddChild(new Paragraph(Anchor.Center, 1, keyBasedAction.Keybind.ToString(), true));
+
+        return actionButton;
+    }
+
+    private static Button BasicButton()
+    {
+        Button basicButton = new(Anchor.AutoInline, new(1, 1));
+        basicButton.SetHeightBasedOnChildren = true;
+        basicButton.SetWidthBasedOnChildren = true;
+        basicButton.ChildPadding = new Padding(6, 1);
+        basicButton.Padding = new Padding(2, 0);
+        return basicButton;
+    }
+
+    private void RemoveInnerAction(int indexInArray, ArrayBasedAction parentAction)
+    {
+        var actionsList = parentAction.Actions.ToList();
+        actionsList.RemoveAt(indexInArray);
+        parentAction.Actions = actionsList.ToArray();
+        RebuildUI();
+    }
+
+    private void RemoveTopLevelAction(int actionIndex)
+    {
+        Input.Players[playerIndex].Map.Actions.Remove(actionIndex);
+        RebuildUI();
+    }
+
     public void Update()
     {
+        if (Root is null) RebuildUI();
         UpdateBinding();
     }
 
@@ -38,43 +135,83 @@ public class RebindMenu
     {
         if (bindingActive)
         {
-            if (timeout > 0)
-            {
-                timeout -= Time.RawDeltaTime;
-                return;
-            }
+            timeout -= Time.DeltaTime;
+            if (timeout > 0) return;
 
             Key anyKey = Input.FirstKeyDown(playerIndex);
             if (anyKey == Key.None) return;
-            bool flowControl = BindKey(anyKey);
-            if (!flowControl)
-                return;
+            BindKey(anyKey);
+            RebuildUI();
         }
     }
 
-    private bool BindKey(Key keyToBind)
+    private void StartBinding(int actionIndex)
+    {
+        actionToBind = actionIndex;
+        timeout = 0.2f;
+        bindingActive = true;
+    }
+
+    private void StopBinding()
+    {
+        bindingActive = false;
+        timeout = 0;
+        actionToBind = -1;
+    }
+
+    private void BindKey(Key keyToBind)
     {
         InputAction newAction = new DownAction(keyToBind);
         var actions = Input.Players[playerIndex].Map.Actions;
-        var prevAction = actions[actionToBind];
-
-        if (prevAction is null)
+        if (!actions.TryGetValue(actionToBind, out var prevAction) || prevAction is null)
         {
             actions[actionToBind] = newAction;
-            bindingActive = false;
-            return false;
+            StopBinding();
+            return;
+        }
+
+        if (SameAsNewBindAction(prevAction, keyToBind))
+        {
+            actions.Remove(actionToBind);
+            StopBinding();
+            return;
         }
 
         if (prevAction is OrAction orAction)
         {
             var orActionsList = orAction.Actions.ToList();
-            orActionsList.Add(newAction);
+            bool foundSameAction = false;
+
+            for (int i = 0; i < orActionsList.Count; i++)
+            {
+                //Exactly same as the action we wanted to add - remove it instead.
+                if (SameAsNewBindAction(orActionsList[i], keyToBind))
+                {
+                    orActionsList.RemoveAt(i);
+                    foundSameAction = true;
+                    break;
+                }
+            }
+
+            if (!foundSameAction)
+                orActionsList.Add(newAction);
+
             orAction.Actions = orActionsList.ToArray();
-            bindingActive = false;
-            return false;
+            StopBinding();
+            return;
         }
 
         actions[actionToBind] = new OrAction([actions[actionToBind], newAction]);
-        return true;
+        StopBinding();
+    }
+
+    private static bool SameAsNewBindAction(InputAction action, Key keyToBind)
+    {
+        return action is DownAction downAction && downAction.Keybind == keyToBind;
+    }
+
+    public void Draw()
+    {
+        Root?.Draw(Time.gameTime, Renderer.spriteBatch, 1, new());
     }
 }

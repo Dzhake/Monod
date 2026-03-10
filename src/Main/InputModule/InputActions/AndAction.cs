@@ -4,13 +4,8 @@ namespace Monod.InputModule.InputActions;
 /// <summary>
 /// Action that is active when all of the <see cref="Actions"/> is active. Can't have non-integer value.
 /// </summary>
-public class AndAction : InputAction
+public class AndAction : ArrayBasedAction
 {
-    /// <summary>
-    /// Actions that are checked.
-    /// </summary>
-    public InputAction[] Actions;
-
     /// <summary>
     /// Create a new instance of the <see cref="AndAction"/> with the given <see cref="Actions"/>.
     /// </summary>
@@ -38,6 +33,10 @@ public class AndAction : InputAction
     /// Name of this input action in serialization.
     /// </summary>
     public static readonly string NAME = "And";
+
+    public override string Name => "And";
+
+    public override string JoinName => "and";
 
     ///<inheritdoc/>
     public override string ToString()

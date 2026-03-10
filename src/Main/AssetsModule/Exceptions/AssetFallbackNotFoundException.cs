@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Monod.AssetsModule.Exceptions;
+﻿namespace Monod.AssetsModule.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when <see cref="assetManager"/> could not find fallback for an asset.

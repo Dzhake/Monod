@@ -5,7 +5,7 @@ namespace Monod.AssetsModule;
 /// <summary>
 /// Util functions for Microsoft.Extensions.FileSystemGlobbing namespace.
 /// </summary>
-public class Globbing
+public static class Globbing
 {
     /// <summary>
     /// Create a new <see cref="Matcher"/>, and add patterns to it based on the <paramref name="definition"/>.

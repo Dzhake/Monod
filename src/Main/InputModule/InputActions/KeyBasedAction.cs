@@ -23,6 +23,10 @@ public abstract class KeyBasedAction : InputAction
     /// <returns>Value of this input action for the given player.</returns>
     public override float GetValue(int playerIndex) => Input.GetValue(Keybind, playerIndex);
 
+    /// <summary>
+    /// Create a new instance of the <see cref="KeyBasedAction"/>.
+    /// </summary>
+    /// <param name="keybind">Keybind this input action uses.</param>
     public KeyBasedAction(Key keybind)
     {
         Keybind = keybind;

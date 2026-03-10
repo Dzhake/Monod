@@ -9,6 +9,11 @@ namespace Monod.TimeModule;
 public static class Time
 {
     /// <summary>
+    /// GameTime passed to game's Update. For MLEM.
+    /// </summary>
+    public static GameTime gameTime;
+
+    /// <summary>
     /// Unscaled time since last update.
     /// </summary>
     public static TimeSpan RawDeltaTimeSpan;
@@ -60,6 +65,7 @@ public static class Time
     /// <param name="isActive">Pass here <see cref="Game.IsActive"/>.</param>
     public static void Update(GameTime gameTime, bool isActive)
     {
+        Time.gameTime = gameTime;
         if (GraphicsSettings.FocusLossBehaviour == GraphicsSettings.OnFocusLossBehaviour.Continue) isActive = true;
 
         if (wasActive || GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco)

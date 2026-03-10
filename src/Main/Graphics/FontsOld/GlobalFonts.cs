@@ -10,5 +10,5 @@ public static class GlobalFonts
     /// <summary>
     /// Font used for menus (including loading screens).
     /// </summary>
-    public static GenericFont? MenuFont;
+    public static GenericFont MenuFont;
 }

@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Monod.Graphics;
 
 namespace Monod.Graphics.Components;
 
@@ -8,6 +7,14 @@ namespace Monod.Graphics.Components;
 /// </summary>
 public static class ProgressBar
 {
+    /// <summary>
+    /// Draw a simple two-rectangle left-to-right progress bar.
+    /// </summary>
+    /// <param name="fraction">Fraction of a bar that should be filled.</param>
+    /// <param name="position">Position of bar's topleft.</param>
+    /// <param name="size">Size of the bar in pixels.</param>
+    /// <param name="color">Color of the bar.</param>
+    /// <param name="borderWidth">Width of the bar's border.</param>
     public static void Draw(float fraction, Vector2 position, Vector2 size, Color? color = null, float borderWidth = 1f)
     {
         color ??= Color.White;

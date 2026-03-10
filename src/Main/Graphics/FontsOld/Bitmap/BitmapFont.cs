@@ -107,7 +107,6 @@ public class BitmapFont
     /// Draws <paramref name="text"/> via <see cref="Renderer"/> with specified options using this <see cref="BitmapFont"/>. <see cref="Renderer"/> must be active.
     /// </summary>
     /// <param name="text">Text to draw.</param>
-    /// <param name="spriteBatch">Active <see cref="SpriteBatch"/>, which will draw the text.</param>
     /// <param name="position">The drawing location on render target.</param>
     /// <param name="color">A color mask.</param>
     /// <param name="rotation">A rotation of this sprite.</param>

@@ -35,15 +35,7 @@ public static class InputActionParser
         Errors.Clear();
 
         SpanParser parser = new SpanParser(text);
-        InputAction result = ParseExpression(ref parser, text);
-        parser.SkipWhitespaces();
-        if (parser.CanRead() && result is not InvalidInputAction)
-        {
-            int start = parser.position;
-            int length = parser.source.Length - start;
-            return Invalid("Unexpected characters after expression", start, length, parser.source.Slice(start, length));
-        }
-        return result;
+        return ParseExpression(ref parser, text);
     }
 
     /// <summary>

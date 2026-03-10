@@ -20,7 +20,11 @@ public sealed class InputMap
     /// <param name="actionIndex">Index of the action in <see cref="Input.ActionNames"/>.</param>
     /// <param name="playerIndex">Index of the player for whom to get value. Affects how inputs are checked.</param>
     /// <returns>Value of the action. Usually 0 or 1, but might be somewhere in between for specific actions.</returns>
-    public float GetValue(int actionIndex, int playerIndex) => Actions[actionIndex].GetValue(playerIndex);
+    public float GetValue(int actionIndex, int playerIndex)
+    {
+        if (Actions.TryGetValue(actionIndex, out var action)) return action.GetValue(playerIndex);
+        return 0;
+    }
 
     /// <summary>
     /// Whether action is considered active/non-zero.
@@ -28,14 +32,21 @@ public sealed class InputMap
     /// /// <param name="actionIndex">Index of the action in <see cref="Input.ActionNames"/>.</param>
     /// <param name="playerIndex">Index of the player for whom to check. Affects how inputs are checked.</param>
     /// <returns>Whether action is considered active/non-zero.</returns>
-    public bool IsActive(int actionIndex, int playerIndex) => Actions[actionIndex].IsActive(playerIndex);
+    public bool IsActive(int actionIndex, int playerIndex)
+    {
+        if (Actions.TryGetValue(actionIndex, out var action)) return action.IsActive(playerIndex);
+        return false;
+    }
 
     /// <summary>
     /// Block the key used for the action, to prevent it from triggering again this frame.
     /// </summary>
     /// /// <param name="actionIndex">Index of the action in <see cref="Input.ActionNames"/>.</param>
     /// <param name="playerIndex">Index of the player for whom to block. Affects how inputs are blocked.</param>
-    public void Block(int actionIndex, int playerIndex) => Actions[actionIndex].Block(playerIndex);
+    public void Block(int actionIndex, int playerIndex)
+    {
+        if (Actions.TryGetValue(actionIndex, out var action)) action.Block(playerIndex);
+    }
 
     /// <summary>
     /// Run <see cref="Block"/> if the <see cref="IsActive"/> is <see langword="true"/>, and return whether the action is active.
@@ -43,5 +54,9 @@ public sealed class InputMap
     /// /// <param name="actionIndex">Index of the action in <see cref="Input.ActionNames"/>.</param>
     /// <param name="playerIndex">Index of the player for whom to check/block. Affects how inputs are checked/blocked.</param>
     /// <returns>Whether the action is active.</returns>
-    public bool BlockIfActive(int actionIndex, int playerIndex) => Actions[actionIndex].BlockIfActive(playerIndex);
+    public bool BlockIfActive(int actionIndex, int playerIndex)
+    {
+        if (Actions.TryGetValue(actionIndex, out var action)) return action.BlockIfActive(playerIndex);
+        return false;
+    }
 }
