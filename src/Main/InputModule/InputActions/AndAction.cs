@@ -36,8 +36,6 @@ public class AndAction : ArrayBasedAction
 
     public override string Name => "And";
 
-    public override string JoinName => "and";
-
     ///<inheritdoc/>
     public override string ToString()
     {

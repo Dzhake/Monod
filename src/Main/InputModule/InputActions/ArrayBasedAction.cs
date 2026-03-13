@@ -11,8 +11,6 @@ public abstract class ArrayBasedAction : InputAction
 
     public abstract string Name { get; }
 
-    public abstract string JoinName { get; }
-
     ///<inheritdoc/>
     public override string ToString()
     {

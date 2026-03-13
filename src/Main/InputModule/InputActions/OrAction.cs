@@ -33,6 +33,4 @@ public class OrAction : ArrayBasedAction
     /// Name of this input action in serialization.
     /// </summary>
     public override string Name => "Or";
-
-    public override string JoinName => "or";
 }

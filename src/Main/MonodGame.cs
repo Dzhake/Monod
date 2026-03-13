@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
+using MLEM.Misc;
 using MLEM.Ui;
 using MLEM.Ui.Style;
 using Monod.AssetsModule;
@@ -63,6 +64,7 @@ public abstract class MonodGame : Game
         MainAssetManager.LoadAssets();
         var style = new UntexturedStyle(Renderer.spriteBatch);
         style.Font = GlobalFonts.MenuFont;
+        MlemPlatform.Current = new MlemPlatform.DesktopGl<TextInputEventArgs>((w, c) => w.TextInput += c);
         MainUiSystem = new UiSystem(this, style);
     }
 

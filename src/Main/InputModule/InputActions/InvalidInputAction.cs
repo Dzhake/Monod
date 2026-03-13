@@ -1,4 +1,6 @@
-﻿namespace Monod.InputModule.InputActions;
+﻿using Monod.InputModule.Parsing;
+
+namespace Monod.InputModule.InputActions;
 
 /// <summary>
 /// Input action that could not be parsed from the given <see cref="Text"/>.
@@ -10,13 +12,16 @@ public class InvalidInputAction : InputAction
     /// </summary>
     public readonly string Text;
 
+    public ActionParseError Error;
+
     /// <summary>
     /// Create a new instance of the <see cref="InvalidInputAction"/> with the specified <see cref="Text"/>.
     /// </summary>
     /// <param name="text">Text that could not be parsed as input action.</param>
-    public InvalidInputAction(string text)
+    public InvalidInputAction(string text, ActionParseError error)
     {
         Text = text;
+        Error = error;
     }
 
     ///<inheritdoc/>

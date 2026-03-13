@@ -3,6 +3,7 @@ using MLEM.Ui;
 using MLEM.Ui.Elements;
 using Monod.Graphics;
 using Monod.InputModule.InputActions;
+using Monod.InputModule.Parsing;
 using Monod.Localization;
 using Monod.TimeModule;
 
@@ -12,6 +13,8 @@ public class RebindMenu
 {
     public Panel Root;
     public int playerIndex;
+
+    public bool AdvancedMode;
 
     /// <summary>
     /// Timeout after the player pressed "bind" button, to prevent the key that was used to press that button register as the new binding.
@@ -25,14 +28,23 @@ public class RebindMenu
         Root = new Panel(Anchor.AutoInline, new(Renderer.Window.ClientBounds.Width, Renderer.Window.ClientBounds.Height));
         Root.Padding = new Padding(0, 2);
         system.Add("RebindMenu", Root);
-        RebuildUI();
     }
 
-    public void RebuildUI()
+    public void RebuildUi()
     {
         Root.RemoveChildren();
         float windowWidth = Renderer.Window.ClientBounds.Width;
         float windowHeight = Renderer.Window.ClientBounds.Height;
+
+        Checkbox advancedModeCheckbox = new Checkbox(Anchor.AutoLeft, new(1, 18), "Advanced mode", AdvancedMode);
+        advancedModeCheckbox.SetWidthBasedOnChildren = true;
+        advancedModeCheckbox.OnCheckStateChange += (_, isChecked) =>
+        {
+            AdvancedMode = isChecked;
+            RebuildUi();
+        };
+
+        Root.AddChild(advancedModeCheckbox);
 
         for (int actionIndex = 0; actionIndex < Input.ActionNames.MaxValue; actionIndex++)
         {
@@ -42,11 +54,41 @@ public class RebindMenu
             Group actionsGroup = new(Anchor.AutoCenter, new(1, 1));
             actionsGroup.ChildPadding = new Padding(0, 1);
             Root.AddChild(actionsGroup);
-            if (Input.Players[playerIndex].Map.Actions.TryGetValue(actionIndex, out var action))
-                AddActionButtons(actionIndex, actionsGroup, action, null);
-            Button startRebindingButton = AddBindButton(actionIndex);
-            actionsGroup.AddChild(startRebindingButton);
+            if (AdvancedMode)
+            {
+                string text = "";
+                if (Input.Players[playerIndex].Map.Actions.TryGetValue(actionIndex, out var action)) text = action.ToString() ?? "";
+                TextField textField = new(Anchor.AutoInlineCenter, new(1, 30), text: text);
+                int actionIndexCopy = actionIndex; //dereference, to avoid issues with lambda in 'for' loop.
+                textField.OnEnterPressed += element =>
+                {
+                    if (element is not TextField textField) return;
+                    ParseAction(actionIndexCopy, textField.Text);
+                };
+                actionsGroup.AddChild(textField);
+            }
+            else
+            {
+                if (Input.Players[playerIndex].Map.Actions.TryGetValue(actionIndex, out var action))
+                    AddActionButtons(actionIndex, actionsGroup, action, null);
+                Button startRebindingButton = AddBindButton(actionIndex);
+                actionsGroup.AddChild(startRebindingButton);
+            }
         }
+    }
+
+    private void ParseAction(int actionIndex, string text)
+    {
+        InputAction action = InputActionParser.Parse(text);
+        if (action is InvalidInputAction)
+        {
+
+        }
+        else
+        {
+            Input.Players[playerIndex].Map.Actions[actionIndex] = action;
+        }
+        RebuildUi();
     }
 
     private Button AddBindButton(int actionIndex)
@@ -116,18 +158,18 @@ public class RebindMenu
         var actionsList = parentAction.Actions.ToList();
         actionsList.RemoveAt(indexInArray);
         parentAction.Actions = actionsList.ToArray();
-        RebuildUI();
+        RebuildUi();
     }
 
     private void RemoveTopLevelAction(int actionIndex)
     {
         Input.Players[playerIndex].Map.Actions.Remove(actionIndex);
-        RebuildUI();
+        RebuildUi();
     }
 
     public void Update()
     {
-        if (Root is null) RebuildUI();
+        if (Root is null) RebuildUi();
         UpdateBinding();
     }
 
@@ -141,7 +183,8 @@ public class RebindMenu
             Key anyKey = Input.FirstKeyDown(playerIndex);
             if (anyKey == Key.None) return;
             BindKey(anyKey);
-            RebuildUI();
+            RebuildUi();
+            StopBinding();
         }
     }
 
@@ -166,14 +209,12 @@ public class RebindMenu
         if (!actions.TryGetValue(actionToBind, out var prevAction) || prevAction is null)
         {
             actions[actionToBind] = newAction;
-            StopBinding();
             return;
         }
 
         if (SameAsNewBindAction(prevAction, keyToBind))
         {
             actions.Remove(actionToBind);
-            StopBinding();
             return;
         }
 
@@ -197,12 +238,10 @@ public class RebindMenu
                 orActionsList.Add(newAction);
 
             orAction.Actions = orActionsList.ToArray();
-            StopBinding();
             return;
         }
 
         actions[actionToBind] = new OrAction([actions[actionToBind], newAction]);
-        StopBinding();
     }
 
     private static bool SameAsNewBindAction(InputAction action, Key keyToBind)
