@@ -5,7 +5,7 @@ namespace MLEM.Ui.Style {
     /// <summary>
     /// A struct used by <see cref="Element"/> to store style properties.
     /// This is a helper struct that allows default style settings from <see cref="UiStyle"/> to be overridden by custom user settings easily.
-    /// Note that <c>T</c> implicitly converts to <c>StyleProp{T}</c> and vice versa.
+    /// Note that <c>TEnum</c> implicitly converts to <c>StyleProp{TEnum}</c> and vice versa.
     /// </summary>
     /// <typeparam name="T">The type of style setting that this property stores</typeparam>
     public readonly struct StyleProp<T> {

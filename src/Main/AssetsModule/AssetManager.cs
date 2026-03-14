@@ -1,6 +1,5 @@
 ﻿using Monod.AssetsModule.Exceptions;
 using Monod.Shared;
-using Serilog;
 
 namespace Monod.AssetsModule;
 
@@ -125,7 +124,7 @@ public sealed class AssetManager : IDisposable
         ObjectDisposedException.ThrowIf(disposed, this);
         Loader.EnqueueLoadAssetManifests();
         Loader.EnqueueLoadAssets();
-        Log.Information("{AssetManager} is loading assets", this);
+        Assets.Logger.Information("{AssetManager} is loading assets", this);
     }
 
     /// <summary>

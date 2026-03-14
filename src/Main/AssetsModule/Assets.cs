@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using Monod.AssetsModule.Commands;
+using Monod.LogModule;
 using Monod.Shared.Collections;
 using Monod.Shared.Extensions;
 using Serilog;
@@ -20,6 +21,11 @@ public static class Assets
     /// This name is reserved and can't be used for assets. "Assets manifest" is a metadata file about assets, containing info such as which <see cref="IAssetFilter"/> and <see cref="AssetParser"/> to use.
     /// </remarks>
     public static readonly string MANIFEST_FILENAME = "assets.json";
+
+    /// <summary>
+    /// Logger that should be used by the AssetsModule
+    /// </summary>
+    public static readonly ILogger Logger = LogHelper.ForModule("Assets");
 
     /// <summary>
     /// All registered <see cref="AssetManager"/>s.
@@ -141,7 +147,7 @@ public static class Assets
 
             if (CommandsTotal == CommandsFinished)
             {
-                Log.Information("Finished executing {Count} commands", CommandsTotal);
+                Assets.Logger.Information("Finished executing {Count} commands", CommandsTotal);
                 ResetLoadInfo();
             }
         }
@@ -199,7 +205,7 @@ public static class Assets
 
         Managers.Add(prefix, assetManager);
         assetManager.Prefix = prefix;
-        Log.Information("Registered asset manager with prefix: {Prefix}", prefix);
+        Assets.Logger.Information("Registered asset manager with prefix: {Prefix}", string.IsNullOrEmpty(prefix) ? "<empty>" : prefix);
     }
 
     /// <summary>
@@ -212,11 +218,11 @@ public static class Assets
         if (assetsManager?.Prefix is { } prefix && Managers.Remove(prefix))
         {
             assetsManager.Prefix = null;
-            Log.Information("Unregistered asset manager with prefix: {Prefix}", prefix);
+            Assets.Logger.Information("Unregistered asset manager with prefix: {Prefix}", string.IsNullOrEmpty(prefix) ? "<empty>" : prefix);
             return true;
         }
 
-        Log.Information("Failed to unregister asset manager: {IAssetsManager}", assetsManager);
+        Assets.Logger.Information("Failed to unregister asset manager: {IAssetsManager}", assetsManager);
         return false;
     }
 

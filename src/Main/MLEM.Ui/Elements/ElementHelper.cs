@@ -143,21 +143,21 @@ namespace MLEM.Ui.Elements {
 
         /// <summary>
         /// Creates a <see cref="Button"/> that acts as a way to input a custom value for a <see cref="Keybind"/>.
-        /// Note that only the <see cref="Keybind.Combination"/> at index <paramref name="index"/> of the given keybind is displayed and edited, all others are ignored.
+        /// Note that only the <see cref="Keybind.Combination"/> at index <paramref name="index"/> of the given Keybinds is displayed and edited, all others are ignored.
         /// Inputting custom keybinds using this element supports <see cref="ModifierKey"/>-based modifiers and any <see cref="GenericInput"/>-based keys.
-        /// The keybind button's current state can be retrieved using the "Active" <see cref="GenericDataHolder.GetData{T}"/> key, which stores a bool that indicates whether the button is currently waiting for a new value to be assigned.
+        /// The Keybinds button's current state can be retrieved using the "Active" <see cref="GenericDataHolder.GetData{T}"/> key, which stores a bool that indicates whether the button is currently waiting for a new value to be assigned.
         /// </summary>
         /// <param name="anchor">The button's anchor</param>
         /// <param name="size">The button's size</param>
-        /// <param name="keybind">The keybind that this button should represent</param>
+        /// <param name="keybind">The Keybinds that this button should represent</param>
         /// <param name="inputHandler">The input handler to query inputs with</param>
-        /// <param name="activePlaceholder">A placeholder text that is displayed while the keybind is being edited</param>
-        /// <param name="unbind">An optional keybind to press that allows the keybind value to be unbound, clearing the combination</param>
-        /// <param name="unboundPlaceholder">A placeholder text that is displayed if the keybind is unbound</param>
+        /// <param name="activePlaceholder">A placeholder text that is displayed while the Keybinds is being edited</param>
+        /// <param name="unbind">An optional Keybinds to press that allows the Keybinds value to be unbound, clearing the combination</param>
+        /// <param name="unboundPlaceholder">A placeholder text that is displayed if the Keybinds is unbound</param>
         /// <param name="inputName">An optional function to give each input a display name that is easier to read. If this is null, <see cref="GenericInput.ToString"/> is used.</param>
         /// <param name="index">The index in the <paramref name="keybind"/> that the button should display. Note that, if the index is greater than the amount of combinations, combinations entered using this button will be stored at an earlier index.</param>
         /// <param name="isKeybindAllowed">A function that can optionally determine whether a given input and modifier combination is allowed. If this is null, all combinations are allowed.</param>
-        /// <returns>A keybind button with the given settings</returns>
+        /// <returns>A Keybinds button with the given settings</returns>
         public static Button KeybindButton(Anchor anchor, Vector2 size, Keybind keybind, InputHandler inputHandler, string activePlaceholder, Keybind unbind = default, string unboundPlaceholder = "", Func<GenericInput, string> inputName = null, int index = 0, Func<GenericInput, IEnumerable<GenericInput>, bool> isKeybindAllowed = null) {
             string GetCurrentName() {
                 return keybind.TryGetCombination(index, out var combination) ? combination.ToString(" + ", inputName) : unboundPlaceholder;

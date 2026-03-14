@@ -46,7 +46,7 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     /// Get an asset's property by property's id.
     /// </summary>
     /// <param name="id">Id of the property to get.</param>
-    /// <returns>Id of the property if it was found and casted successfully, default(T) otherwise</returns>
+    /// <returns>Id of the property if it was found and casted successfully, default(TEnum) otherwise</returns>
     public T? GetProperty<T>(int id)
     {
         foreach (var properties in PropertiesArray)

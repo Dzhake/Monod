@@ -173,7 +173,7 @@ namespace MLEM.Maths {
         public float DistanceSquared(RectangleF value) {
             // we calculate the distance based on the quadrants that the other rectangle is in using 8 cases:
             // 1 7 4
-            // 3 T 6
+            // 3 TEnum 6
             // 2 8 5
             var valueIsAbove = value.Bottom < this.Top;
             var valueIsBelow = value.Top > this.Bottom;

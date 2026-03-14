@@ -3,9 +3,6 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting.Display;
 using Serilog.Sinks.SystemConsole.Themes;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -32,7 +29,7 @@ public static class LogHelper
     {
         File.Create(LogFile).Close(); //erases file
 
-        string outputTemplate = "[{Timestamp:hh:mm:ss} {Level:u3}] [{Mod}] {Message}{NewLine}{Exception}";
+        string outputTemplate = "[{Timestamp:hh:mm:ss} {Level:u3} {Mod} {Module}] {Message:lj}{NewLine}{Exception}";
         MessageTemplateTextFormatter formatter = new(outputTemplate);
         LevelSwitch = new();
         Log.Logger = new LoggerConfiguration()
@@ -92,4 +89,11 @@ public static class LogHelper
         [ConsoleThemeStyle.LevelError] = "\e[38;2;255;0;0m",
         [ConsoleThemeStyle.LevelFatal] = "\e[38;2;255;0;0m\e[48;2;255;255;0m",
     });
+
+    /// <summary>
+    /// Create a new <see cref="ILogger"/> for the specified module.
+    /// </summary>
+    /// <param name="moduleName">Name of the module.</param>
+    /// <returns>A new <see cref="ILogged"/>.</returns>
+    public static ILogger ForModule(string moduleName) => Log.ForContext("Module", moduleName);
 }

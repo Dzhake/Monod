@@ -10,11 +10,11 @@ namespace Monod.Shared.Collections;
 /// <remarks>
 /// <para>Collection similar to the <see cref="List{T}"/>, but instead of moving elements around when removing elements <see cref="IndexedList{T}"/> places null at their place, and when adding new elements searches for indexes with null, or resizes collection if needed. Because of this behaviour indexes of the elements in <see cref="IndexedList{T}"/> never change, unless the element is removed, so you can store indexes for any amount of time, allowing you to remove elements from the <see cref="IndexedList{T}"/> much quicker than from the <see cref="List{T}"/>. But if you don't store indexes, then both <see cref="Add(T)"/> and <see cref="Remove"/> operation iterate the collection, unlike only <see cref="List{T}.Remove"/> for the <see cref="List{T}"/>.</para>
 /// <para><see cref="IndexedList{T}"/> is also probably much worse if you only modify early indexes of the collection, as <see cref="List{T}"/> would shift items to early indexes and only modify late indexes, and <see cref="IndexedList{T}"/> will iterate all the indexes when adding item to end of the collection.</para>
-/// <para><b>DO NOT USE WITH VALUE TYPES!</b> <see cref="IndexedList{T}"/> uses mix of <see langword="default"/> and null for empty indexes. For value types those don't match, so collection will be considered having no empty indexes, and whenever you try to add an element it'll resize, because no empty indexes are found. As result, each time you add an element size of the collection doubles. Consider using "T?" (e.g. "<see cref="int"/>?") instead of "<see cref="int"/>" instead, so <see langword="default"/> for it will match null.</para>
+/// <para><b>DO NOT USE WITH VALUE TYPES!</b> <see cref="IndexedList{T}"/> uses mix of <see langword="default"/> and null for empty indexes. For value types those don't match, so collection will be considered having no empty indexes, and whenever you try to add an element it'll resize, because no empty indexes are found. As result, each time you add an element size of the collection doubles. Consider using "TEnum?" (e.g. "<see cref="int"/>?") instead of "<see cref="int"/>" instead, so <see langword="default"/> for it will match null.</para>
 /// </remarks>
 [CollectionBuilder(typeof(IndexedListBuilder), nameof(IndexedListBuilder.Create))]
 public class IndexedList<T> : ICollection<T>
-//do not implement IList<T> because it would break polymorphism, because Remove doesn't shift indexes.
+//do not implement IList<TEnum> because it would break polymorphism, because Remove doesn't shift indexes.
 {
     /// <summary>
     /// Initializes a new instance of <see cref="IndexedList{T}"/> with capacity 4.

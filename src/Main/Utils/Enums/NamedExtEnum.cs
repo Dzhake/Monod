@@ -40,7 +40,7 @@ public class NamedExtEnum
     /// <summary>
     /// Initialize a new instance of the <see cref="NamedExtEnum"/> with the specified <paramref name="names"/>.
     /// </summary>
-    /// <param name="names">List of names the enum should start with. Same as using <see cref="AddValue"/> for each value specified in the list, but more performant.</param>
+    /// <param name="names">List of names the enum should start with. Same as using <see cref="AddOrGetValue"/> for each value specified in the list, but more performant.</param>
     public NamedExtEnum(List<string> names)
     {
         InternalNames = names;
@@ -53,7 +53,7 @@ public class NamedExtEnum
     /// </summary>
     /// <param name="name">Name of the new value. Must be unique for this value.</param>
     /// <returns>Value associated with the name.</returns>
-    public int AddValue(string name)
+    public int AddOrGetValue(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
 

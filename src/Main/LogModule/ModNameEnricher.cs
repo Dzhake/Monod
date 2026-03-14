@@ -16,6 +16,6 @@ public class ModNameEnricher : ILogEventEnricher
     public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
     {
         logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty(
-        "Mod", "DD"));
+        "Mod", "Monod"));
     }
 }

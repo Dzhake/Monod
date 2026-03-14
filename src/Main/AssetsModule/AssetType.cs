@@ -20,7 +20,7 @@ public enum AssetType
     Ignore,
 
     /// <summary>
-    /// Binary asset type, converted into <see cref="T:byte[]"/>.
+    /// Binary asset type, converted into <see cref="TEnum:byte[]"/>.
     /// </summary>
     Binary,
 
@@ -50,7 +50,7 @@ public enum AssetType
     Localization,
 
     /// <summary>
-    /// Font asset type, loaded as <see cref="T:byte[]"/>.
+    /// Font asset type, loaded as <see cref="TEnum:byte[]"/>.
     /// </summary>
     Font,
 }

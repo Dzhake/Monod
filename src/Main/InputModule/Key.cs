@@ -353,7 +353,7 @@ public enum Key
     /// </summary>
     S = 83,
     /// <summary>
-    /// T key.
+    /// TEnum key.
     /// </summary>
     T = 84,
     /// <summary>

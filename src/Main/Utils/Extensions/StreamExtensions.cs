@@ -82,10 +82,10 @@ public static class StreamExtensions
 
 
     /// <summary>
-    /// Converts current stream to <see cref="T:byte[]"/> asynchronously.
+    /// Converts current stream to <see cref="TEnum:byte[]"/> asynchronously.
     /// </summary>
     /// <param name="stream">Stream to convert.</param>
-    /// <returns><see cref="T:byte[]"/> read from <paramref name="stream"/>.</returns>
+    /// <returns><see cref="TEnum:byte[]"/> read from <paramref name="stream"/>.</returns>
     /// <exception cref="InvalidOperationException">readCount doesn't match byteLength</exception>
     [Pure]
     public static async ValueTask<byte[]> ToByteArrayAsync(this Stream stream)

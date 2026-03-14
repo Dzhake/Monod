@@ -11,6 +11,9 @@
         <OutputPath>$(ProjectDir)bin\</OutputPath>
 		<ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="InputModule\RebindMenu.cs" />
+    </ItemGroup>
     
     <ItemGroup>
 		<ProjectReference Include="..\SDL3-CS\SDL3\SDL3.Core.csproj" />

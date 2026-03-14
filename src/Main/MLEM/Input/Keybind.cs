@@ -9,8 +9,8 @@ using MLEM.Misc;
 
 namespace MLEM.Input {
     /// <summary>
-    /// A keybind represents a generic way to trigger input.
-    /// A keybind is made up of multiple key combinations, one of which has to be pressed for the keybind to be triggered.
+    /// A Keybinds represents a generic way to trigger input.
+    /// A Keybinds is made up of multiple key combinations, one of which has to be pressed for the Keybinds to be triggered.
     /// Note that this type is serializable using <see cref="DataContractAttribute"/>.
     /// Note that this class implements <see cref="IComparable"/> and <see cref="IComparable{T}"/>, which allows two combinations to be ordered based on how many <see cref="Combination.Modifiers"/> their combinations have.
     /// </summary>
@@ -21,14 +21,14 @@ namespace MLEM.Input {
         private static readonly GenericInput[] EmptyInputs = new GenericInput[0];
 
         /// <summary>
-        /// The combinations that make up this keybind.
+        /// The combinations that make up this Keybinds.
         /// This collection can be modified using <see cref="Add(MLEM.Input.GenericInput,MLEM.Input.GenericInput[])"/>, <see cref="Remove"/>, <see cref="Clear"/>, <see cref="CopyFrom"/>, etc.
         /// </summary>
         [DataMember]
         public Combination[] Combinations { get; private set; } = Keybind.EmptyCombinations;
 
         /// <summary>
-        /// Creates a new keybind and adds the given key and modifiers using <see cref="Add(MLEM.Input.GenericInput,MLEM.Input.GenericInput[])"/>
+        /// Creates a new Keybinds and adds the given key and modifiers using <see cref="Add(MLEM.Input.GenericInput,MLEM.Input.GenericInput[])"/>
         /// </summary>
         /// <param name="key">The key to be pressed.</param>
         /// <param name="modifiers">The modifier keys that have to be held down.</param>
@@ -42,33 +42,33 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Creates a new keybind with the given <paramref name="combinations"/>.
+        /// Creates a new Keybinds with the given <paramref name="combinations"/>.
         /// </summary>
-        /// <param name="combinations">The combinations to initialize this keybind with.</param>
+        /// <param name="combinations">The combinations to initialize this Keybinds with.</param>
         public Keybind(params Combination[] combinations) {
             this.Combinations = combinations.ToArray();
         }
 
         /// <summary>
-        /// Creates a new keybind with no default combinations
+        /// Creates a new Keybinds with no default combinations
         /// </summary>
         public Keybind() {}
 
         /// <summary>
-        /// Adds a new key combination to this keybind that can optionally be pressed for the keybind to trigger.
+        /// Adds a new key combination to this Keybinds that can optionally be pressed for the Keybinds to trigger.
         /// </summary>
         /// <param name="key">The key to be pressed.</param>
         /// <param name="modifiers">The modifier keys that have to be held down.</param>
-        /// <returns>This keybind, for chaining</returns>
+        /// <returns>This Keybinds, for chaining</returns>
         public Keybind Add(GenericInput key, params GenericInput[] modifiers) {
             return this.Add(new Combination(key, modifiers));
         }
 
         /// <summary>
-        /// Adds the given <see cref="Combination"/> to this keybind that can optionally be pressed for the keybind to trigger.
+        /// Adds the given <see cref="Combination"/> to this Keybinds that can optionally be pressed for the Keybinds to trigger.
         /// </summary>
         /// <param name="combination">The combination to add.</param>
-        /// <returns>This keybind, for chaining</returns>
+        /// <returns>This Keybinds, for chaining</returns>
         public Keybind Add(Combination combination) {
             this.Combinations = this.Combinations.Append(combination).ToArray();
             return this;
@@ -82,22 +82,22 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Inserts a new key combination into the given <paramref name="index"/> of this keybind's combinations that can optionally be pressed for the keybind to trigger.
+        /// Inserts a new key combination into the given <paramref name="index"/> of this Keybinds's combinations that can optionally be pressed for the Keybinds to trigger.
         /// </summary>
         /// <param name="index">The index to insert this combination into.</param>
         /// <param name="key">The key to be pressed.</param>
         /// <param name="modifiers">The modifier keys that have to be held down.</param>
-        /// <returns>This keybind, for chaining.</returns>
+        /// <returns>This Keybinds, for chaining.</returns>
         public Keybind Insert(int index, GenericInput key, params GenericInput[] modifiers) {
             return this.Insert(index, new Combination(key, modifiers));
         }
 
         /// <summary>
-        /// Inserts the given <see cref="Combination"/> into the given <paramref name="index"/> of this keybind's combinations that can optionally be pressed for the keybind to trigger.
+        /// Inserts the given <see cref="Combination"/> into the given <paramref name="index"/> of this Keybinds's combinations that can optionally be pressed for the Keybinds to trigger.
         /// </summary>
         /// <param name="index">The index to insert this combination into.</param>
         /// <param name="combination">The combination to insert.</param>
-        /// <returns>This keybind, for chaining.</returns>
+        /// <returns>This Keybinds, for chaining.</returns>
         public Keybind Insert(int index, Combination combination) {
             this.Combinations = this.Combinations.Take(index).Append(combination).Concat(this.Combinations.Skip(index)).ToArray();
             return this;
@@ -111,9 +111,9 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Clears this keybind, removing all active combinations.
+        /// Clears this Keybinds, removing all active combinations.
         /// </summary>
-        /// <returns>This keybind, for chaining</returns>
+        /// <returns>This Keybinds, for chaining</returns>
         public Keybind Clear() {
             this.Combinations = Keybind.EmptyCombinations;
             return this;
@@ -123,30 +123,30 @@ namespace MLEM.Input {
         /// Removes all combinations that match the given predicate
         /// </summary>
         /// <param name="predicate">The predicate to match against</param>
-        /// <returns>This keybind, for chaining</returns>
+        /// <returns>This Keybinds, for chaining</returns>
         public Keybind Remove(Func<Combination, int, bool> predicate) {
             this.Combinations = this.Combinations.Where((c, i) => !predicate(c, i)).ToArray();
             return this;
         }
 
         /// <summary>
-        /// Copies all of the combinations from the given keybind into this keybind.
-        /// Note that this doesn't <see cref="Clear"/> this keybind, so combinations will be merged rather than replaced.
+        /// Copies all of the combinations from the given Keybinds into this Keybinds.
+        /// Note that this doesn't <see cref="Clear"/> this Keybinds, so combinations will be merged rather than replaced.
         /// </summary>
-        /// <param name="other">The keybind to copy from</param>
-        /// <returns>This keybind, for chaining</returns>
+        /// <param name="other">The Keybinds to copy from</param>
+        /// <returns>This Keybinds, for chaining</returns>
         public Keybind CopyFrom(Keybind other) {
             this.Combinations = this.Combinations.Concat(other.Combinations).ToArray();
             return this;
         }
 
         /// <summary>
-        /// Returns whether this keybind is considered to be down.
+        /// Returns whether this Keybinds is considered to be down.
         /// See <see cref="InputHandler.IsDown"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
         /// <param name="gamepadIndex">The index of the gamepad to query, or -1 to query all gamepads</param>
-        /// <returns>Whether this keybind is considered to be down</returns>
+        /// <returns>Whether this Keybinds is considered to be down</returns>
         public bool IsDown(InputHandler handler, int gamepadIndex = -1) {
             foreach (var combination in this.Combinations) {
                 if (combination.IsDown(handler, gamepadIndex))
@@ -156,12 +156,12 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns whether this keybind was considered to be down in the last update call.
+        /// Returns whether this Keybinds was considered to be down in the last update call.
         /// See <see cref="InputHandler.WasDown"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
         /// <param name="gamepadIndex">The index of the gamepad to query, or -1 to query all gamepads</param>
-        /// <returns>Whether this keybind was considered to be down</returns>
+        /// <returns>Whether this Keybinds was considered to be down</returns>
         public bool WasDown(InputHandler handler, int gamepadIndex = -1) {
             foreach (var combination in this.Combinations) {
                 if (combination.WasDown(handler, gamepadIndex))
@@ -171,12 +171,12 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns whether this keybind is considered to be pressed.
+        /// Returns whether this Keybinds is considered to be pressed.
         /// See <see cref="InputHandler.IsPressed"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
         /// <param name="gamepadIndex">The index of the gamepad to query, or -1 to query all gamepads</param>
-        /// <returns>Whether this keybind is considered to be pressed</returns>
+        /// <returns>Whether this Keybinds is considered to be pressed</returns>
         public bool IsPressed(InputHandler handler, int gamepadIndex = -1) {
             foreach (var combination in this.Combinations) {
                 if (combination.IsPressed(handler, gamepadIndex))
@@ -186,12 +186,12 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns whether this keybind is considered to be pressed and has not been consumed yet using<see cref="TryConsumePressed"/>.
+        /// Returns whether this Keybinds is considered to be pressed and has not been consumed yet using<see cref="TryConsumePressed"/>.
         /// See <see cref="InputHandler.IsPressedAvailable"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
         /// <param name="gamepadIndex">The index of the gamepad to query, or -1 to query all gamepads</param>
-        /// <returns>Whether this keybind is considered to be pressed</returns>
+        /// <returns>Whether this Keybinds is considered to be pressed</returns>
         public bool IsPressedAvailable(InputHandler handler, int gamepadIndex = -1) {
             foreach (var combination in this.Combinations) {
                 if (combination.IsPressedAvailable(handler, gamepadIndex))
@@ -201,12 +201,12 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns whether this keybind is considered to be pressed.
+        /// Returns whether this Keybinds is considered to be pressed.
         /// See <see cref="InputHandler.TryConsumePressed"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
         /// <param name="gamepadIndex">The index of the gamepad to query, or -1 to query all gamepads</param>
-        /// <returns>Whether this keybind is considered to be pressed</returns>
+        /// <returns>Whether this Keybinds is considered to be pressed</returns>
         public bool TryConsumePressed(InputHandler handler, int gamepadIndex = -1) {
             foreach (var combination in this.Combinations) {
                 if (combination.TryConsumePressed(handler, gamepadIndex))
@@ -216,7 +216,7 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns whether any of this keybind's modifier keys are currently down.
+        /// Returns whether any of this Keybinds's modifier keys are currently down.
         /// See <see cref="InputHandler.IsDown"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
@@ -231,7 +231,7 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns whether any of this keybind's modifier keys were down in the last update call.
+        /// Returns whether any of this Keybinds's modifier keys were down in the last update call.
         /// See <see cref="InputHandler.WasDown"/> for more information.
         /// </summary>
         /// <param name="handler">The input handler to query the keys with</param>
@@ -246,20 +246,20 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Returns an enumerable of all of the combinations that this keybind currently contains
+        /// Returns an enumerable of all of the combinations that this Keybinds currently contains
         /// </summary>
-        /// <returns>This keybind's combinations</returns>
+        /// <returns>This Keybinds's combinations</returns>
         public IEnumerable<Combination> GetCombinations() {
             foreach (var combination in this.Combinations)
                 yield return combination;
         }
 
         /// <summary>
-        /// Tries to retrieve the combination at the given <paramref name="index"/> within this keybind.
+        /// Tries to retrieve the combination at the given <paramref name="index"/> within this Keybinds.
         /// </summary>
         /// <param name="index">The index of the combination to retrieve.</param>
         /// <param name="combination">The combination, or default if this method returns false.</param>
-        /// <returns>Whether the combination could be successfully retrieved or the index was out of bounds of this keybind's combination collection.</returns>
+        /// <returns>Whether the combination could be successfully retrieved or the index was out of bounds of this Keybinds's combination collection.</returns>
         public bool TryGetCombination(int index, out Combination combination) {
             if (index >= 0 && index < this.Combinations.Length) {
                 combination = this.Combinations[index];
@@ -271,13 +271,13 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Converts this keybind into an easily human-readable string.
+        /// Converts this Keybinds into an easily human-readable string.
         /// When using <see cref="ToString()"/>, this method is used with <paramref name="joiner"/> set to ", ".
         /// </summary>
         /// <param name="joiner">The string to use to join combinations</param>
         /// <param name="combinationJoiner">The string to use for combination-internal joining, see <see cref="Combination.ToString(string,System.Func{MLEM.Input.GenericInput,string})"/></param>
         /// <param name="inputName">The function to use for determining the display name of generic inputs, see <see cref="Combination.ToString(string,System.Func{MLEM.Input.GenericInput,string})"/></param>
-        /// <returns>A human-readable string representing this keybind</returns>
+        /// <returns>A human-readable string representing this Keybinds</returns>
         public string ToString(string joiner, string combinationJoiner = " + ", Func<GenericInput, string> inputName = null) {
             return string.Join(joiner, this.Combinations.Select(c => c.ToString(combinationJoiner, inputName)));
         }
@@ -293,7 +293,7 @@ namespace MLEM.Input {
 
         /// <summary>Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.</summary>
         /// <param name="obj">An object to compare with this instance.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="TEnum:System.ArgumentException">
         /// <paramref name="obj" /> is not the same type as this instance.</exception>
         /// <returns>A value that indicates the relative order of the objects being compared. The return value has these meanings:
         ///
@@ -309,9 +309,9 @@ namespace MLEM.Input {
         }
 
         /// <summary>
-        /// Converts this keybind into a string, separating every included <see cref="Combination"/> by a comma
+        /// Converts this Keybinds into a string, separating every included <see cref="Combination"/> by a comma
         /// </summary>
-        /// <returns>This keybind as a string</returns>
+        /// <returns>This Keybinds as a string</returns>
         public override string ToString() {
             return this.ToString(", ");
         }
@@ -489,7 +489,7 @@ namespace MLEM.Input {
 
             /// <summary>Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.</summary>
             /// <param name="obj">An object to compare with this instance.</param>
-            /// <exception cref="T:System.ArgumentException">
+            /// <exception cref="TEnum:System.ArgumentException">
             /// <paramref name="obj" /> is not the same type as this instance.</exception>
             /// <returns>A value that indicates the relative order of the objects being compared. The return value has these meanings:
             ///

@@ -29,7 +29,7 @@ namespace MLEM.Graphics {
         /// </summary>
         public RasterizerState RasterizerState;
         /// <summary>
-        /// A custom <see cref="T:Microsoft.Xna.Framework.Graphics.Effect" /> to override the default sprite effect.
+        /// A custom <see cref="TEnum:Microsoft.Xna.Framework.Graphics.Effect" /> to override the default sprite effect.
         /// </summary>
         public Effect Effect;
         /// <summary>
@@ -45,7 +45,7 @@ namespace MLEM.Graphics {
         /// <param name="samplerState">State of the sampler. Uses <see cref="F:Microsoft.Xna.Framework.Graphics.SamplerState.LinearClamp" /> if null.</param>
         /// <param name="depthStencilState">State of the depth-stencil buffer. Uses <see cref="F:Microsoft.Xna.Framework.Graphics.DepthStencilState.None" /> if null.</param>
         /// <param name="rasterizerState">State of the rasterization. Uses <see cref="F:Microsoft.Xna.Framework.Graphics.RasterizerState.CullCounterClockwise" /> if null.</param>
-        /// <param name="effect">A custom <see cref="T:Microsoft.Xna.Framework.Graphics.Effect" /> to override the default sprite effect.</param>
+        /// <param name="effect">A custom <see cref="TEnum:Microsoft.Xna.Framework.Graphics.Effect" /> to override the default sprite effect.</param>
         /// <param name="transformMatrix">An optional matrix used to transform the sprite geometry. Uses <see cref="P:Microsoft.Xna.Framework.Matrix.Identity" /> if null.</param>
         public SpriteBatchContext(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState blendState = null, SamplerState samplerState = null, DepthStencilState depthStencilState = null, RasterizerState rasterizerState = null, Effect effect = null, Matrix? transformMatrix = null) {
             this.SortMode = sortMode;
@@ -63,7 +63,7 @@ namespace MLEM.Graphics {
         /// </summary>
         /// <param name="device">The graphics device to query data from.</param>
         /// <param name="sortMode">The drawing order for sprite and text drawing. <see cref="F:Microsoft.Xna.Framework.Graphics.SpriteSortMode.Deferred" /> by default.</param>
-        /// <param name="effect">A custom <see cref="T:Microsoft.Xna.Framework.Graphics.Effect" /> to override the default sprite effect.</param>
+        /// <param name="effect">A custom <see cref="TEnum:Microsoft.Xna.Framework.Graphics.Effect" /> to override the default sprite effect.</param>
         /// <param name="transformMatrix">An optional matrix used to transform the sprite geometry. Uses <see cref="P:Microsoft.Xna.Framework.Matrix.Identity" /> if null.</param>
         /// <returns>A new sprite batch context from the <paramref name="device"/>'s current information.</returns>
         public static SpriteBatchContext Current(GraphicsDevice device, SpriteSortMode sortMode = SpriteSortMode.Deferred, Effect effect = null, Matrix? transformMatrix = null) {

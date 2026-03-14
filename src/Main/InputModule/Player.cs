@@ -6,7 +6,7 @@
 public sealed class Player
 {
     /// <summary>
-    /// Index of the gamepad this player uses.
+    /// Index of the gamepad this player uses, or -1 if this player only uses keyboard.
     /// </summary>
     public int GamepadIndex = -1;
 
@@ -18,18 +18,36 @@ public sealed class Player
     /// <summary>
     /// Whether last device used by this player was gamepad or keyboard/mouse. Used to determine which icons to show in tutorial/hints.
     /// </summary>
-    public bool LastUsedDeviceIsGamepad = false;
+    public bool LastUsedDeviceIsGamepad;
 
     /// <summary>
     /// Input settings this player uses.
     /// </summary>
-    private InputSettings? _settings = null;
+    private InputSettings? _settings;
 
     /// <summary>
     /// Input settings this player uses, or <see cref="Input.GlobalSettings"/> as fallback.
     /// </summary>
     public InputSettings Settings => _settings ?? Input.GlobalSettings;
 
-    private InputMap? _map = null;
-    public InputMap Map => _map ?? Input.DefaultMap;
+    private KeyMap? _map;
+    public KeyMap Map
+    {
+        get
+        {
+            if (_map is null)
+                _map = Input.DefaultMap.Clone();
+            return _map;
+        }
+
+        set
+        {
+            _map = value;
+        }
+    }
+
+    public void Update(InputState state, int playerIndex)
+    {
+        Map.Update(state, playerIndex);
+    }
 }

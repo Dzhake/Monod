@@ -1,7 +1,6 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Monod.AssetsModule.Commands;
 using Monod.Shared;
-using Serilog;
 
 namespace Monod.AssetsModule;
 
@@ -144,7 +143,6 @@ public class AssetLoader
     /// <param name="command"></param>
     protected void TryAddCommand(AssetLoaderCommand command)
     {
-        Log.Information("{Text}", command.GetText());
         Assets.IncrementTotalCommandsCount();
         try
         {
@@ -250,14 +248,14 @@ public class AssetLoader
     {
         if (assetStream is null) //When asset was deleted/renamed?
         {
-            Log.Debug("{This}: Unloaded asset at {Path}.", this, path);
+            Assets.Logger.Debug("{This}: Unloaded asset at {Path}.", this, path);
             RemoveFromCache(path);
             return false;
         }
 
         if (assetStream.Value.Type == AssetType.Ignore)
         {
-            Log.Debug("{This}: Ignoring asset at {Path}.", this, path);
+            Assets.Logger.Debug("{This}: Ignoring asset at {Path}.", this, path);
             return false;
         }
 
@@ -266,7 +264,7 @@ public class AssetLoader
         AssetParser? parser = GetParser(assetInfo);
         if (parser is null)
         {
-            Log.Warning("Could not find parser for the asset with type {Type} at path {Path}. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type, path);
+            Assets.Logger.Warning("Could not find parser for the asset with type {Type} at path {Path}. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type, path);
             return false;
         }
 
@@ -297,7 +295,7 @@ public class AssetLoader
         }
         catch (Exception exception)
         {
-            Log.Error(exception, "An exception occured while trying to open a file:");
+            Assets.Logger.Error(exception, "An exception occured while trying to open a file:");
             return null;
         }
     }
@@ -319,7 +317,7 @@ public class AssetLoader
         }
         catch (Exception exception)
         {
-            Log.Error(exception, "An exception occured while trying to open a file:");
+            Assets.Logger.Error(exception, "An exception occured while trying to open a file:");
             return null;
         }
     }
@@ -428,7 +426,7 @@ public class AssetLoader
             CacheLock.ExitWriteLock();
         }
 
-        Log.Debug("{This}: Removed asset from the cache: {Path}", this, path);
+        Assets.Logger.Debug("{This}: Removed asset from the cache: {Path}", this, path);
     }
 
     /// <summary>
@@ -471,7 +469,7 @@ public class AssetLoader
         {
             CacheLock.ExitWriteLock();
         }
-        Log.Information("{This}: Unloaded {Count} assets", this, paths.Length);
+        Assets.Logger.Information("{This}: Unloaded {Count} assets", this, paths.Length);
     }
 
 
