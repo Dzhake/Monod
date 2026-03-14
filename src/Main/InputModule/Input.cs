@@ -47,12 +47,12 @@ public static class Input
     /// <summary>
     /// Current state of the input devices.
     /// </summary>
-    private static InputState CurState = new();
+    public static InputState CurState = new();
 
     /// <summary>
     /// State of the input devices on previous frame.
     /// </summary>
-    private static InputState PrevState = new();
+    public static InputState PrevState = new();
 
     /// <summary>
     /// Default/backup input map for all players. Should not be modified, and should be used for "restore to defaults".
@@ -63,7 +63,6 @@ public static class Input
     /// Enum of all possible actions, to be used with <see cref="KeyMap"/>, to have a way to globally define an action (for serialization/getting input action for the given player by name).
     /// </summary>
     public static NamedExtEnum ActionNames = new();
-    public static InputAction[] Actions;
 
     public static HashSet<Key> KeyboardKeysPressed = new();
     public static HashSet<Key> KeyboardKeysReleased = new();
@@ -88,6 +87,16 @@ public static class Input
 
     private static void OnKeyDown(object? sender, InputKeyEventArgs e) => KeyboardKeysPressed.Add((Key)e.Key);
 
+    /// <summary>
+    /// Event subscriber called on the <see cref="GameWindow.TextInput"/>.
+    /// </summary>
+    /// <param name="sender">Event sender.</param>
+    /// <param name="e">Event args.</param>
+    private static void OnTextInput(object? sender, TextInputEventArgs e)
+    {
+        if (char.IsControl(e.Character)) return;
+        KeyString?.Append(e.Character);
+    }
 
 
     /// <summary>
@@ -142,6 +151,17 @@ public static class Input
     #endregion
 
     #region ReadingInput
+    public static Key FirstKeyReleased(int playerIndex)
+    {
+        if (Players[playerIndex].UsesKeyboard && KeyboardKeysReleased.Count > 0)
+            return KeyboardKeysReleased.First();
+
+        for (Key i = MIN_EXISTING_KEY; i < Key.None; i++)
+            if (KeyReleased(i, playerIndex)) return i;
+
+        return Key.None;
+    }
+
     /// <summary>
     /// Get the first (random/any) key that was pressed this frame.
     /// </summary>
@@ -154,7 +174,7 @@ public static class Input
             return KeyboardKeysPressed.First();
 
         for (Key i = MIN_EXISTING_KEY; i < Key.None; i++)
-            if (Down(i, playerIndex)) return i;
+            if (KeyPressed(i, playerIndex)) return i;
 
         return Key.None;
     }
@@ -233,6 +253,14 @@ public static class Input
     public static GamePadState GetGamePad(InputState state, int playerIndex) => state.Gamepads[Players[playerIndex].GamepadIndex];
 
     /// <summary>
+    /// Get player at the specified <paramref name="playerIndex"/>.
+    /// </summary>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/></param>
+    /// <returns>Player at the specified <paramref name="playerIndex"/>.</returns>
+    [Pure]
+    public static Player GetPlayer(int playerIndex) => Players[playerIndex];
+
+    /// <summary>
     /// Check whether any button was pressed/released on the gamepad at <paramref name="gamepadIndex"/> compared to previous update.
     /// </summary>
     /// <param name="gamepadIndex">Index of the gamepad in monogame.</param>
@@ -276,13 +304,62 @@ public static class Input
 
 
     /// <summary>
+    /// Check whether the <paramref name="actionIndex"/> is down this frame.
+    /// </summary>
+    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
+    [Pure]
+    public static bool ActionDown(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Down();
+
+    /// <summary>
+    /// Check whether the <paramref name="actionIndex"/> is up this frame.
+    /// </summary>
+    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
+    [Pure]
+    public static bool ActionUp(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Up();
+
+    /// <summary>
+    /// Check whether the <paramref name="actionIndex"/> is pressed this frame.
+    /// </summary>
+    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
+    [Pure]
+    public static bool ActionPressed(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Pressed();
+
+    /// <summary>
+    /// Check whether the <paramref name="actionIndex"/> is released this frame.
+    /// </summary>
+    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
+    [Pure]
+    public static bool ActionReleased(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Released();
+
+    /// <summary>
+    /// Check whether the <paramref name="actionIndex"/> is held this frame.
+    /// </summary>
+    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
+    [Pure]
+    public static bool ActionHeld(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Held();
+
+
+
+
+
+    /// <summary>
     /// Check whether the <paramref name="key"/> is down this frame.
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
     /// <returns>Whether the <paramref name="key"/> is down this frame.</returns>
     [Pure]
-    public static bool Down(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Down();
+    public static bool KeyDown(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) != 0;
 
     /// <summary>
     /// Check whether the <paramref name="key"/> is up this frame.
@@ -291,7 +368,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player for whom to check.</param>
     /// <returns>Whether the <paramref name="key"/> is up this frame.</returns>
     [Pure]
-    public static bool Up(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Up();
+    public static bool KeyUp(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) == 0;
 
 
     /// <summary>
@@ -301,7 +378,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player for whom to check.</param>
     /// <returns>Whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.</returns>
     [Pure]
-    public static bool Pressed(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Pressed();
+    public static bool KeyPressed(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) == 0 && GetValue(CurState, key, playerIndex) != 0;
 
     /// <summary>
     /// Check whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.
@@ -310,7 +387,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player for whom to check.</param>
     /// <returns>Whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.</returns>
     [Pure]
-    public static bool Released(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Released();
+    public static bool KeyReleased(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) == 0;
 
     /// <summary>
     /// Check whether the <paramref name="key"/> was pressed on this and previous frames.
@@ -319,65 +396,6 @@ public static class Input
     /// <param name="playerIndex">Index of the player for whom to check.</param>
     /// <returns>Whether the <paramref name="key"/> was pressed on this and previous frames.</returns>
     [Pure]
-    public static bool Held(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Held();
-
-    /// <summary>
-    /// Check whether the <paramref name="key"/> is down this frame.
-    /// </summary>
-    /// <param name="key">Key to check.</param>
-    /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is down this frame.</returns>
-    [Pure]
-    public static bool Down(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) != 0;
-
-    /// <summary>
-    /// Check whether the <paramref name="key"/> is up this frame.
-    /// </summary>
-    /// <param name="key">Key to check.</param>
-    /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is up this frame.</returns>
-    [Pure]
-    public static bool Up(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) == 0;
-
-
-    /// <summary>
-    /// Check whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.
-    /// </summary>
-    /// <param name="key">Key to check.</param>
-    /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.</returns>
-    [Pure]
-    public static bool Pressed(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) == 0 && GetValue(CurState, key, playerIndex) != 0;
-
-    /// <summary>
-    /// Check whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.
-    /// </summary>
-    /// <param name="key">Key to check.</param>
-    /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.</returns>
-    [Pure]
-    public static bool Released(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) == 0;
-
-    /// <summary>
-    /// Check whether the <paramref name="key"/> was pressed on this and previous frames.
-    /// </summary>
-    /// <param name="key">Key to check.</param>
-    /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> was pressed on this and previous frames.</returns>
-    [Pure]
-    public static bool Held(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) != 0;
-    #endregion
-
-    #region Other
-    /// <summary>
-    /// Event subscriber called on the <see cref="GameWindow.TextInput"/>.
-    /// </summary>
-    /// <param name="sender">Event sender.</param>
-    /// <param name="e">Event args.</param>
-    private static void OnTextInput(object? sender, TextInputEventArgs e)
-    {
-        if (char.IsControl(e.Character)) return;
-        KeyString?.Append(e.Character);
-    }
+    public static bool KeyHeld(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) != 0;
     #endregion
 }

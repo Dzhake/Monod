@@ -65,7 +65,7 @@ namespace MLEM.Ui.Elements {
         /// <exception cref="NotSupportedException">If the provided direction is not <see cref="Direction2Helper.IsAdjacent"/></exception>
         public ProgressBar(Anchor anchor, Vector2 size, Direction2 direction, float maxValue, float currentValue = 0) : base(anchor, size) {
             if (!direction.IsAdjacent())
-                throw new NotSupportedException("Progress bars only support Up, Down, Left and Right directions");
+                throw new NotSupportedException("Progress bars only support ActionUp, ActionDown, Left and Right directions");
             this.Direction = direction;
             this.MaxValue = maxValue;
             this.currentValue = currentValue;

@@ -8,11 +8,11 @@ namespace Monod.InputModule;
 public enum Key
 {
     /// <summary>
-    /// Down on directional pad on the gamepad.
+    /// ActionDown on directional pad on the gamepad.
     /// </summary>
     GamepadDPadDown = -34,
     /// <summary>
-    /// Up on directional pad on the gamepad.
+    /// ActionUp on directional pad on the gamepad.
     /// </summary>
     GamepadDPadUp = -33,
     /// <summary>
@@ -621,11 +621,11 @@ public enum Key
     /// </summary>
     VolumeMute = 173,
     /// <summary>
-    /// Volume Down key.
+    /// Volume ActionDown key.
     /// </summary>
     VolumeDown = 174,
     /// <summary>
-    /// Volume Up key.
+    /// Volume ActionUp key.
     /// </summary>
     VolumeUp = 175,
     /// <summary>

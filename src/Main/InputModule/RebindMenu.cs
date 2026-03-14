@@ -24,6 +24,7 @@ public class RebindMenu
         Root = new Panel(Anchor.AutoInline, new(Renderer.Window.ClientBounds.Width, Renderer.Window.ClientBounds.Height));
         Root.Padding = new Padding(0, 2);
         system.Add("RebindMenu", Root);
+        RebuildUi();
     }
 
     public void RebuildUi()
@@ -32,8 +33,7 @@ public class RebindMenu
         float windowWidth = Renderer.Window.ClientBounds.Width;
         float windowHeight = Renderer.Window.ClientBounds.Height;
 
-
-        for (int actionIndex = 0; actionIndex < Input.ActionNames.MaxValue; actionIndex++)
+        foreach ((int actionIndex, InputAction action) in Input.Players[playerIndex].Map)
         {
             string actionName = Input.ActionNames.GetName(actionIndex);
             Paragraph label = new(Anchor.AutoLeft, 1, actionName, true);
@@ -41,25 +41,44 @@ public class RebindMenu
             Group actionsGroup = new(Anchor.AutoCenter, new(1, 1));
             actionsGroup.ChildPadding = new Padding(0, 1);
             Root.AddChild(actionsGroup);
-            if (Input.Players[playerIndex].Map[actionIndex].Keybinds.TryGetValue(actionIndex, out var action))
-                AddActionButtons(actionIndex, actionsGroup, action, null);
+            for (int i = 0; i < action.Keybinds.Count; i++)
+            {
+                Button keybindButton = BasicButton();
+                int keybindIndex = i; //dereference
+                keybindButton.OnPressed += _ =>
+                {
+                    Input.GetPlayer(playerIndex).Map[actionIndex].Keybinds.RemoveAt(keybindIndex);
+                    RebuildUi();
+                };
+                keybindButton.OnSecondaryPressed += _ =>
+                {
+                    var keybinds = Input.GetPlayer(playerIndex).Map[actionIndex].Keybinds;
+                    var keybind = keybinds[keybindIndex];
+                    if (keybind.modifiers != KeyModifiers.None)
+                        keybinds[keybindIndex] = new(keybind.key, KeyModifiers.None);
+                    else
+                        keybinds[keybindIndex] = new(keybind.key, KeyModifiers.Any);
+
+                    RemoveDuplicates(actionIndex);
+                    RebuildUi();
+                };
+                actionsGroup.AddChild(keybindButton);
+
+                Keybind keybind = action.Keybinds[i];
+                string keybindText = "";
+                if (keybind.modifiers != KeyModifiers.Any)
+                {
+                    if (keybind.modifiers == KeyModifiers.None) keybindText += "(None) ";
+                    if (keybind.modifiers.HasFlag(KeyModifiers.Ctrl)) keybindText += "Ctrl+";
+                    if (keybind.modifiers.HasFlag(KeyModifiers.Shift)) keybindText += "Shift+";
+                    if (keybind.modifiers.HasFlag(KeyModifiers.Alt)) keybindText += "Alt+";
+                }
+                keybindText += keybind.key.ToString();
+                keybindButton.AddChild(new Paragraph(Anchor.Center, 1, keybindText, true));
+            }
             Button startRebindingButton = AddBindButton(actionIndex);
             actionsGroup.AddChild(startRebindingButton);
         }
-    }
-
-    private void ParseAction(int actionIndex, string text)
-    {
-        InputAction action = InputActionParser.Parse(text);
-        if (action is InvalidInputAction)
-        {
-
-        }
-        else
-        {
-            Input.Players[playerIndex].Map.Keybinds[actionIndex] = action;
-        }
-        RebuildUi();
     }
 
     private Button AddBindButton(int actionIndex)
@@ -77,43 +96,6 @@ public class RebindMenu
         return "+";
     }
 
-    private void AddActionButtons(int actionIndex, Group actionsGroup, InputAction action, InputAction? parentAction)
-    {
-        if (action is KeyBasedAction keyBasedAction)
-        {
-            Button actionButton = ActionRemovalButton(actionIndex, keyBasedAction);
-            actionsGroup.AddChild(actionButton);
-            if (parentAction is ArrayBasedAction arrayBasedAction)
-                actionButton.OnPressed = element => RemoveInnerAction(arrayBasedAction.Actions.IndexOf(action), arrayBasedAction);
-            else
-                actionButton.OnPressed = element => RemoveTopLevelAction(actionIndex);
-
-        }
-        else if (action is OrAction orAction)
-        {
-            foreach (var innerAction in orAction.Actions)
-            {
-                AddActionButtons(actionIndex, actionsGroup, innerAction, orAction);
-            }
-        }
-        else if (action is AndAction andAction)
-        {
-            foreach (var innerAction in andAction.Actions)
-            {
-                AddActionButtons(actionIndex, actionsGroup, innerAction, andAction);
-            }
-        }
-    }
-
-
-    private static Button ActionRemovalButton(int actionIndex, KeyBasedAction keyBasedAction)
-    {
-        Button actionButton = BasicButton();
-        actionButton.AddChild(new Paragraph(Anchor.Center, 1, keyBasedAction.Keybind.ToString(), true));
-
-        return actionButton;
-    }
-
     private static Button BasicButton()
     {
         Button basicButton = new(Anchor.AutoInline, new(1, 1));
@@ -122,20 +104,6 @@ public class RebindMenu
         basicButton.ChildPadding = new Padding(6, 1);
         basicButton.Padding = new Padding(2, 0);
         return basicButton;
-    }
-
-    private void RemoveInnerAction(int indexInArray, ArrayBasedAction parentAction)
-    {
-        var actionsList = parentAction.Actions.ToList();
-        actionsList.RemoveAt(indexInArray);
-        parentAction.Actions = actionsList.ToArray();
-        RebuildUi();
-    }
-
-    private void RemoveTopLevelAction(int actionIndex)
-    {
-        Input.Players[playerIndex].Map.Keybinds.Remove(actionIndex);
-        RebuildUi();
     }
 
     public void Update()
@@ -151,7 +119,7 @@ public class RebindMenu
             timeout -= Time.DeltaTime;
             if (timeout > 0) return;
 
-            Key anyKey = Input.FirstKeyPressed(playerIndex);
+            Key anyKey = Input.FirstKeyReleased(playerIndex);
             if (anyKey == Key.None) return;
             BindKey(anyKey);
             RebuildUi();
@@ -175,53 +143,22 @@ public class RebindMenu
 
     private void BindKey(Key keyToBind)
     {
-        InputAction newAction = new DownAction(keyToBind);
-        var actions = Input.Players[playerIndex].Map.Keybinds;
-        if (!actions.TryGetValue(actionToBind, out var prevAction) || prevAction is null)
-        {
-            actions[actionToBind] = newAction;
-            return;
-        }
+        KeyModifiers modifiers = KeyModifiers.Any;
+        KeyModifiers currentModifiers = Input.CurState.GetActiveModifiers();
+        if (Input.GetPlayer(playerIndex).UsesKeyboard && currentModifiers != KeyModifiers.None)
+            modifiers = currentModifiers;
 
-        if (SameAsNewBindAction(prevAction, keyToBind))
-        {
-            actions.Remove(actionToBind);
-            return;
-        }
+        Keybind keybind = new(keyToBind, modifiers);
 
-        if (prevAction is OrAction orAction)
-        {
-            var orActionsList = orAction.Actions.ToList();
-            bool foundSameAction = false;
+        var keybinds = Input.Players[playerIndex].Map[actionToBind].Keybinds;
 
-            for (int i = 0; i < orActionsList.Count; i++)
-            {
-                //Exactly same as the action we wanted to add - remove it instead.
-                if (SameAsNewBindAction(orActionsList[i], keyToBind))
-                {
-                    orActionsList.RemoveAt(i);
-                    foundSameAction = true;
-                    break;
-                }
-            }
-
-            if (!foundSameAction)
-                orActionsList.Add(newAction);
-
-            orAction.Actions = orActionsList.ToArray();
-            return;
-        }
-
-        actions[actionToBind] = new OrAction([actions[actionToBind], newAction]);
+        keybinds.Add(keybind);
+        RemoveDuplicates(actionToBind);
     }
 
-    private static bool SameAsNewBindAction(InputAction action, Key keyToBind)
+    private void RemoveDuplicates(int actionIndex)
     {
-        return action is DownAction downAction && downAction.Keybind == keyToBind;
-    }
-
-    public void Draw()
-    {
-        Root?.Draw(Time.gameTime, Renderer.spriteBatch, 1, new());
+        InputAction action = Input.Players[playerIndex].Map[actionIndex];
+        action.Keybinds = action.Keybinds.ToHashSet().ToList();
     }
 }
