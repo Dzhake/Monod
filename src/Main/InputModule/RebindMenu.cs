@@ -43,42 +43,46 @@ public class RebindMenu
             Root.AddChild(actionsGroup);
             for (int i = 0; i < action.Keybinds.Count; i++)
             {
-                Button keybindButton = BasicButton();
-                int keybindIndex = i; //dereference
-                keybindButton.OnPressed += _ =>
-                {
-                    Input.GetPlayer(playerIndex).Map[actionIndex].Keybinds.RemoveAt(keybindIndex);
-                    RebuildUi();
-                };
-                keybindButton.OnSecondaryPressed += _ =>
-                {
-                    var keybinds = Input.GetPlayer(playerIndex).Map[actionIndex].Keybinds;
-                    var keybind = keybinds[keybindIndex];
-                    if (keybind.modifiers != KeyModifiers.None)
-                        keybinds[keybindIndex] = new(keybind.key, KeyModifiers.None);
-                    else
-                        keybinds[keybindIndex] = new(keybind.key, KeyModifiers.Any);
-
-                    RemoveDuplicates(actionIndex);
-                    RebuildUi();
-                };
+                Button keybindButton = KeybindButton(actionIndex, action, i);
                 actionsGroup.AddChild(keybindButton);
-
-                Keybind keybind = action.Keybinds[i];
-                string keybindText = "";
-                if (keybind.modifiers != KeyModifiers.Any)
-                {
-                    if (keybind.modifiers == KeyModifiers.None) keybindText += "(None) ";
-                    if (keybind.modifiers.HasFlag(KeyModifiers.Ctrl)) keybindText += "Ctrl+";
-                    if (keybind.modifiers.HasFlag(KeyModifiers.Shift)) keybindText += "Shift+";
-                    if (keybind.modifiers.HasFlag(KeyModifiers.Alt)) keybindText += "Alt+";
-                }
-                keybindText += keybind.key.ToString();
-                keybindButton.AddChild(new Paragraph(Anchor.Center, 1, keybindText, true));
             }
             Button startRebindingButton = AddBindButton(actionIndex);
             actionsGroup.AddChild(startRebindingButton);
         }
+    }
+
+    private Button KeybindButton(int actionIndex, InputAction action, int keybindIndex)
+    {
+        var button = BasicButton();
+        button.OnPressed += _ =>
+        {
+            Input.GetPlayer(playerIndex).Map[actionIndex].Keybinds.RemoveAt(keybindIndex);
+            RebuildUi();
+        };
+        button.OnSecondaryPressed += _ =>
+        {
+            var keybinds = Input.GetPlayer(playerIndex).Map[actionIndex].Keybinds;
+            var keybind = keybinds[keybindIndex];
+            if (keybind.modifiers != KeyModifiers.None)
+                keybinds[keybindIndex] = new(keybind.key, KeyModifiers.None);
+            else
+                keybinds[keybindIndex] = new(keybind.key, KeyModifiers.Any);
+
+            RemoveDuplicates(actionIndex);
+            RebuildUi();
+        };
+
+
+        Keybind keybind = action.Keybinds[keybindIndex];
+        string keybindText = "";
+        if (keybind.modifiers == KeyModifiers.None) keybindText += "(None) ";
+        if (keybind.modifiers.HasFlag(KeyModifiers.Ctrl)) keybindText += "Ctrl+";
+        if (keybind.modifiers.HasFlag(KeyModifiers.Shift)) keybindText += "Shift+";
+        if (keybind.modifiers.HasFlag(KeyModifiers.Alt)) keybindText += "Alt+";
+        keybindText += keybind.key.ToString();
+        button.AddChild(new Paragraph(Anchor.Center, 1, keybindText, true));
+
+        return button;
     }
 
     private Button AddBindButton(int actionIndex)
@@ -152,8 +156,14 @@ public class RebindMenu
 
         var keybinds = Input.Players[playerIndex].Map[actionToBind].Keybinds;
 
+        int existingIndex = keybinds.IndexOf(keybind);
+        if (existingIndex != -1)
+        {
+            keybinds.RemoveAt(existingIndex);
+            return;
+        }
+
         keybinds.Add(keybind);
-        RemoveDuplicates(actionToBind);
     }
 
     private void RemoveDuplicates(int actionIndex)

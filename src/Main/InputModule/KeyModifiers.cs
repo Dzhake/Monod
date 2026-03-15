@@ -9,7 +9,7 @@ public enum KeyModifiers
     /// <summary>
     /// Any key modifiers, including <see cref="None"/>.
     /// </summary>
-    Any = -1,
+    Any = int.MinValue,
 
     /// <summary>
     /// No key modifiers.
