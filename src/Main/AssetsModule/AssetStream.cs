@@ -1,3 +1,5 @@
+using Monod.AssetsModule.Utils;
+
 namespace Monod.AssetsModule;
 
 /// <summary>

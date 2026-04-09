@@ -11,8 +11,8 @@ using Monod.Graphics.Fonts;
 using Monod.InputModule;
 using Monod.Localization;
 using Monod.Modding.ModdingOld;
-using Monod.Shared;
 using Monod.TimeModule;
+using Monod.Utils.General;
 using System.Globalization;
 
 namespace Monod;

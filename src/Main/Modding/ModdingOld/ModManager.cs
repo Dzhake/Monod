@@ -1,7 +1,7 @@
 using Monod.AssetsModule;
 using Monod.Modding.ModdingOld.Exceptions;
-using Monod.Shared;
-using Monod.Shared.SaveLoad;
+using Monod.SaveModule;
+using Monod.Utils.General;
 using Serilog;
 using System.Diagnostics.Contracts;
 using System.Reflection;

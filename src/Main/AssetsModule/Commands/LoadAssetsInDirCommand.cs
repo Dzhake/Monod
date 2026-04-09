@@ -1,4 +1,4 @@
-﻿using Monod.Shared;
+﻿using Monod.Utils.General;
 
 namespace Monod.AssetsModule.Commands;
 

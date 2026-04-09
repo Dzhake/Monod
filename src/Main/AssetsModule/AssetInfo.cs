@@ -1,4 +1,5 @@
 using Monod.AssetsModule.Exceptions;
+using Monod.AssetsModule.Utils;
 
 namespace Monod.AssetsModule;
 

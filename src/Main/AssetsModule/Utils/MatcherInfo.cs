@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Extensions.FileSystemGlobbing;
 
-namespace Monod.AssetsModule;
+namespace Monod.AssetsModule.Utils;
 
 /// <summary>
 /// Struct that contains one entry in asset manifest: a path matcher, and properties for assets matched by it.
@@ -13,7 +11,7 @@ public readonly struct MatcherInfo : IEquatable<MatcherInfo>
     /// Path matcher, if matched by asset's path, then asset should use <see cref="Properties"/>.
     /// </summary>
     public readonly Matcher PathMatcher;
-    
+
     /// <summary>
     /// Properties that asset should use if it matches the <see cref="PathMatcher"/>.
     /// </summary>
@@ -29,7 +27,7 @@ public readonly struct MatcherInfo : IEquatable<MatcherInfo>
         PathMatcher = pathMatcher;
         Properties = properties;
     }
-    
+
     /// <inheritdoc />
     public override int GetHashCode()
     {

@@ -1,7 +1,7 @@
 using Monod.Shared.Collections;
 using Monod.Shared.Extensions;
 
-namespace Monod.Shared;
+namespace Monod.Utils.General;
 
 /// <summary>
 /// Helper class for keeping track of <see cref="Tasks"/>, and throwing exceptions on main thread to make them catch-able.

@@ -1,4 +1,4 @@
-﻿namespace Monod.Shared;
+﻿namespace Monod.Utils.General;
 
 public static class MonodSettings
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Monod.Shared;
+namespace Monod.Utils.General;
 
 /// <summary>
 /// Small class for caching and reusing <see cref="JsonSerializerOptions"/>.

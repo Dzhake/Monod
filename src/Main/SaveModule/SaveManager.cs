@@ -1,9 +1,8 @@
-using System;
-using System.IO;
+using Monod.Utils.General;
+using Serilog;
 using System.Text.Json;
-using Monod.Shared;
 
-namespace Monod.Shared.SaveLoad;
+namespace Monod.SaveModule;
 
 /// <summary>
 /// Class for saving and loading data using <see cref="JsonSerializer"/>.
@@ -14,7 +13,40 @@ public static class SaveManager
     /// <see cref="Directory"/> path where all saves should be located. Directory called "Saves" next to <see cref="AppContext.BaseDirectory"/> by default.
     /// </summary>
     public static string SavesLocation = Environment.GetEnvironmentVariable("SavesDir") ?? Path.Join(AppContext.BaseDirectory, "Saves");
-    
+
+    public static List<ISaveDataProvider> Users;
+
+    public static void Save(string dir, int type)
+    {
+        List<(string name, object saveObject)> providedData = new();
+
+        foreach (ISaveDataProvider saveUser in Users)
+        {
+            try
+            {
+                providedData.Add((saveUser.Name, saveUser.GetSaveObject(type)));
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "Failed to get save data for '{Name}' with type '{Type}': ", saveUser.Name, type);
+            }
+        }
+
+        foreach (var data in providedData)
+        {
+            string path = Path.Join(dir, data.name);
+            try
+            {
+                string text = JsonSerializer.Serialize(data.saveObject, Json.SReadable);
+                File.WriteAllTextAsync(path, text);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "Failed to save file at '{Path}': ", path);
+            }
+        }
+    }
+
     /// <summary>
     /// Deserializes <see cref="File"/> at the specified <paramref name="saveLocation"/> as <typeparamref name="T"/> , and returns the deserialized value, or null if file not found.
     /// </summary>
@@ -25,7 +57,7 @@ public static class SaveManager
     {
         if (!File.Exists(saveLocation)) return default(T);
         string data = File.ReadAllText(saveLocation);
-        return JsonSerializer.Deserialize<T>(data, Json.SCommon);
+        return JsonSerializer.Deserialize<T>(data, Json.SReadableWithFields);
     }
 
     /// <summary>
@@ -36,6 +68,6 @@ public static class SaveManager
     /// <typeparam name="T">Type of the <paramref name="data"/>.</typeparam>
     public static void Save<T>(string saveLocation, T data)
     {
-        File.WriteAllText(saveLocation, JsonSerializer.Serialize(data, Json.SCommon));
+        File.WriteAllText(saveLocation, JsonSerializer.Serialize(data, Json.SReadableWithFields));
     }
 }

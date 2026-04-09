@@ -1,4 +1,4 @@
-namespace Monod.AssetsModule;
+namespace Monod.AssetsModule.Utils;
 
 /// <summary>
 /// Struct that represents <see cref="FilePath"/> and it's <see cref="Depth"/> (how deep it's directory is relative to drive's root).

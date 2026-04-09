@@ -1,4 +1,4 @@
-namespace Monod.AssetsModule;
+namespace Monod.AssetsModule.Utils;
 
 /// <summary>
 /// Type of resource program should aim for.

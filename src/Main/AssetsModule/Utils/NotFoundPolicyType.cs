@@ -1,6 +1,6 @@
 using Monod.AssetsModule.Exceptions;
 
-namespace Monod.AssetsModule;
+namespace Monod.AssetsModule.Utils;
 
 /// <summary>
 /// Types of action <see cref="AssetManager"/> will do if the specified asset was not found.

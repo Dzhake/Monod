@@ -1,6 +1,6 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 
-namespace Monod.AssetsModule;
+namespace Monod.AssetsModule.Utils;
 
 /// <summary>
 /// Util functions for Microsoft.Extensions.FileSystemGlobbing namespace.

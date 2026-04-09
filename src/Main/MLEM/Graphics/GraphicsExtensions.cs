@@ -38,7 +38,7 @@ namespace MLEM.Graphics {
         }
 
         /// <summary>
-        /// Save version of <see cref="GraphicsDeviceManager.ApplyChanges"/> that doesn't reset window size to defaults
+        /// GetSaveObject version of <see cref="GraphicsDeviceManager.ApplyChanges"/> that doesn't reset window size to defaults
         /// </summary>
         /// <param name="manager">The graphics device manager</param>
         public static void ApplyChangesSafely(this GraphicsDeviceManager manager) {
