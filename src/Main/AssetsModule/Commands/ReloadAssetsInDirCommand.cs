@@ -32,7 +32,7 @@ public sealed class ReloadAssetsInDirCommand(string dir, AssetLoader loader) : A
         string fullDir = Path.Join(Loader.DirectoryPath, Dir);
         if (!Directory.Exists(fullDir))
         {
-            OnFinished();
+            Finish();
             return;
         }
         var assetPaths = Loader.FilterPaths(Directory.GetFiles(fullDir, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(Loader.DirectoryPath, item).Replace('\\', '/'))).ToList();
@@ -45,6 +45,6 @@ public sealed class ReloadAssetsInDirCommand(string dir, AssetLoader loader) : A
     {
         await Loader.LoadAssetAsync(assetPath);
         Interlocked.Add(ref LoadedAssets, 1);
-        if (TotalAssets == LoadedAssets) OnFinished();
+        if (TotalAssets == LoadedAssets) Finish();
     }
 }

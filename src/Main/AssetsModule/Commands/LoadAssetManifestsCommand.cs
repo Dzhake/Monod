@@ -34,7 +34,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         string[] manifests = Directory.GetFiles(Loader.DirectoryPath, Assets.MANIFEST_FILENAME, SearchOption.AllDirectories).Select(path => path.Replace('\\', '/')).ToArray();
         if (manifests.Length == 0)
         {
-            OnFinished();
+            Finish();
             return;
         }
 
@@ -55,7 +55,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         }
 
         Loader.Matchers = matchers.ToArray();
-        OnFinished();
+        Finish();
     }
 
     /// <summary>

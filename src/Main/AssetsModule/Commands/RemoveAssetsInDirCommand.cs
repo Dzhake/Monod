@@ -25,6 +25,6 @@ public sealed class RemoveAssetsInDirCommand(string dir, AssetLoader loader) : A
     public async override Task Run()
     {
         Loader.RemoveDirFromCache(Dir);
-        OnFinished();
+        Finish();
     }
 }

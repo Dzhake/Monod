@@ -1,6 +1,7 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Monod.AssetsModule.Commands;
 using Monod.AssetsModule.Utils;
+using Monod.Utils.Commands;
 using Monod.Utils.General;
 
 namespace Monod.AssetsModule;
@@ -8,7 +9,7 @@ namespace Monod.AssetsModule;
 /// <summary>
 /// Provides methods for loading assets from a directory.
 /// </summary>
-public class AssetLoader
+public class AssetLoader : CommandRunner<AssetLoaderCommand>
 {
     /// <summary>
     /// Manager that uses this <see cref="AssetLoader"/>.
@@ -44,31 +45,6 @@ public class AssetLoader
     /// Lock for <see cref="Cache"/>.
     /// </summary>
     protected ReaderWriterLockSlim CacheLock = new(LockRecursionPolicy.SupportsRecursion);
-
-    /// <summary>
-    /// Queue of commands to run. Commands are run when a new command is enqueued (by <see cref="TryAddCommand"/>) or when a command is finished (by <see cref="AssetLoaderCommand.OnFinished"/>). Access only with <see cref="CommandsLock"/>.
-    /// </summary>
-    protected Queue<AssetLoaderCommand> Commands = new();
-
-    /// <summary>
-    /// Commands that is currently being run on another thread.
-    /// </summary>
-    public AssetLoaderCommand? ActiveCommand;
-
-    /// <summary>
-    /// Whether this <see cref="AssetLoader"/> currently doesn't execute any commands.
-    /// </summary>
-    public bool LoadingInactive => (ActiveCommand?.IsFinished ?? true) && CommandsLeft == 0;
-
-    /// <summary>
-    /// Amount of commands left in the queue.
-    /// </summary>
-    public int CommandsLeft => Commands.Count;
-
-    /// <summary>
-    /// Lock for <see cref="Commands"/>.
-    /// </summary>
-    public ReaderWriterLockSlim CommandsLock = new(LockRecursionPolicy.SupportsRecursion);
 
     /// <inheritdoc />
     public override string ToString() => Manager.ToString();
@@ -119,7 +95,7 @@ public class AssetLoader
     private void OnFileDeleted(object sender, FileSystemEventArgs e)
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
-        // just reload it both as a dir and as an asset to be safe, there aren't really any reliable way to determine whether a file or dir was deleted
+        // just reload it both as a dir and as an asset to be safe, there aren't really any reliable ways to determine whether a file or dir was deleted
 
         EnqueueRemoveAssetsInDir(relativePath);
         if (!Directory.Exists(e.FullPath)) EnqueueReloadAsset(relativePath);
@@ -137,55 +113,11 @@ public class AssetLoader
         EnqueueReloadAsset(relativePath);
     }
 
-
-    /// <summary>
-    /// Add the <paramref name="command"/> to the <see cref="Commands"/>, or run it, if <see cref="LoadingInactive"/> is <see langword="true"/>.
-    /// </summary>
-    /// <param name="command"></param>
-    protected void TryAddCommand(AssetLoaderCommand command)
+    ///<inheritdoc/>
+    protected override void TryAddCommand(AssetLoaderCommand command)
     {
         Assets.IncrementTotalCommandsCount();
-        try
-        {
-            CommandsLock.EnterWriteLock();
-
-            if (LoadingInactive)
-                RunCommand(command);
-            else
-                Commands.Enqueue(command);
-        }
-        finally
-        {
-            CommandsLock.ExitWriteLock();
-        }
-    }
-
-    /// <summary>
-    /// Run the next command in queue.
-    /// </summary>
-    public void RunNextCommand()
-    {
-        try
-        {
-            CommandsLock.EnterWriteLock();
-            if (Commands.Count == 0) return;
-            AssetLoaderCommand command = Commands.Dequeue();
-            RunCommand(command);
-        }
-        finally
-        {
-            CommandsLock.ExitWriteLock();
-        }
-    }
-
-    /// <summary>
-    /// Run the <paramref name="command"/> on another thread.
-    /// </summary>
-    /// <param name="command">Command to run.</param>
-    protected void RunCommand(AssetLoaderCommand command)
-    {
-        ActiveCommand = command;
-        MainThread.Add(Task.Run(command.Run));
+        base.TryAddCommand(command);
     }
 
 

@@ -25,6 +25,6 @@ public sealed class ReloadAssetCommand(string path, AssetLoader loader) : AssetL
     public async override Task Run()
     {
         await Loader.LoadAssetAsync(Path);
-        OnFinished();
+        Finish();
     }
 }

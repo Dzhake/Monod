@@ -148,7 +148,7 @@ public static class Assets
 
             if (CommandsTotal == CommandsFinished)
             {
-                Assets.Logger.Information("Finished executing {Count} commands", CommandsTotal);
+                Logger.Information("Finished executing {Count} commands", CommandsTotal);
                 ResetLoadInfo();
             }
         }
