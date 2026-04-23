@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Chasm.SemanticVersioning;
 using System.Text.Json.Serialization;
-using Chasm.SemanticVersioning;
 
-namespace Monod.Modding.ModdingOld;
+namespace Monod.ModsModule;
 
 /// <summary>
 /// Represents Id of a <see cref="Mod"/>.
@@ -23,10 +22,10 @@ public readonly struct ModId : IEquatable<ModId>
 
 
     /// <summary>
-    /// Initializes a new instance of <see cref="ModId"/> with specified <see cref="Name"/> and <see cref="Version"/>.
+    /// Initializes a new instance of <see cref="ModId"/>.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="version"></param>
+    /// <param name="name">Name of the mod (from config)</param>
+    /// <param name="version">Version of the mod (from config)</param>
     [JsonConstructor]
     public ModId(string name, SemanticVersion version)
     {
@@ -50,13 +49,13 @@ public readonly struct ModId : IEquatable<ModId>
         return obj is ModId other && Name == other.Name && Version.Equals(other.Version);
     }
 
-    /// <inheritdoc/>  
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return HashCode.Combine(Name, Version);
     }
 
-    
+
     /// <summary>
     /// Whether two specified <see cref="ModId"/>s are equal.
     /// </summary>
@@ -79,12 +78,12 @@ public readonly struct ModId : IEquatable<ModId>
         return !(left == right);
     }
 
-    /// <inheritdoc/> 
+    /// <inheritdoc/>
     public override string ToString()
     {
         return $"{Name} v{Version}";
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool Equals(ModId other) => string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase) && Version.Equals(other.Version);
 }

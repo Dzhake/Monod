@@ -38,5 +38,6 @@ public abstract class Command
     protected virtual void Finish()
     {
         IsFinished = true;
+
     }
 }

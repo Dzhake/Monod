@@ -10,7 +10,7 @@ using Monod.Graphics.Components;
 using Monod.Graphics.Fonts;
 using Monod.InputModule;
 using Monod.Localization;
-using Monod.Modding.ModdingOld;
+using Monod.ModsModule;
 using Monod.TimeModule;
 using Monod.Utils.General;
 using System.Globalization;
@@ -36,6 +36,9 @@ public abstract class MonodGame : Game
     {
         CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
         CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+        Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
@@ -56,6 +59,8 @@ public abstract class MonodGame : Game
         Assets.RegisterAssetManager(MainAssetManager, "");
 
         base.Initialize();
+
+        ModManager.EnqueueLoadAllMods();
     }
 
     /// <inheritdoc/>
@@ -77,7 +82,7 @@ public abstract class MonodGame : Game
         Input.Update();
         MainThread.Update();
 
-        ModManager.Update();
+        //ModManager.Update();
         Assets.Update();
 
         if (Assets.IsLoading) //Don't care about thread safety, readonly with no side effects other than one frame delay
@@ -101,7 +106,16 @@ public abstract class MonodGame : Game
         GraphicsDevice.Clear(Color.Black);
         if (ModManager.InProgress)
         {
-            //font.DrawText("Loading mods.", Renderer.spriteBatch, Vector2.Zero); TODO have some sort of default font or something. Requires MainAssetManager.
+            GenericFont? font = GlobalFonts.MenuFont;
+            float width = Window.ClientBounds.Width;
+            float height = Window.ClientBounds.Height;
+            int finished = ModManager.FinishedTasksThisCommand;
+            int total = ModManager.TotalTasksThisCommand;
+
+            Renderer.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, SamplerState.PointClamp);
+            font.DrawString(Renderer.spriteBatch, $"Loading mods: {finished}/{total}", Vector2.Zero, Color.White);
+            ProgressBar.Draw((float)finished / total, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
+            Renderer.End();
             return;
         }
 

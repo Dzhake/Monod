@@ -3,10 +3,10 @@ using Monod.Utils.General;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Monod.Modding.ModdingOld;
+namespace Monod.ModsModule.ModdingOld;
 
 /// <summary>
-/// Represents <see cref="Assembly"/> for <see cref="Mod"/>s
+/// <see cref="AssemblyLoadContext"/> for one <see cref="Mod"/>.
 /// </summary>
 public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
 {
@@ -21,23 +21,25 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
     private readonly FileSystemWatcher? watcher;
 
     /// <summary>
-    /// <see cref="ModConfig"/> for same <see cref="Mod"/> as this <see cref="ModAssemblyLoadContext"/>
+    /// <see cref="ModManifest"/> for same <see cref="Mod"/> as this <see cref="ModAssemblyLoadContext"/>
     /// </summary>
     private readonly Mod mod;
+
+    public Assembly? MainAssembly;
 
     /// <summary>
     /// Instances a new <see cref="ModAssemblyLoadContext"/>.
     /// </summary>
     /// <param name="mod">Mod related to the newly created assembly context.</param>
-    /// <exception cref="InvalidOperationException"><paramref name="mod.Config.AssemblyFile"/> is null</exception>
+    /// <exception cref="InvalidOperationException"><paramref name="mod.Manifest.AssemblyFile"/> is null.</exception>
     public ModAssemblyLoadContext(Mod mod) : base(isCollectible: true)
     {
-        ModConfig config = mod.Config;
-        if (config.AssemblyFile is null) Guard.InvalidOperationException("Trying to create ModAssemblyLoadContext with config which has null AssemblyFile");
+        ModManifest manifest = mod.Manifest;
+        if (manifest.AssemblyFile is null) Guard.InvalidOperationException("Trying to create ModAssemblyLoadContext for manifest without an AssemblyFile");
         this.mod = mod;
 
         if (!MonodSettings.HotReload) return;
-        watcher = new(Path.Combine(mod.Directory, Path.GetDirectoryName(config.AssemblyFile) ?? ""), Path.GetFileName(config.AssemblyFile));
+        watcher = new(Path.Combine(mod.Directory, Path.GetDirectoryName(manifest.AssemblyFile) ?? ""), Path.GetFileName(manifest.AssemblyFile));
         watcher.NotifyFilter = NotifyFilters.LastWrite;
         watcher.Changed += OnFileChanged;
 
@@ -47,8 +49,9 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
     private void OnFileChanged(object sender, FileSystemEventArgs e)
     {
         if (watcher != sender) return;
-        ModManager.ReloadAssembly(mod);
-        watcher.EnableRaisingEvents = false; //since assembly is going to be reloaded, "this" will be disposed, so we don't need watcher anymore. Also fixes issue with events being raised twice.
+        //ModManager.ReloadAssembly(mod);
+        watcher.EnableRaisingEvents = false; //since assembly is going to be reloaded, this assembly load context will be disposed, so we don't need watcher anymore. Also fixes issue with events being raised twice.
+        // TODO use same load context, only unload the assembly
     }
 
     /// <summary>
@@ -60,6 +63,7 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
         if (Interlocked.Exchange(ref disposed, true) || !disposing) return;
 
         watcher?.Dispose();
+
         Unload();
     }
 

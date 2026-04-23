@@ -1,4 +1,4 @@
-namespace Monod.Modding.ModdingOld;
+namespace Monod.ModsModule;
 
 /// <summary>
 /// Represents status a <see cref="Mod"/> can have.
@@ -9,14 +9,19 @@ public enum ModStatus
     /// Mod is disabled by user.
     /// </summary>
     Disabled,
-    
+
     /// <summary>
     /// Mod is enabled and working successfully.
     /// </summary>
     Enabled,
-    
+
     /// <summary>
-    /// Mod failed to load.
+    /// Mod or one of it's parts are loading.
     /// </summary>
-    FailedToLoad,
+    Loading,
+
+    /// <summary>
+    /// Mod or one of it's parts are unloading.
+    /// </summary>
+    Unloading,
 }

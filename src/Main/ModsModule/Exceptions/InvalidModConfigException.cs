@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
-
-namespace Monod.Modding.ModdingOld.Exceptions;
+﻿namespace Monod.ModsModule.Exceptions;
 
 /// <summary>
-/// Thrown when config for <see cref="ModConfig"/> is not found or is invalid
+/// Thrown when config for <see cref="ModManifest"/> is not found or is invalid
 /// </summary>
 public class InvalidModConfigException : Exception
 {

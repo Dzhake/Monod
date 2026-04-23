@@ -1,12 +1,11 @@
-﻿using JetBrains.Annotations;
-using Monod.AssetsModule.Commands;
+﻿using Monod.AssetsModule.Commands;
 using Monod.AssetsModule.Utils;
 using Monod.LogModule;
 using Monod.Shared.Collections;
 using Monod.Shared.Extensions;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
-using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
+using System.Diagnostics.Contracts;
 
 namespace Monod.AssetsModule;
 
@@ -243,7 +242,7 @@ public static class Assets
     /// <param name="fullPath">Full path to the asset (Asset Manager's name + ":" + Relative asset's path)</param>
     /// <returns>Asset from the cache found at the specified path.</returns>
     /// <exception cref="ArgumentException">Could not find asset manager with the specified prefix.</exception>
-    [MustUseReturnValue]
+    [Pure]
     public static T Get<T>(string fullPath)
     {
         SplitPath(fullPath, out var prefix, out var relativePath);
@@ -257,7 +256,7 @@ public static class Assets
     /// <param name="fullPath">Full path to the asset (Asset Manager's name + ":" + Relative asset's path)</param>
     /// <returns>Asset from the cache found at the specified path.</returns>
     /// <exception cref="ArgumentException">Could not find asset manager with the specified prefix.</exception>
-    [MustUseReturnValue]
+    [Pure]
     public static T? GetOrDefault<T>(string fullPath)
     {
         SplitPath(fullPath, out var prefix, out var relativePath);
@@ -270,12 +269,19 @@ public static class Assets
     /// <param name="prefix">Name of the manager.</param>
     /// <returns>Manager with the specified name in <see cref="Managers"/>.</returns>
     /// <exception cref="ArgumentException">Could not find asset manager with the specified prefix.</exception>
-    [MustUseReturnValue]
+    [Pure]
     public static AssetManager GetManager(string prefix)
     {
         if (!Managers.TryGetValue(prefix, out AssetManager? manager))
             throw new ArgumentException("Could not find asset manager with the specified prefix. Check that the asset manager was registered and that the prefix is correct.", nameof(prefix));
         return manager;
+    }
+
+
+    [Pure]
+    public static bool ManagerRegistered(string prefix)
+    {
+        return Managers.ContainsKey(prefix);
     }
 
     /// <summary>

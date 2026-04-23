@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Chasm.SemanticVersioning.Ranges;
 using System.Text.Json.Serialization;
-using Chasm.SemanticVersioning.Ranges;
 
-namespace Monod.Modding.ModdingOld;
+namespace Monod.ModsModule;
 
 /// <summary>
 /// Represents info about <see cref="Mod"/>'s dependency
@@ -39,14 +38,14 @@ public readonly struct ModDep
         return obj is ModDep other && Name == other.Name && Versions.Equals(other.Versions);
     }
 
-    /// <inheritdoc/>  
+    /// <inheritdoc/>
     public override int GetHashCode()
     {
         return HashCode.Combine(Name, Versions);
     }
 
     /// <summary>
-    /// Checks if two <see cref="ModId"/>s <see cref="Equals"/>
+    /// Checks if two <see cref="ModId"/>s are equal.
     /// </summary>
     public static bool operator ==(ModDep left, ModDep right)
     {
@@ -54,14 +53,14 @@ public readonly struct ModDep
     }
 
     /// <summary>
-    /// Checks whether two <see cref="ModId"/>s don't <see cref="Equals"/>
+    /// Checks whether two <see cref="ModId"/>s aren't equal.
     /// </summary>
     public static bool operator !=(ModDep left, ModDep right)
     {
         return !(left == right);
     }
 
-    /// <inheritdoc/> 
+    /// <inheritdoc/>
     public override string ToString()
     {
         return $"{Name} v{Versions}";
