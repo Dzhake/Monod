@@ -18,21 +18,20 @@ public abstract class ModListener
     /// <summary>
     /// Called when mod's assembly is loaded.
     /// </summary>
-    public virtual void Initialize()
-    {
-    }
+    public virtual void Initialize() { }
 
     /// <summary>
     /// Called after all mods are loaded.
     /// </summary>
-    public virtual void PostInitialize()
-    {
-    }
+    public virtual void PostInitialize() { }
 
     /// <summary>
     /// Called every frame, in Game's Update.
     /// </summary>
-    public virtual void Update()
-    {
-    }
+    public virtual void Update() { }
+
+    /// <summary>
+    /// Called when the mod is disabled.
+    /// </summary>
+    public virtual void Unload() { }
 }

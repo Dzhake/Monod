@@ -1,6 +1,6 @@
 ﻿namespace Monod.ModsModule.Commands;
 
-public class LoadAllModsCommand(ModManagerCommandRunner runner) : ModManagerCommand(runner)
+public class LoadEnabledModsCommand(ModManagerCommandRunner runner) : ModManagerCommand(runner)
 {
     ///<inheritdoc/>
     public override int TotalProgress => ModManager.TotalTasksThisCommand;
@@ -14,8 +14,17 @@ public class LoadAllModsCommand(ModManagerCommandRunner runner) : ModManagerComm
     public async override Task Run()
     {
         List<string> manifestPaths = [];
-        foreach (string dir in ModManager.GlobalModDirs)
-            manifestPaths.AddRange(ModManager.FindManifestsInDir(dir));
+        foreach (string modName in ModManager.EnabledMods)
+        {
+            string? dir = ModManager.FindModDir(modName);
+            if (dir == null)
+            {
+                ModManager.ModNotFound();
+                Finish();
+                return;
+            }
+            manifestPaths.Add(ModManager.GetModManifestPath(dir));
+        }
 
         await ModManager.LoadModsAsync(manifestPaths);
         Finish();

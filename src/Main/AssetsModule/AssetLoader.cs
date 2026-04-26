@@ -114,7 +114,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     }
 
     ///<inheritdoc/>
-    protected override void TryAddCommand(AssetLoaderCommand command)
+    public override void TryAddCommand(AssetLoaderCommand command)
     {
         Assets.IncrementTotalCommandsCount();
         base.TryAddCommand(command);

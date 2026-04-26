@@ -1,7 +1,10 @@
 using Chasm.SemanticVersioning.Ranges;
 using Monod.AssetsModule;
+using Monod.LogModule;
+using Monod.ModsModule.Commands;
 using Monod.ModsModule.Exceptions;
 using Monod.ModsModule.ModdingOld;
+using Monod.Shared.Exceptions;
 using Monod.Utils.Collections;
 using Monod.Utils.General;
 using Serilog;
@@ -9,7 +12,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Text.Json;
-using Monod.LogModule;
 
 namespace Monod.ModsModule;
 
@@ -47,7 +49,7 @@ public static class ModManager
     public static ReaderWriterLockSlim ModsLock = new();
 
     //Serialized
-    public static HashSet<string> EnabledMods = ["Correct Manifest", "Library", "User"];
+    public static HashSet<string> EnabledMods = ["Correct Manifest", "User", "Library"];
     //Serialized
     public static ConcurrentDictionary<string, string> ModNameToDirCache = new();
 
@@ -319,9 +321,38 @@ public static class ModManager
         EnqueueLoadAllMods();
     }
 
-    public static void UnloadMod(string modName)
+    public static void DisableMod(string modName)
     {
-        //remove all references, GC.Collect, unload assembly, unapply patches, remove asset manager, etc.
+        ArgumentNullException.ThrowIfNull(modName);
+
+        if (!TryGetMod(modName, out var mod))
+            Guard.ArgumentException($"Tried to disable mod \"{modName}\", but it was not found");
+
+        if (mod is null)
+            Guard.InvalidOperationException($"Tried to disable mod \"{modName}\", but the mod is null");
+        DisableMod(mod);
+    }
+
+    public static void DisableMod(Mod mod)
+    {
+        mod.Status = ModStatus.Unloading;
+
+        mod.Listener?.Unload();
+        mod.Listener = null;
+
+        mod.HarmonyInstance?.UnpatchSelf();
+        mod.HarmonyInstance = null;
+
+        UnloadModAssembly(mod);
+
+        if (mod.Assets is not null)
+            Assets.UnRegisterAssetsManager(mod.Assets);
+        mod.Assets = null;
+
+        mod.LoggerInstance = null;
+
+        mod.Status = ModStatus.Disabled;
+        Logger.Information("Disabled mod: {ModName}", mod.GetName());
     }
 
     public static void ReloadModAssembly(Mod mod)
@@ -332,14 +363,30 @@ public static class ModManager
 
     public static void UnloadModAssembly(Mod mod)
     {
-        mod.AssemblyContext?.Unload();
+        ModAssemblyLoadContext? loadContext = mod.AssemblyContext;
+        if (loadContext is not null)
+        {
+            if (loadContext.MainAssembly is null) return;
+            WeakReference<Assembly> weakRef = new(loadContext.MainAssembly);
+
+            for (int i = 0; i < 5; i++)
+            {
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                if (!loadContext.Assemblies.Any())
+                    break;
+            }
+
+            Guard.Exception($"Failed to unload assembly of mod \"{mod.GetName()}. Verify that the mod does required cleanup in ModListener.Unload, does not keep references to classes of types from mod's assembly anywhere, and doesn't run any background tasks.\"");
+        }
+
     }
 
     public static void LoadModAssembly(Mod mod)
     {
-        ModManifest config = mod.Manifest;
-        if (string.IsNullOrEmpty(config.AssemblyFile)) return;
-        string dllPath = Path.Join(mod.Directory, config.AssemblyFile);
+        ModManifest manifest = mod.Manifest;
+        if (string.IsNullOrEmpty(manifest.AssemblyFile)) return;
+        string dllPath = Path.Join(mod.Directory, manifest.AssemblyFile);
         Logger.Information("Loading assembly from {DllPath}", dllPath);
 
         ModAssemblyLoadContext? assemblyContext = mod.AssemblyContext;
@@ -388,30 +435,31 @@ public static class ModManager
 
     public static void EnqueueLoadEnabledMods()
     {
-        //run command to load enabled mods, using ModNameToDirCache, and if mod was not found, run load all mods
+        Runner.TryAddCommand(new LoadEnabledModsCommand(Runner));
     }
 
     public static void EnqueueLoadAllMods()
     {
-        Runner.EnqueueLoadAllMods();
+        Runner.TryAddCommand(new LoadAllModsCommand(Runner));
     }
 
     public static void EnqueueLoadModsFromDir(string dir)
     {
-        Runner.LoadModsFromDir(dir);
+        Runner.TryAddCommand(new LoadModsFromDirCommand(dir, Runner));
     }
 
-    public static void EnqueueToggleMods(List<Mod> toDisable, List<Mod> toEnable)
+    public static void EnqueueToggleMods(ICollection<string> toDisable, ICollection<string> toEnable)
     {
-        //run command to disable mods, then command to enable mods
+        EnqueueUnloadMods(toDisable);
+        EnqueueLoadMods(toEnable);
     }
 
-    public static void EnqueueUnloadMods(List<Mod> mods)
+    public static void EnqueueUnloadMods(ICollection<string> modNames)
     {
-        //run command that unloads each mod
+        Runner.TryAddCommand(new UnloadModsCommand(modNames, Runner));
     }
 
-    public static void EnqueueLoadMods(List<Mod> mods)
+    public static void EnqueueLoadMods(ICollection<string> modNames)
     {
         //run command that enables mods
     }
@@ -435,8 +483,28 @@ public static class ModManager
         }
     }
 
+    public static bool TryGetMod(string modName, out Mod? mod)
+    {
+        try
+        {
+            ModsLock.EnterReadLock();
+            if (Mods.TryGetValue(modName, out mod))
+                return true;
+            mod = null;
+            return false;
+        }
+        finally
+        {
+            ModsLock.ExitReadLock();
+        }
+    }
+
     private static void AddBrokenMod(BrokenMod brokenMod)
     {
         BrokenMods.Add(brokenMod);
+        if (brokenMod.Manifest?.Id.Name is not null)
+            Logger.Warning("Broken mod {ModName} : {Issue}", brokenMod.Manifest.Id.Name, brokenMod.FailureReason);
+        else
+            Logger.Warning("Broken mod at {ManifestPath}: {Issue}", brokenMod.ManifestPath, brokenMod.FailureReason);
     }
 }

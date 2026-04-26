@@ -14,16 +14,16 @@ namespace Monod.LogModule;
 public static class LogHelper
 {
     /// <summary>
-    /// <see cref="File"/> path to file where <see cref="Log"/> logs
+    /// <see cref="File"/> path to file where <see cref="Log"/> logs.
     /// </summary>
     public static readonly string LogFile = $"{AppContext.BaseDirectory}log.txt";
     /// <summary>
-    /// Allows switching minimum printed <see cref="LogEventLevel"/> (Use <see cref="SetMinimumLogLevel"/>)
+    /// Allows switching minimum printed <see cref="LogEventLevel"/> (Use <see cref="SetMinimumLogLevel"/>).
     /// </summary>
     public static LoggingLevelSwitch? LevelSwitch;
 
     /// <summary>
-    /// Initializes <see cref="Log.Logger"/>
+    /// Initializes <see cref="Log.Logger"/>.
     /// </summary>
     public static void Initialize()
     {
@@ -41,9 +41,9 @@ public static class LogHelper
     }
 
     /// <summary>
-    /// Write some information related to system (e.g. EntryAssembly.FullName, OS, SystemMemory)
+    /// Write some information related to system (e.g. EntryAssembly.FullName, OS, SystemMemory).
     /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if <see cref="Assembly.GetEntryAssembly"/> is null</exception>
+    /// <exception cref="InvalidOperationException">Thrown if <see cref="Assembly.GetEntryAssembly"/> is null.</exception>
     public static void WriteStartupInfo()
     {
         Assembly? entryAssembly = Assembly.GetEntryAssembly();
@@ -55,10 +55,10 @@ public static class LogHelper
     }
 
     /// <summary>
-    /// Switches minimum printed <see cref="LogEventLevel"/> to <paramref name="level"/>
+    /// Switches minimum printed <see cref="LogEventLevel"/> to <paramref name="level"/>.
     /// </summary>
     /// <param name="level">New minimum <see cref="LogEventLevel"/>. Messages of this level and higher will be printed to console and log.txt</param>
-    /// <exception cref="InvalidOperationException">LevelSwitch is null</exception>
+    /// <exception cref="InvalidOperationException">LevelSwitch is null.</exception>
     public static void SetMinimumLogLevel(LogEventLevel level)
     {
         if (LevelSwitch is null)
@@ -67,7 +67,7 @@ public static class LogHelper
     }
 
     /// <summary>
-    /// <see cref="AnsiConsoleTheme"/> used by ConsoleSink
+    /// <see cref="AnsiConsoleTheme"/> used by ConsoleSink.
     /// </summary>
     public static AnsiConsoleTheme ConsoleTheme { get; } = new(
     new Dictionary<ConsoleThemeStyle, string>
@@ -94,6 +94,6 @@ public static class LogHelper
     /// Create a new <see cref="ILogger"/> for the specified module.
     /// </summary>
     /// <param name="moduleName">Name of the module.</param>
-    /// <returns>A new <see cref="ILogged"/>.</returns>
+    /// <returns>A new <see cref="ILogger"/>.</returns>
     public static ILogger ForModule(string moduleName) => Log.ForContext("Module", moduleName);
 }

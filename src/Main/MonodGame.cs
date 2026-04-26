@@ -60,7 +60,7 @@ public abstract class MonodGame : Game
 
         base.Initialize();
 
-        ModManager.EnqueueLoadAllMods();
+        ModManager.EnqueueLoadEnabledMods();
     }
 
     /// <inheritdoc/>

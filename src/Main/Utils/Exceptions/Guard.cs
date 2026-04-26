@@ -18,6 +18,7 @@ public static class Guard
     /// Throw a new <see cref="ArgumentException"/> with message: "Key already exists: '{key}'".
     /// </summary>
     /// <param name="key">Key that already exists in a given array/dictionary/etc.</param>
+    [DoesNotReturn]
     public static void DuplicateKeyException(object key) => throw new ArgumentException($"Key already exists: '{key}'.");
 
     /// <summary>
@@ -26,4 +27,13 @@ public static class Guard
     /// <param name="message">Message that is passed to <see cref="System.InvalidOperationException"/>.</param>
     [DoesNotReturn]
     public static void InvalidOperationException(string message) => throw new InvalidOperationException(message);
+
+    [DoesNotReturn]
+    public static void ArgumentException(string message) => throw new ArgumentException(message);
+
+    [DoesNotReturn]
+    public static void ArgumentException(string message, string paramName) => throw new ArgumentException(message, paramName);
+
+    [DoesNotReturn]
+    public static void Exception(string message) => throw new Exception(message);
 }

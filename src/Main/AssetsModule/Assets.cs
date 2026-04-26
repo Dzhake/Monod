@@ -1,4 +1,5 @@
 ﻿using Monod.AssetsModule.Commands;
+using Monod.AssetsModule.Exceptions;
 using Monod.AssetsModule.Utils;
 using Monod.LogModule;
 using Monod.Shared.Collections;
@@ -246,7 +247,14 @@ public static class Assets
     public static T Get<T>(string fullPath)
     {
         SplitPath(fullPath, out var prefix, out var relativePath);
-        return GetManager(prefix.ToString()).Get<T>(relativePath.ToString());
+        string prefixString = prefix.ToString();
+        AssetManager? manager = GetManager(prefixString);
+        if (manager is null)
+        {
+            AssetManagerNotFoundException.Throw(prefixString);
+            return default!;
+        }
+        return manager.Get<T>(relativePath.ToString());
     }
 
     /// <summary>
@@ -260,7 +268,9 @@ public static class Assets
     public static T? GetOrDefault<T>(string fullPath)
     {
         SplitPath(fullPath, out var prefix, out var relativePath);
-        return GetManager(prefix.ToString()).GetOrDefault<T>(relativePath.ToString());
+        AssetManager? manager = GetManager(prefix.ToString());
+        if (manager is null) return default;
+        return manager.GetOrDefault<T>(relativePath.ToString());
     }
 
     /// <summary>
@@ -270,10 +280,13 @@ public static class Assets
     /// <returns>Manager with the specified name in <see cref="Managers"/>.</returns>
     /// <exception cref="ArgumentException">Could not find asset manager with the specified prefix.</exception>
     [Pure]
-    public static AssetManager GetManager(string prefix)
+    public static AssetManager? GetManager(string prefix)
     {
         if (!Managers.TryGetValue(prefix, out AssetManager? manager))
-            throw new ArgumentException("Could not find asset manager with the specified prefix. Check that the asset manager was registered and that the prefix is correct.", nameof(prefix));
+        {
+            return null;
+            //Guard.ArgumentException("Could not find asset manager with the specified prefix. Check that the asset manager was registered and that the prefix is correct.", nameof(prefix));
+        }
         return manager;
     }
 

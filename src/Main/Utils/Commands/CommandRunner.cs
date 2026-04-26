@@ -38,7 +38,7 @@ public class CommandRunner<T> where T : Command
     /// Add the <paramref name="command"/> to the <see cref="Commands"/>, or run it, if <see cref="LoadingInactive"/> is <see langword="true"/>.
     /// </summary>
     /// <param name="command">Command to add.</param>
-    protected virtual void TryAddCommand(T command)
+    public virtual void TryAddCommand(T command)
     {
         try
         {
