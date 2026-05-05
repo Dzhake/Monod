@@ -1,12 +1,13 @@
 using Monod.Shared.Exceptions;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
-namespace Monod.Shared.Enums;
+namespace Monod.Utils.Enums;
 
 /// <summary>
 /// Extensible "enum"-like, where each value is associated with a <see cref="string"/> "name" for it. Provides methods for adding new values, and retrieving registered values by their name or names by associated values.
 /// </summary>
-public class NamedExtEnum
+public sealed class ExtEnumInfo<TValue> where TValue : struct
 {
     /// <summary>
     /// List of registered names, where index is a value, and the value (object) in the list is value's name.
@@ -16,7 +17,7 @@ public class NamedExtEnum
     /// <summary>
     /// Dictionary of registered values, where key is value's name, and the value in the dictionary is the value.
     /// </summary>
-    private readonly Dictionary<string, int> Values;
+    private readonly Dictionary<string, TValue> Values;
 
     /// <summary>
     /// Readonly list of all names stored in this enum. Useful for iterating over names/debug purposes.
@@ -28,24 +29,35 @@ public class NamedExtEnum
     /// </summary>
     public int MaxValue => InternalNames.Count;
 
-    /// <summary>
-    /// Initialize a new instance of the <see cref="NamedExtEnum"/> with default values.
-    /// </summary>
-    public NamedExtEnum()
+    private void VerifyGenericType()
     {
+        int size = Unsafe.SizeOf<TValue>();
+        if (size != sizeof(int))
+        {
+            Guard.Exception($"Tried to create ExtEnumInfo with generic type param of size {size}, but size of {sizeof(int)} is needed. Don't use ExtEnumInfo for generics of size not equal to int size.");
+        }
+    }
+
+    /// <summary>
+    /// Initialize a new instance of the <see cref="ExtEnumInfo{TValue}"/> with default values.
+    /// </summary>
+    public ExtEnumInfo()
+    {
+        VerifyGenericType();
         InternalNames = new();
         Values = new(StringComparer.Ordinal);
     }
 
     /// <summary>
-    /// Initialize a new instance of the <see cref="NamedExtEnum"/> with the specified <paramref name="names"/>.
+    /// Initialize a new instance of the <see cref="ExtEnumInfo{TValue}"/> with the specified <paramref name="names"/>.
     /// </summary>
     /// <param name="names">List of names the enum should start with. Same as using <see cref="AddOrGetValue"/> for each value specified in the list, but more performant.</param>
-    public NamedExtEnum(List<string> names)
+    public ExtEnumInfo(List<string> names)
     {
+        VerifyGenericType();
         InternalNames = names;
         Values = new(StringComparer.Ordinal);
-        for (int i = 0; i < names.Count; i++) Values.Add(names[i], i);
+        for (int i = 0; i < names.Count; i++) Values.Add(names[i], Unsafe.As<int, TValue>(ref i));
     }
 
     /// <summary>
@@ -53,14 +65,15 @@ public class NamedExtEnum
     /// </summary>
     /// <param name="name">Name of the new value. Must be unique for this value.</param>
     /// <returns>Value associated with the name.</returns>
-    public int AddOrGetValue(string name)
+    public TValue AddOrGetValue(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (Values.TryGetValue(name, out int existingValue))
+        if (Values.TryGetValue(name, out TValue existingValue))
             return existingValue;
 
-        int value = InternalNames.Count;
+        int count = InternalNames.Count;
+        TValue value = Unsafe.As<int, TValue>(ref count);
         InternalNames.Add(name);
         Values[name] = value;
         return value;
@@ -71,15 +84,15 @@ public class NamedExtEnum
     /// </summary>
     /// <param name="name">Name, that was used when registering the value.</param>
     /// <returns>Value associated with the specified name.</returns>
-    public int GetValue(string name)
+    public TValue GetValue(string name)
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (Values.TryGetValue(name, out int value))
+        if (Values.TryGetValue(name, out TValue value))
             return value;
 
         Guard.KeyNotFoundException(name);
-        return 0; // unreachable
+        return default; // unreachable
     }
 
     /// <summary>
@@ -88,7 +101,7 @@ public class NamedExtEnum
     /// <param name="name">The name of the value to get.</param>
     /// <param name="value">When this method returns, contains the value associated with the specified name, if the name is found; otherwise, the default value for the type of the value parameter. This parameter is passed uninitialized.</param>
     /// <returns>Whether the value was found.</returns>
-    public bool TryGetValue(string name, out int value)
+    public bool TryGetValue(string name, out TValue value)
     {
         ArgumentNullException.ThrowIfNull(name);
         return Values.TryGetValue(name, out value);
@@ -108,6 +121,16 @@ public class NamedExtEnum
     }
 
     /// <summary>
+    /// Get the name associated with the specified value.
+    /// </summary>
+    /// <param name="value">The value of the name to get.</param>
+    /// <returns>Name associated with the specified value.</returns>
+    public string GetName(TValue value)
+    {
+        return GetName(Unsafe.As<TValue, int>(ref value));
+    }
+
+    /// <summary>
     /// Get the name associated with the specified value in a error-safe way.
     /// </summary>
     /// <param name="value">The value of the name to get.</param>
@@ -123,5 +146,16 @@ public class NamedExtEnum
 
         name = null;
         return false;
+    }
+
+    /// <summary>
+    /// Get the name associated with the specified value in a error-safe way.
+    /// </summary>
+    /// <param name="value">The value of the name to get.</param>
+    /// <param name="name">Name associated with the specified value, or null if it was not found.</param>
+    /// <returns>Whether the name was found.</returns>
+    public bool TryGetName(TValue value, [NotNullWhen(true)] out string? name)
+    {
+        return TryGetName(Unsafe.As<TValue, int>(ref value), out name);
     }
 }

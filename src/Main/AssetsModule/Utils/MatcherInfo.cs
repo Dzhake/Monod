@@ -15,14 +15,14 @@ public readonly struct MatcherInfo : IEquatable<MatcherInfo>
     /// <summary>
     /// Properties that asset should use if it matches the <see cref="PathMatcher"/>.
     /// </summary>
-    public readonly Dictionary<int, object> Properties;
+    public readonly Dictionary<AssetProp, object> Properties;
 
     /// <summary>
     /// Initialize a new <see cref="MatcherInfo"/> with the specific <see cref="PathMatcher"/> and <see cref="Properties"/>.
     /// </summary>
     /// <param name="pathMatcher">Path matcher, if matched by asset's path, then asset should use <see cref="Properties"/>.</param>
     /// <param name="properties">Properties that asset should use if it matches the <see cref="PathMatcher"/>.</param>
-    public MatcherInfo(Matcher pathMatcher, Dictionary<int, object> properties)
+    public MatcherInfo(Matcher pathMatcher, Dictionary<AssetProp, object> properties)
     {
         PathMatcher = pathMatcher;
         Properties = properties;

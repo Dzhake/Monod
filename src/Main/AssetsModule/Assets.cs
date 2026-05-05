@@ -83,6 +83,7 @@ public static class Assets
     /// </summary>
     public static void Initialize()
     {
+        AssetProps.Initialize();
         DefaultParsers.AddRange([
             new(AssetType.Binary, AssetParsers.Binary),
             new(AssetType.Text, AssetParsers.Text),

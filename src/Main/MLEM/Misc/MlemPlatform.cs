@@ -67,7 +67,7 @@ namespace MLEM.Misc {
         /// This platform uses the built-in MonoGame TextInput event, which makes this listener work with any keyboard localization natively.
         /// This platform is initialized as follows:
         /// <code>
-        /// MlemPlatform.Current = new MlemPlatform.DesktopGl&lt;TextInputEventArgs&gt;((w, c) => w.TextInput += c);
+        /// MlemPlatform.CurrentValue = new MlemPlatform.DesktopGl&lt;TextInputEventArgs&gt;((w, c) => w.TextInput += c);
         /// </code>
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -114,7 +114,7 @@ namespace MLEM.Misc {
         /// This platform uses the built-in FNA TextInputEXT event, which makes this listener work with any keyboard localization natively.
         /// This platform is initialized as follows:
         /// <code>
-        /// MlemPlatform.Current = new MlemPlatform.DesktopFna(a => TextInputEXT.TextInput += a);
+        /// MlemPlatform.CurrentValue = new MlemPlatform.DesktopFna(a => TextInputEXT.TextInput += a);
         /// </code>
         /// </summary>
         public class DesktopFna : MlemPlatform {
@@ -153,7 +153,7 @@ namespace MLEM.Misc {
         /// Additionally, it starts a new activity whenever <see cref="OpenLinkOrFile"/> is called.
         /// This listener is initialized as follows in the game's <c>Activity</c> class:
         /// <code>
-        /// MlemPlatform.Current = new MlemPlatform.Mobile(KeyboardInput.Show, l =&gt; this.StartActivity(new Intent(Intent.ActionView, Uri.Parse(l))));
+        /// MlemPlatform.CurrentValue = new MlemPlatform.Mobile(KeyboardInput.Show, l =&gt; this.StartActivity(new Intent(Intent.ActionView, Uri.Parse(l))));
         /// </code>
         /// </summary>
         public class Mobile : MlemPlatform {

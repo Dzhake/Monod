@@ -1,3 +1,5 @@
+using Monod.SaveModule;
+
 namespace Monod.ModsModule;
 
 /// <summary>
@@ -14,6 +16,8 @@ public abstract class ModListener
     /// Whether <see cref="PostInitialized"/> was called for this listener. Used to determine whether to call <see cref="PostInitialized"/>.
     /// </summary>
     public bool PostInitialized;
+
+    public ISaveDataProvider? SaveDataProvider;
 
     /// <summary>
     /// Called when mod's assembly is loaded.

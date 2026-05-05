@@ -34,7 +34,7 @@ public readonly struct AssetStream : IEquatable<AssetStream>, IDisposable
     /// <param name="propertiesArray">Properties of <see cref="MatcherInfo"/>s that asset's path matched to.</param>
     /// <param name="path">Path of the asset.</param>
     /// <returns>A new <see cref="AssetInfo"/> with same <see cref="Stream"/> and <see cref="Type"/> and the specified <paramref name="propertiesArray"/>.</returns>
-    public AssetInfo ToInfo(Dictionary<int, object>[] propertiesArray, string path) => new AssetInfo(Stream, Type, propertiesArray, path);
+    public AssetInfo ToInfo(Dictionary<AssetProp, object>[] propertiesArray, string path) => new AssetInfo(Stream, Type, propertiesArray, path);
 
     /// <inheritdoc />
     public bool Equals(AssetStream other) => Stream.Equals(other.Stream);

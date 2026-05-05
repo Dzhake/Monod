@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Monod.ModsModule.Exceptions;
 
-public class ModListenerCountException : Exception
+public class ExternalModCountException : Exception
 {
 
     public readonly string Issue;
@@ -18,7 +18,7 @@ public class ModListenerCountException : Exception
 
     public Assembly assembly;
 
-    public ModListenerCountException(string issue, int count, Assembly assembly)
+    public ExternalModCountException(string issue, int count, Assembly assembly)
     {
         Issue = issue;
         Count = count;
@@ -26,5 +26,5 @@ public class ModListenerCountException : Exception
     }
 
     [DoesNotReturn]
-    public static void Throw(string issue, int count, Assembly assembly) => throw new ModListenerCountException(issue, count, assembly);
+    public static void Throw(string issue, int count, Assembly assembly) => throw new ExternalModCountException(issue, count, assembly);
 }

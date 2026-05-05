@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monod.LogModule;
-using Monod.Shared.Enums;
 using Monod.Shared.Extensions;
 using Serilog;
 using System.Diagnostics.Contracts;
@@ -45,7 +44,7 @@ public static class Input
     public static InputSettings GlobalSettings = new();
 
     /// <summary>
-    /// Current state of the input devices.
+    /// CurrentValue state of the input devices.
     /// </summary>
     public static InputState CurState = new();
 
@@ -59,11 +58,6 @@ public static class Input
     /// </summary>
     public static KeyMap DefaultMap = new();
 
-    /// <summary>
-    /// Enum of all possible actions, to be used with <see cref="KeyMap"/>, to have a way to globally define an action (for serialization/getting input action for the given player by name).
-    /// </summary>
-    public static NamedExtEnum ActionNames = new();
-
     public static HashSet<Key> KeyboardKeysPressed = new();
     public static HashSet<Key> KeyboardKeysReleased = new();
     public static HashSet<Key>?[] GamepadKeyUps;
@@ -73,7 +67,7 @@ public static class Input
     /// <summary>
     /// Call in the <see cref="Game.Initialize"/>.
     /// </summary>
-    /// <param name="game">Current game.</param>
+    /// <param name="game">CurrentValue game.</param>
     public static void Initialize(Game game)
     {
         KeyString = new StringBuilder();
@@ -310,7 +304,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
     /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
-    public static bool ActionDown(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Down();
+    public static bool ActionDown(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Down();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is up this frame.
@@ -319,7 +313,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
     /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
-    public static bool ActionUp(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Up();
+    public static bool ActionUp(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Up();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is pressed this frame.
@@ -328,7 +322,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
     /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
-    public static bool ActionPressed(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Pressed();
+    public static bool ActionPressed(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Pressed();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is released this frame.
@@ -337,7 +331,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
     /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
-    public static bool ActionReleased(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Released();
+    public static bool ActionReleased(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Released();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is held this frame.
@@ -346,7 +340,7 @@ public static class Input
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
     /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
-    public static bool ActionHeld(int actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Held();
+    public static bool ActionHeld(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Held();
 
 
 

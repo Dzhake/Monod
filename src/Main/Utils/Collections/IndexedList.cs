@@ -292,7 +292,7 @@ public class IndexedList<T> : ICollection<T>
     protected sealed class IndexedListEnumerator(T?[] array) : IEnumerator<T>
     {
         /// <summary>
-        /// Current index of enumerator.
+        /// CurrentValue index of enumerator.
         /// </summary>
         private int index = -1;
 

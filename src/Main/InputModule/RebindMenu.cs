@@ -17,7 +17,7 @@ public class RebindMenu
     /// </summary>
     public float timeout;
     public bool bindingActive;
-    public int actionToBind;
+    public InputActionIndex actionToBind;
 
     public RebindMenu(UiSystem system)
     {
@@ -33,9 +33,10 @@ public class RebindMenu
         float windowWidth = Renderer.Window.ClientBounds.Width;
         float windowHeight = Renderer.Window.ClientBounds.Height;
 
-        foreach ((int actionIndex, InputAction action) in Input.Players[playerIndex].Map)
+
+        foreach ((InputActionIndex actionIndex, InputAction action) in Input.Players[playerIndex].Map)
         {
-            string actionName = Input.ActionNames.GetName(actionIndex);
+            string actionName = InputActionIndex.Info.GetName(actionIndex);
             Paragraph label = new(Anchor.AutoLeft, 1, actionName, true);
             Root.AddChild(label);
             Group actionsGroup = new(Anchor.AutoCenter, new(1, 1));
@@ -51,7 +52,7 @@ public class RebindMenu
         }
     }
 
-    private Button KeybindButton(int actionIndex, InputAction action, int keybindIndex)
+    private Button KeybindButton(InputActionIndex actionIndex, InputAction action, int keybindIndex)
     {
         var button = BasicButton();
         button.OnPressed += _ =>
@@ -85,7 +86,7 @@ public class RebindMenu
         return button;
     }
 
-    private Button AddBindButton(int actionIndex)
+    private Button AddBindButton(InputActionIndex actionIndex)
     {
         Button button = BasicButton();
         button.AddChild(new Paragraph(Anchor.Center, 1, element => GetAddBindButtonText(actionIndex), true));
@@ -94,7 +95,7 @@ public class RebindMenu
         return button;
     }
 
-    private string GetAddBindButtonText(int actionIndex)
+    private string GetAddBindButtonText(InputActionIndex actionIndex)
     {
         if (actionIndex == actionToBind && bindingActive) return Locale.Get("Waiting for input");
         return "+";
@@ -131,7 +132,7 @@ public class RebindMenu
         }
     }
 
-    private void StartBinding(int actionIndex)
+    private void StartBinding(InputActionIndex actionIndex)
     {
         actionToBind = actionIndex;
         timeout = 0.2f;
@@ -142,7 +143,7 @@ public class RebindMenu
     {
         bindingActive = false;
         timeout = 0;
-        actionToBind = -1;
+        actionToBind = (InputActionIndex)(-1);
     }
 
     private void BindKey(Key keyToBind)
@@ -166,7 +167,7 @@ public class RebindMenu
         keybinds.Add(keybind);
     }
 
-    private void RemoveDuplicates(int actionIndex)
+    private void RemoveDuplicates(InputActionIndex actionIndex)
     {
         InputAction action = Input.Players[playerIndex].Map[actionIndex];
         action.Keybinds = action.Keybinds.ToHashSet().ToList();

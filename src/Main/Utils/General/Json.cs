@@ -10,7 +10,7 @@ public static class Json
     /// <summary>
     /// Common <see cref="JsonSerializerOptions"/> for use when you [de]serialize with <see cref="JsonSerializer"/>.
     /// </summary>
-    public static readonly JsonSerializerOptions SCommon = new() { AllowTrailingCommas = true };
+    public static readonly JsonSerializerOptions SCommon = new() { AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
 
     /// <summary>
     /// <see cref="SCommon"/> for cases when you want to write clean and readable JSON.
@@ -25,7 +25,7 @@ public static class Json
 
 
     /// <summary>
-    /// Common <see cref="JsonSerializerOptions"/> for use when you [de]serialize with <see cref="JsonSerializer"/>.
+    /// Common <see cref="JsonDocumentOptions"/> for use when you parse with <see cref="JsonDocument"/>.
     /// </summary>
-    public static readonly JsonDocumentOptions DCommon = new() { AllowTrailingCommas = true };
+    public static readonly JsonDocumentOptions DCommon = new() { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip };
 }

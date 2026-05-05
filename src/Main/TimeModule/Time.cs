@@ -44,7 +44,7 @@ public static class Time
     public static TimeSpan TotalTime;
 
     /// <summary>
-    /// Current time scale.
+    /// CurrentValue time scale.
     /// </summary>
     public static float TimeScale = 1;
 

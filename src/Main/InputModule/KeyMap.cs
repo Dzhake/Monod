@@ -6,7 +6,7 @@ namespace Monod.InputModule;
 /// 
 /// </summary>
 [JsonConverter(typeof(KeyMapConverter))]
-public sealed class KeyMap : Dictionary<int, InputAction>
+public sealed class KeyMap : Dictionary<InputActionIndex, InputAction>
 {
     public void Update(InputState state, int playerIndex)
     {

@@ -16,7 +16,7 @@ public abstract class Command
     public abstract int TotalProgress { get; }
 
     /// <summary>
-    /// Current amount of progress this command has done. Used for progress bars.
+    /// CurrentValue amount of progress this command has done. Used for progress bars.
     /// </summary>
     public abstract int CurrentProgress { get; }
 

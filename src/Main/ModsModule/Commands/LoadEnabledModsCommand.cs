@@ -14,7 +14,7 @@ public class LoadEnabledModsCommand(ModManagerCommandRunner runner) : ModManager
     public async override Task Run()
     {
         List<string> manifestPaths = [];
-        foreach (string modName in ModManager.EnabledMods)
+        foreach (string modName in ModManager.EnabledMods.CurrentValue)
         {
             string? dir = ModManager.FindModDir(modName);
             if (dir == null)

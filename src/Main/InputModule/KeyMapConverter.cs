@@ -20,7 +20,7 @@ public class KeyMapConverter : JsonConverter<KeyMap>
             foreach ((string actionName, List<Keybind> keybinds) in deserializedDict)
             {
                 // If name is not found, then create it, to keep the value in case the mod is unloaded or something like that.
-                int value = Input.ActionNames.AddOrGetValue(actionName);
+                InputActionIndex value = InputActionIndex.Info.AddOrGetValue(actionName);
                 map[value] = new(keybinds);
             }
         }
@@ -33,9 +33,9 @@ public class KeyMapConverter : JsonConverter<KeyMap>
     {
         var dict = new Dictionary<string, List<Keybind>>();
 
-        foreach ((int actionIndex, InputAction action) in value)
+        foreach ((InputActionIndex actionIndex, InputAction action) in value)
         {
-            if (Input.ActionNames.TryGetName(actionIndex, out string? name) && name != null)
+            if (InputActionIndex.Info.TryGetName(actionIndex, out string? name) && name != null)
                 dict[name] = action.Keybinds;
         }
 

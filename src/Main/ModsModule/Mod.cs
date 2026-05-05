@@ -12,7 +12,7 @@ namespace Monod.ModsModule;
 public sealed class Mod
 {
     /// <summary>
-    /// Current status of the mod.
+    /// CurrentValue status of the mod.
     /// </summary>
     public ModStatus Status = ModStatus.Enabled;
 
@@ -54,7 +54,7 @@ public sealed class Mod
     /// <summary>
     /// Listener for the mod, which contains virtual methods called by <see cref="ModManager"/>.
     /// </summary>
-    public ModListener? Listener;
+    public ModListener? ExternalMod;
 
     /// <summary>
     /// Ties <paramref name="config"/> with <see cref="Mod"/>, and sets <see cref="LoggerInstance"/> and <see cref="HarmonyInstance"/> based on <paramref name="config"/>.

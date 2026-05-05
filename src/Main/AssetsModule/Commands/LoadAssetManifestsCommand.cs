@@ -72,11 +72,11 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
 
         foreach (JsonProperty match in document.RootElement.EnumerateObject())
         {
-            var properties = new Dictionary<int, object>();
+            var properties = new Dictionary<AssetProp, object>();
 
             foreach (JsonProperty inner in match.Value.EnumerateObject())
             {
-                int id = AssetProps.NameToId(inner.Name);
+                AssetProp id = AssetProp.Info.GetValue(inner.Name);
                 properties[id] = AssetProps.ParseAssetProp(inner.Value.GetRawText(), id);
             }
 

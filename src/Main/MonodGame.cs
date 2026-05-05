@@ -11,6 +11,7 @@ using Monod.Graphics.Fonts;
 using Monod.InputModule;
 using Monod.Localization;
 using Monod.ModsModule;
+using Monod.SaveModule;
 using Monod.TimeModule;
 using Monod.Utils.General;
 using System.Globalization;
@@ -60,6 +61,7 @@ public abstract class MonodGame : Game
 
         base.Initialize();
 
+        SaveManager.Load(SaveType.Settings, SaveManager.SavesLocation);
         ModManager.EnqueueLoadEnabledMods();
     }
 

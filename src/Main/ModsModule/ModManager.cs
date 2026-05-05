@@ -4,6 +4,8 @@ using Monod.LogModule;
 using Monod.ModsModule.Commands;
 using Monod.ModsModule.Exceptions;
 using Monod.ModsModule.ModdingOld;
+using Monod.SaveModule;
+using Monod.SaveModule.FilePreset;
 using Monod.Shared.Exceptions;
 using Monod.Utils.Collections;
 using Monod.Utils.General;
@@ -32,6 +34,7 @@ public static class ModManager
         }
     }
 
+    public static readonly string MOD_MANIFEST_FILENAME = "manifest.json";
     public static readonly string RELATIVE_MODS_DIR = Path.Join(AppContext.BaseDirectory, "Mods");
 
     public static ILogger Logger = LogHelper.ForModule("Mods");
@@ -49,7 +52,7 @@ public static class ModManager
     public static ReaderWriterLockSlim ModsLock = new();
 
     //Serialized
-    public static HashSet<string> EnabledMods = ["Correct Manifest", "User", "Library"];
+    public static FilePreset<HashSet<string>> EnabledMods;
     //Serialized
     public static ConcurrentDictionary<string, string> ModNameToDirCache = new();
 
@@ -62,7 +65,21 @@ public static class ModManager
     public static int FinishedTasksThisCommand;
     public static int TotalTasksThisCommand;
 
+    public static void LoadSettings(string dir)
+    {
+        string subDir = Path.Combine(dir, "ModManager");
+        string enabledModsDir = Path.Combine(subDir, "EnabledMods");
+        EnabledMods = new(enabledModsDir);
+        EnabledMods.LoadAll();
+        SaveManager.ReadJson<ConcurrentDictionary<string, string>>(Path.Combine(subDir, nameof(ModNameToDirCache)));
+    }
 
+    public static void SaveSettings(string dir)
+    {
+        string subDir = Path.Combine(dir, "ModManager");
+        Directory.CreateDirectory(subDir);
+        SaveManager.WriteJson(ModNameToDirCache, Path.Combine(subDir, nameof(ModNameToDirCache)));
+    }
 
     public static async Task LoadModsAsync(List<string> manifestPaths)
     {
@@ -144,6 +161,12 @@ public static class ModManager
         }
     }
 
+    /// <summary>
+    /// Check whether mod with the given <paramref name="modName"/> is enabled, and it's version is within the range of <paramref name="acceptedVersions"/>.
+    /// </summary>
+    /// <param name="modName">Name of the mod.</param>
+    /// <param name="acceptedVersions">Range of accepted versions. If mod's version doesn't fall in the range the result will be <see langword="false"/>.</param>
+    /// <returns>Whether mod with the given <paramref name="modName"/> is enabled, and it's version is within the range of <paramref name="acceptedVersions"/>.</returns>
     private static bool IsModEnabled(string modName, VersionRange? acceptedVersions = null)
     {
         try
@@ -159,7 +182,7 @@ public static class ModManager
 
     private static async Task LoadModFromManifestAsync(ModManifest manifest, string modDir, ObservableDict<string, ModLoadInfo> tasks)
     {
-        if (!EnabledMods.Contains(manifest.Id.Name))
+        if (!EnabledMods.CurrentValue.Contains(manifest.Id.Name))
         {
             AddDisabledMod(manifest, modDir);
             Interlocked.Increment(ref FinishedTasksThisCommand);
@@ -168,10 +191,10 @@ public static class ModManager
 
         bool depsSatisfied = await WaitUntilDepsLoaded(manifest, tasks);
 
-        if (EnabledMods.Contains(manifest.Id.Name) && depsSatisfied)
+        if (EnabledMods.CurrentValue.Contains(manifest.Id.Name) && depsSatisfied)
         {
             Mod mod = CreateModFromManifest(manifest, modDir);
-            EnableMod(mod);
+            LoadMod(mod);
             Logger.Information("Loaded mod: {ModName}", mod.GetName());
             AddModToDict(mod);
         }
@@ -188,7 +211,7 @@ public static class ModManager
         {
             foreach (ModDep dep in manifest.Deps)
             {
-                if (!EnabledMods.Contains(dep.Name))
+                if (!EnabledMods.CurrentValue.Contains(dep.Name))
                     return false;
 
                 if (IsModEnabled(dep.Name, dep.Versions))
@@ -212,13 +235,18 @@ public static class ModManager
         AddModToDict(disabledMod);
     }
 
-    public static void EnableMod(Mod mod)
+    public static void LoadMod(Mod mod)
     {
         mod.Status = ModStatus.Loading;
         LoadModData(mod);
         mod.Status = ModStatus.Enabled;
     }
 
+    /// <summary>
+    /// Load mod manifest at the <paramref name="manifestPath"/> asynchronously.
+    /// </summary>
+    /// <param name="manifestPath">File path of the mod manifest.</param>
+    /// <returns>Loaded manifest, or <see langword="null"/> if manifest failed to load.</returns>
     public static async Task<ModManifest?> LoadManifestAsync(string manifestPath)
     {
         if (!File.Exists(manifestPath))
@@ -229,7 +257,7 @@ public static class ModManager
 
         try
         {
-            using FileStream manifestStream = File.OpenRead(manifestPath);
+            await using FileStream manifestStream = File.OpenRead(manifestPath);
             ModManifest? result = await JsonSerializer.DeserializeAsync<ModManifest>(manifestStream, Json.SCommon);
             if (result is null)
             {
@@ -285,7 +313,7 @@ public static class ModManager
     /// <param name="modDir">Directory, where manifest is located.</param>
     /// <returns>File path of "manifestPath.json".</returns>
     [Pure]
-    public static string GetModManifestPath(string modDir) => Path.Join(modDir, "manifest.json");
+    public static string GetModManifestPath(string modDir) => Path.Join(modDir, MOD_MANIFEST_FILENAME);
 
     /// <summary>
     /// Get directory path for the specified <paramref name="modDir"/>.
@@ -330,15 +358,15 @@ public static class ModManager
 
         if (mod is null)
             Guard.InvalidOperationException($"Tried to disable mod \"{modName}\", but the mod is null");
-        DisableMod(mod);
+        UnloadMod(mod);
     }
 
-    public static void DisableMod(Mod mod)
+    public static void UnloadMod(Mod mod)
     {
         mod.Status = ModStatus.Unloading;
 
-        mod.Listener?.Unload();
-        mod.Listener = null;
+        mod.ExternalMod?.Unload();
+        mod.ExternalMod = null;
 
         mod.HarmonyInstance?.UnpatchSelf();
         mod.HarmonyInstance = null;
@@ -399,9 +427,9 @@ public static class ModManager
         }
         assemblyContext.MainAssembly = LoadAssembly(assemblyContext, dllPath); ;
         mod.AssemblyContext = assemblyContext;
-        mod.Listener = ReflectionUtils.CreateInstance<ModListener>(FindModListenerType(assemblyContext.MainAssembly));
-        mod.Listener.mod = mod;
-        mod.Listener.Initialize();
+        mod.ExternalMod = ReflectionUtils.CreateInstance<ModListener>(FindModListenerType(assemblyContext.MainAssembly));
+        mod.ExternalMod.mod = mod;
+        mod.ExternalMod.Initialize();
     }
 
     /// <summary>
@@ -415,10 +443,10 @@ public static class ModManager
         switch (modTypes.Length)
         {
             case 0:
-                ModListenerCountException.Throw($"Subclass of ModListener not found in {assembly.FullName}", 0, assembly);
+                ExternalModCountException.Throw($"Subclass of ModListener not found in {assembly.FullName}", 0, assembly);
                 return null;
             case > 1:
-                ModListenerCountException.Throw($"Found more than one subclass of ModListener in {assembly.FullName}", modTypes.Length, assembly);
+                ExternalModCountException.Throw($"Found more than one subclass of ModListener in {assembly.FullName}", modTypes.Length, assembly);
                 return null;
             default:
                 return modTypes[0];

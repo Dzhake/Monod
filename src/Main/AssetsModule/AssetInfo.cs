@@ -21,7 +21,7 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     /// <summary>
     /// Properties of <see cref="MatcherInfo"/>s that asset's path matched to. Use <see cref="GetProperty"/> to get a property.
     /// </summary>
-    public readonly Dictionary<int, object>[] PropertiesArray;
+    public readonly Dictionary<AssetProp, object>[] PropertiesArray;
 
     /// <summary>
     /// Path of the asset.
@@ -35,7 +35,7 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     /// <param name="type">Type of the asset.</param>
     /// <param name="propertiesArray">Properties dictionary of the asset with key being an <see cref="AssetProps"/> and the value is parsed property.</param>
     /// <param name="path">Path of the asset.</param>
-    public AssetInfo(Stream assetStream, AssetType type, Dictionary<int, object>[] propertiesArray, string path)
+    public AssetInfo(Stream assetStream, AssetType type, Dictionary<AssetProp, object>[] propertiesArray, string path)
     {
         AssetStream = assetStream;
         PropertiesArray = propertiesArray;
@@ -48,7 +48,7 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     /// </summary>
     /// <param name="id">Id of the property to get.</param>
     /// <returns>Id of the property if it was found and casted successfully, default(TEnum) otherwise</returns>
-    public T? GetProperty<T>(int id)
+    public T? GetProperty<T>(AssetProp id)
     {
         foreach (var properties in PropertiesArray)
             if (properties.TryGetValue(id, out object? property))

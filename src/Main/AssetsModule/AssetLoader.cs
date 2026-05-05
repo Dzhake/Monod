@@ -261,9 +261,9 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     /// </summary>
     /// <param name="path">Path of the asset in this <see cref="AssetManager"/>.</param>
     /// <returns>List of properties the asset at the given <paramref name="path"/> should have.</returns>
-    protected List<Dictionary<int, object>> MatchPath(string path)
+    protected List<Dictionary<AssetProp, object>> MatchPath(string path)
     {
-        List<Dictionary<int, object>> result = new();
+        List<Dictionary<AssetProp, object>> result = new();
         if (Matchers is null) return result;
         foreach (MatcherInfo matcherInfo in Matchers)
             if (matcherInfo.PathMatcher.Match(path).HasMatches) result.Add(matcherInfo.Properties);

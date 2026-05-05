@@ -1,3 +1,4 @@
+using Monod.ModsModule;
 using Monod.Utils.General;
 using Serilog;
 using System.Text.Json;
@@ -14,60 +15,56 @@ public static class SaveManager
     /// </summary>
     public static string SavesLocation = Environment.GetEnvironmentVariable("SavesDir") ?? Path.Join(AppContext.BaseDirectory, "Saves");
 
-    public static List<ISaveDataProvider> Users;
+    public static MonodSaveDataProvider MonodProvider = new();
+    public static ISaveDataProvider? VanillaProvider;
 
-    public static void Save(string dir, int type)
+    public static IEnumerable<ISaveDataProvider> GetProviders()
     {
-        List<(string name, object saveObject)> providedData = new();
+        yield return MonodProvider;
+        if (VanillaProvider is not null) yield return VanillaProvider;
+        foreach (Mod mod in ModManager.Mods.Values)
+            if (mod.ExternalMod?.SaveDataProvider is not null) yield return mod.ExternalMod.SaveDataProvider;
+    }
 
-        foreach (ISaveDataProvider saveUser in Users)
+
+    public static void Save(SaveType type, string dir)
+    {
+        foreach (ISaveDataProvider saveProvider in GetProviders())
         {
             try
             {
-                providedData.Add((saveUser.Name, saveUser.GetSaveObject(type)));
+                saveProvider.Save(type, dir);
             }
             catch (Exception exception)
             {
-                Log.Error(exception, "Failed to get save data for '{Name}' with type '{Type}': ", saveUser.Name, type);
-            }
-        }
-
-        foreach (var data in providedData)
-        {
-            string path = Path.Join(dir, data.name);
-            try
-            {
-                string text = JsonSerializer.Serialize(data.saveObject, Json.SReadable);
-                File.WriteAllTextAsync(path, text);
-            }
-            catch (Exception exception)
-            {
-                Log.Error(exception, "Failed to save file at '{Path}': ", path);
+                Log.Error(exception, "Failed to save \"{Name}\" for type \"{Type}\": ", saveProvider.Name, type);
             }
         }
     }
 
-    /// <summary>
-    /// Deserializes <see cref="File"/> at the specified <paramref name="saveLocation"/> as <typeparamref name="T"/> , and returns the deserialized value, or null if file not found.
-    /// </summary>
-    /// <param name="saveLocation"><see cref="File"/> path to the file with serialized <typeparamref name="T"/>.</param>
-    /// <typeparam name="T">Type of the serialized object.</typeparam>
-    /// <returns>Deserialized object.</returns>
-    public static T? Load<T>(string saveLocation)
+    public static void Load(SaveType type, string dir)
     {
-        if (!File.Exists(saveLocation)) return default(T);
-        string data = File.ReadAllText(saveLocation);
-        return JsonSerializer.Deserialize<T>(data, Json.SReadableWithFields);
+        foreach (ISaveDataProvider saveProvider in GetProviders())
+        {
+            try
+            {
+                saveProvider.Load(type, dir);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, "Failed to load \"{Name}\" for type \"{Type}\": ", saveProvider.Name, type);
+            }
+        }
     }
 
-    /// <summary>
-    /// Serializes <paramref name="data"/> to the <see cref="File"/> at <paramref name="saveLocation"/>.
-    /// </summary>
-    /// <param name="saveLocation"><see cref="File"/> path where to save the <paramref name="data"/>.</param>
-    /// <param name="data">Json-serializable object to save.</param>
-    /// <typeparam name="T">Type of the <paramref name="data"/>.</typeparam>
-    public static void Save<T>(string saveLocation, T data)
+    public static void WriteJson(object obj, string filePath)
     {
-        File.WriteAllText(saveLocation, JsonSerializer.Serialize(data, Json.SReadableWithFields));
+        File.WriteAllText(filePath, JsonSerializer.Serialize(obj, Json.SReadable));
+    }
+
+    public static T? ReadJson<T>(string filePath)
+    {
+        if (!File.Exists(filePath)) return default;
+        return JsonSerializer.Deserialize<T>(File.ReadAllText(filePath), Json.SCommon);
     }
 }
