@@ -54,7 +54,7 @@ public static class ModManager
     //Serialized
     public static FilePreset<HashSet<string>> EnabledMods;
     //Serialized
-    public static ConcurrentDictionary<string, string> ModNameToDirCache = new();
+    public static FileSave<ConcurrentDictionary<string, string>>? ModNameToDirCache;
 
     public static List<string> GlobalModDirs = [RELATIVE_MODS_DIR];
 
@@ -68,17 +68,24 @@ public static class ModManager
     public static void LoadSettings(string dir)
     {
         string subDir = Path.Combine(dir, "ModManager");
+
+        if (ModNameToDirCache is null)
+        {
+            string modNameCachePath = Path.Combine(subDir, Path.ChangeExtension(nameof(ModNameToDirCache), "json"));
+            ModNameToDirCache = new(modNameCachePath);
+        }
+        ModNameToDirCache.Load();
+
         string enabledModsDir = Path.Combine(subDir, "EnabledMods");
         EnabledMods = new(enabledModsDir);
         EnabledMods.LoadAll();
-        SaveManager.ReadJson<ConcurrentDictionary<string, string>>(Path.Combine(subDir, nameof(ModNameToDirCache)));
     }
 
     public static void SaveSettings(string dir)
     {
         string subDir = Path.Combine(dir, "ModManager");
         Directory.CreateDirectory(subDir);
-        SaveManager.WriteJson(ModNameToDirCache, Path.Combine(subDir, nameof(ModNameToDirCache)));
+        ModNameToDirCache?.Save();
     }
 
     public static async Task LoadModsAsync(List<string> manifestPaths)
@@ -135,8 +142,9 @@ public static class ModManager
 
         string modDir = Path.GetDirectoryName(manifestPath) ?? "";
         string name = manifest.Id.Name;
-        if (!ModNameToDirCache.ContainsKey(name))
-            ModNameToDirCache[name] = modDir;
+        if (ModNameToDirCache?.Value is not null && !ModNameToDirCache.Value.ContainsKey(name))
+            ModNameToDirCache.Value[name] = modDir;
+
         if (IsModLoaded(manifest.Id.Name))
         {
             Interlocked.Increment(ref FinishedTasksThisCommand);
@@ -337,7 +345,7 @@ public static class ModManager
             ModsLock.ExitReadLock();
         }
 
-        if (ModNameToDirCache.TryGetValue(modName, out string? dir)) return dir;
+        if (ModNameToDirCache?.Value?.TryGetValue(modName, out string? dir) ?? false) return dir;
 
         return null;
     }
@@ -345,7 +353,7 @@ public static class ModManager
     public static void ModNotFound()
     {
         ModsFound = false;
-        ModNameToDirCache.Clear();
+        ModNameToDirCache?.Value?.Clear();
         EnqueueLoadAllMods();
     }
 

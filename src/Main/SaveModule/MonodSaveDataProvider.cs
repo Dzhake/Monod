@@ -31,7 +31,7 @@ public class MonodSaveDataProvider : ISaveDataProvider
 
     public void SaveSettings(string dir)
     {
-
+        ModManager.SaveSettings(dir);
     }
 
     public void LoadSettings(string dir)
