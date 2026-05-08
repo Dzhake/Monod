@@ -43,6 +43,13 @@ public abstract class MonodGame : Game
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
+
+        Exiting += OnExit;
+    }
+
+    private void OnExit(object? sender, ExitingEventArgs e)
+    {
+        SaveManager.Save(SaveType.Settings, SaveManager.SavesLocation);
     }
 
     /// <inheritdoc/>

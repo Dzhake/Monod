@@ -5,18 +5,20 @@ namespace Monod.SaveModule.FilePreset;
 
 public class FilePreset<T> where T : class, new()
 {
-    public Dictionary<string, T> Values;
+    public Dictionary<string, T> Presets;
     public T CurrentValue;
     public string CurrentName;
     public string Dir;
 
-    public FilePreset(string dir)
+    public FilePreset(string dir, string? selectedPreset = null)
     {
         Dir = dir;
-        Values = new();
+        Presets = new();
+        if (!string.IsNullOrEmpty(selectedPreset))
+            Switch(selectedPreset);
     }
 
-    public void LoadAll()
+    public void LoadAll(string? selectedPreset = null)
     {
         if (!Directory.Exists(Dir))
         {
@@ -28,17 +30,17 @@ public class FilePreset<T> where T : class, new()
         foreach (string file in Directory.EnumerateFiles(Dir, "", SearchOption.TopDirectoryOnly))
         {
             string name = Path.GetFileNameWithoutExtension(file);
-            T? value = SaveManager.ReadJson<T>(file);
+            T? value = SaveUtil.ReadJson<T>(file);
             if (value is null)
             {
-                ModManager.Logger.Warning("Preset at path {FilePath} deserialized as null. Verify that the preset is valid and is not empty.", file);
+                ModManager.Logger.Warning("Preset at path '{FilePath}' deserialized as null. Verify that the preset is valid and is not empty.", file);
                 continue;
             }
-            Values.Add(name, value);
+            Presets.Add(name, value);
         }
 
-        Switch("default");
-        //TODO save which preset is selected
+        if (CurrentName is null)
+            Switch(selectedPreset ?? ModManager.DEFAULT_PRESET_NAME);
     }
 
     public void AddDefault()
@@ -50,7 +52,7 @@ public class FilePreset<T> where T : class, new()
 
     public void SaveAll()
     {
-        foreach (T value in Values.Values) Save(value);
+        foreach (T value in Presets.Values) Save(value);
     }
 
     public void SaveCurrent() => Save(CurrentValue);
@@ -58,7 +60,7 @@ public class FilePreset<T> where T : class, new()
     public void Save(T value)
     {
         if (value is not null)
-            SaveManager.WriteJson(value, GetFilePath(CurrentName));
+            SaveUtil.WriteJson(value, GetFilePath(CurrentName));
     }
 
     public OneOf<T, FilePresetError> Switch(string newName)
@@ -78,28 +80,28 @@ public class FilePreset<T> where T : class, new()
 
     public OneOf<T?, FilePresetError> Duplicate(string name, string newName)
     {
-        if (!Values.TryGetValue(name, out var value))
+        if (!Presets.TryGetValue(name, out var value))
             return new PresetNotFoundError(name);
-        if (Values.ContainsKey(newName))
+        if (Presets.ContainsKey(newName))
             return new PresetAlreadyExistsError(newName);
-        SaveManager.WriteJson(value, GetFilePath(newName));
+        SaveUtil.WriteJson(value, GetFilePath(newName));
         Load(newName, out value);
         return value;
     }
 
     public OneOf<T, FilePresetError> AddValue(string name, T? value = null)
     {
-        if (Values.ContainsKey(name))
+        if (Presets.ContainsKey(name))
             return new PresetAlreadyExistsError(name);
         value ??= new T();
-        Values[name] = value;
-        SaveManager.WriteJson(value, GetFilePath(name));
+        Presets[name] = value;
+        SaveUtil.WriteJson(value, GetFilePath(name));
         return value;
     }
 
     public bool TryGetValue(string name, out T? value)
     {
-        if (Values.TryGetValue(name, out value))
+        if (Presets.TryGetValue(name, out value))
             return true;
         if (Load(name, out value))
             return true;
@@ -115,13 +117,13 @@ public class FilePreset<T> where T : class, new()
             value = default;
             return false;
         }
-        value = SaveManager.ReadJson<T>(filePath);
+        value = SaveUtil.ReadJson<T>(filePath);
         return true;
     }
 
     public void Delete(string name)
     {
-        Values.Remove(name);
+        Presets.Remove(name);
 
         if (CurrentName == name)
         {
@@ -132,6 +134,17 @@ public class FilePreset<T> where T : class, new()
         {
             File.Delete(GetFilePath(name));
         }
+    }
+
+    public FilePresetError? Rename(string oldName, string newName)
+    {
+        string oldPath = GetFilePath(oldName);
+        if (!File.Exists(oldPath)) return new PresetNotFoundError(oldName);
+        string newPath = GetFilePath(newName);
+        if (File.Exists(newPath)) return new PresetAlreadyExistsError(newName);
+
+        File.Move(oldPath, newPath, true);
+        return null;
     }
 
     private string GetFilePath(string name)

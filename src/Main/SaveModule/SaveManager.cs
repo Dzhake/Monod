@@ -1,5 +1,4 @@
 using Monod.ModsModule;
-using Monod.Utils.General;
 using Serilog;
 using System.Text.Json;
 
@@ -55,16 +54,5 @@ public static class SaveManager
                 Log.Error(exception, "Failed to load \"{Name}\" for type \"{Type}\": ", saveProvider.Name, type);
             }
         }
-    }
-
-    public static void WriteJson(object obj, string filePath)
-    {
-        File.WriteAllText(filePath, JsonSerializer.Serialize(obj, Json.SReadable));
-    }
-
-    public static T? ReadJson<T>(string filePath)
-    {
-        if (!File.Exists(filePath)) return default;
-        return JsonSerializer.Deserialize<T>(File.ReadAllText(filePath), Json.SCommon);
     }
 }

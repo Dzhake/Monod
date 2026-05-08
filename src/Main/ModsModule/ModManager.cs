@@ -53,8 +53,10 @@ public static class ModManager
 
     //Serialized
     public static FilePreset<HashSet<string>> EnabledMods;
-    //Serialized
-    public static FileSave<ConcurrentDictionary<string, string>>? ModNameToDirCache;
+    public static string SelectedModsPreset;
+    public static ConcurrentDictionary<string, string>? ModNameToDirCache;
+
+    public static readonly string DEFAULT_PRESET_NAME = "default";
 
     public static List<string> GlobalModDirs = [RELATIVE_MODS_DIR];
 
@@ -65,27 +67,33 @@ public static class ModManager
     public static int FinishedTasksThisCommand;
     public static int TotalTasksThisCommand;
 
-    public static void LoadSettings(string dir)
+    public static void LoadSettings(string saveDir)
     {
-        string subDir = Path.Combine(dir, "ModManager");
+        string dir = Path.Combine(saveDir, "ModManager");
 
-        if (ModNameToDirCache is null)
+        ModNameToDirCache = SaveUtil.ReadJson(dir, ModNameToDirCache) ?? new();
+
+        if (EnabledMods is null)
         {
-            string modNameCachePath = Path.Combine(subDir, Path.ChangeExtension(nameof(ModNameToDirCache), "json"));
-            ModNameToDirCache = new(modNameCachePath);
-        }
-        ModNameToDirCache.Load();
+            string enabledModsDir = Path.Combine(dir, "EnabledMods");
+            EnabledMods = new(enabledModsDir);
 
-        string enabledModsDir = Path.Combine(subDir, "EnabledMods");
-        EnabledMods = new(enabledModsDir);
-        EnabledMods.LoadAll();
+            string selectedPreset = SaveUtil.ReadJson(dir, SelectedModsPreset) ?? DEFAULT_PRESET_NAME;
+            EnabledMods.LoadAll(selectedPreset);
+        }
+        else
+        {
+            EnabledMods.LoadAll();
+        }
     }
 
-    public static void SaveSettings(string dir)
+    public static void SaveSettings(string saveDir)
     {
-        string subDir = Path.Combine(dir, "ModManager");
-        Directory.CreateDirectory(subDir);
-        ModNameToDirCache?.Save();
+        string dir = Path.Combine(saveDir, "ModManager");
+        Directory.CreateDirectory(dir);
+        if (ModNameToDirCache is not null)
+            SaveUtil.WriteJson(dir, ModNameToDirCache);
+        SaveUtil.WriteJson(dir, EnabledMods.CurrentName, nameof(SelectedModsPreset));
     }
 
     public static async Task LoadModsAsync(List<string> manifestPaths)
@@ -142,8 +150,8 @@ public static class ModManager
 
         string modDir = Path.GetDirectoryName(manifestPath) ?? "";
         string name = manifest.Id.Name;
-        if (ModNameToDirCache?.Value is not null && !ModNameToDirCache.Value.ContainsKey(name))
-            ModNameToDirCache.Value[name] = modDir;
+
+        ModNameToDirCache?[name] = modDir;
 
         if (IsModLoaded(manifest.Id.Name))
         {
@@ -345,7 +353,7 @@ public static class ModManager
             ModsLock.ExitReadLock();
         }
 
-        if (ModNameToDirCache?.Value?.TryGetValue(modName, out string? dir) ?? false) return dir;
+        if (ModNameToDirCache?.TryGetValue(modName, out string? dir) ?? false) return dir;
 
         return null;
     }
@@ -353,7 +361,7 @@ public static class ModManager
     public static void ModNotFound()
     {
         ModsFound = false;
-        ModNameToDirCache?.Value?.Clear();
+        ModNameToDirCache?.Clear();
         EnqueueLoadAllMods();
     }
 

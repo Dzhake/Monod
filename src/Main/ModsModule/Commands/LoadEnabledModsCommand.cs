@@ -17,7 +17,7 @@ public class LoadEnabledModsCommand(ModManagerCommandRunner runner) : ModManager
         foreach (string modName in ModManager.EnabledMods.CurrentValue)
         {
             string? dir = ModManager.FindModDir(modName);
-            if (dir == null)
+            if (dir == null || !File.Exists(ModManager.GetModManifestPath(dir)))
             {
                 ModManager.ModNotFound();
                 Finish();
