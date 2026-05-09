@@ -17,11 +17,6 @@ public sealed class Mod
     public ModStatus Status { get; set; } = ModStatus.Enabled;
 
     /// <summary>
-    /// Reason the mod failed to load. Not null if <see cref="Status"/> is <see cref="ModStatus.FailedToLoad"/>.
-    /// </summary>
-    public Exception? FailureReason;
-
-    /// <summary>
     /// <see cref="ModManifest"/> read from config.json of this <see cref="Mod"/>.
     /// </summary>
     public ModManifest Manifest = null!;

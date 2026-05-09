@@ -30,5 +30,6 @@
 		<PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
 		<PackageReference Include="MonoGame.Extended" Version="5.5.1" />
 		<PackageReference Include="FontStashSharp.MonoGame" Version="1.5.5" />
+		<PackageReference Include="Friflo.Engine.ECS" Version="3.6.0" />
     </ItemGroup>
 </Project>

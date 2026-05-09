@@ -8,7 +8,7 @@ public static class SaveUtil
 {
     public static string GetJsonFilePath(string dir, object _, [CallerArgumentExpression(nameof(_))] string fileName = "")
     {
-        return Path.Combine(dir, Path.ChangeExtension(fileName, "json"));
+        return GetJsonFilePath(dir, fileName);
     }
 
     public static string GetJsonFilePath(string dir, string fileName)
@@ -22,7 +22,7 @@ public static class SaveUtil
         return JsonSerializer.Deserialize<T>(File.ReadAllText(filePath), Json.SCommon);
     }
 
-    public static T? ReadJson<T>(string dir, T? obj, [CallerArgumentExpression(nameof(obj))] string fileName = "")
+    public static T? ReadJson<T>(string dir, T? _, [CallerArgumentExpression(nameof(_))] string fileName = "")
     {
         return ReadJson<T>(GetJsonFilePath(dir, fileName));
     }
