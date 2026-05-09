@@ -6,13 +6,13 @@ namespace Monod.SaveModule.FilePreset;
 public class FilePreset<T> where T : class, new()
 {
     public Dictionary<string, T> Presets;
-    public T CurrentValue;
+    public T CurrentPreset;
     public string CurrentName;
-    public string Dir;
+    public string PresetsDir;
 
     public FilePreset(string dir, string? selectedPreset = null)
     {
-        Dir = dir;
+        PresetsDir = dir;
         Presets = new();
         if (!string.IsNullOrEmpty(selectedPreset))
             Switch(selectedPreset);
@@ -20,14 +20,14 @@ public class FilePreset<T> where T : class, new()
 
     public void LoadAll(string? selectedPreset = null)
     {
-        if (!Directory.Exists(Dir))
+        if (!Directory.Exists(PresetsDir))
         {
-            Directory.CreateDirectory(Dir);
+            Directory.CreateDirectory(PresetsDir);
             AddDefault();
             return;
         }
 
-        foreach (string file in Directory.EnumerateFiles(Dir, "", SearchOption.TopDirectoryOnly))
+        foreach (string file in Directory.EnumerateFiles(PresetsDir, "", SearchOption.TopDirectoryOnly))
         {
             string name = Path.GetFileNameWithoutExtension(file);
             T? value = SaveUtil.ReadJson<T>(file);
@@ -55,7 +55,7 @@ public class FilePreset<T> where T : class, new()
         foreach (T value in Presets.Values) Save(value);
     }
 
-    public void SaveCurrent() => Save(CurrentValue);
+    public void SaveCurrent() => Save(CurrentPreset);
 
     public void Save(T value)
     {
@@ -74,7 +74,7 @@ public class FilePreset<T> where T : class, new()
         }
 
         CurrentName = newName;
-        CurrentValue = value;
+        CurrentPreset = value;
         return value;
     }
 
@@ -149,6 +149,6 @@ public class FilePreset<T> where T : class, new()
 
     private string GetFilePath(string name)
     {
-        return Path.Combine(Dir, Path.ChangeExtension(name, "json"));
+        return Path.Combine(PresetsDir, Path.ChangeExtension(name, "json"));
     }
 }

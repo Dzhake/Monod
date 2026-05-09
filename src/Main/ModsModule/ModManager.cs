@@ -94,6 +94,7 @@ public static class ModManager
         if (ModNameToDirCache is not null)
             SaveUtil.WriteJson(dir, ModNameToDirCache);
         SaveUtil.WriteJson(dir, EnabledMods.CurrentName, nameof(SelectedModsPreset));
+        EnabledMods.SaveAll();
     }
 
     public static async Task LoadModsAsync(List<string> manifestPaths)
@@ -153,7 +154,7 @@ public static class ModManager
 
         ModNameToDirCache?[name] = modDir;
 
-        if (IsModLoaded(manifest.Id.Name))
+        if (IsModEnabled(manifest.Id.Name))
         {
             Interlocked.Increment(ref FinishedTasksThisCommand);
             return;
@@ -198,7 +199,7 @@ public static class ModManager
 
     private static async Task LoadModFromManifestAsync(ModManifest manifest, string modDir, ObservableDict<string, ModLoadInfo> tasks)
     {
-        if (!EnabledMods.CurrentValue.Contains(manifest.Id.Name))
+        if (!EnabledMods.CurrentPreset.Contains(manifest.Id.Name))
         {
             AddDisabledMod(manifest, modDir);
             Interlocked.Increment(ref FinishedTasksThisCommand);
@@ -207,7 +208,7 @@ public static class ModManager
 
         bool depsSatisfied = await WaitUntilDepsLoaded(manifest, tasks);
 
-        if (EnabledMods.CurrentValue.Contains(manifest.Id.Name) && depsSatisfied)
+        if (EnabledMods.CurrentPreset.Contains(manifest.Id.Name) && depsSatisfied)
         {
             Mod mod = CreateModFromManifest(manifest, modDir);
             LoadMod(mod);
@@ -227,7 +228,7 @@ public static class ModManager
         {
             foreach (ModDep dep in manifest.Deps)
             {
-                if (!EnabledMods.CurrentValue.Contains(dep.Name))
+                if (!EnabledMods.CurrentPreset.Contains(dep.Name))
                     return false;
 
                 if (IsModEnabled(dep.Name, dep.Versions))
@@ -256,6 +257,12 @@ public static class ModManager
         mod.Status = ModStatus.Loading;
         LoadModData(mod);
         mod.Status = ModStatus.Enabled;
+    }
+
+
+    public static void EnableMod(string modName)
+    {
+        EnabledMods.CurrentPreset.Add(modName);
     }
 
     /// <summary>
@@ -396,6 +403,7 @@ public static class ModManager
         mod.LoggerInstance = null;
 
         mod.Status = ModStatus.Disabled;
+        EnabledMods.CurrentPreset.Remove(mod.GetName());
         Logger.Information("Disabled mod: {ModName}", mod.GetName());
     }
 
@@ -479,33 +487,65 @@ public static class ModManager
 
     public static void EnqueueLoadEnabledMods()
     {
-        Runner.TryAddCommand(new LoadEnabledModsCommand(Runner));
+        Runner.AddCommand(new LoadEnabledModsCommand(Runner));
     }
 
     public static void EnqueueLoadAllMods()
     {
-        Runner.TryAddCommand(new LoadAllModsCommand(Runner));
+        Runner.AddCommand(new LoadAllModsCommand(Runner));
     }
 
     public static void EnqueueLoadModsFromDir(string dir)
     {
-        Runner.TryAddCommand(new LoadModsFromDirCommand(dir, Runner));
+        Runner.AddCommand(new LoadModsFromDirCommand(dir, Runner));
     }
 
-    public static void EnqueueToggleMods(ICollection<string> toDisable, ICollection<string> toEnable)
+    public static void EnqueueToggleMods(ICollection<string> modsToDisable, ICollection<string> modsToEnable)
     {
-        EnqueueUnloadMods(toDisable);
-        EnqueueLoadMods(toEnable);
+        EnqueueUnloadMods(modsToDisable);
+        EnqueueEnableMods(modsToEnable);
+        EnqueueLoadMods(modsToEnable);
+    }
+
+    public static void EnqueueEnableMods(ICollection<string> modsToEnable)
+    {
+        Runner.AddCommand(new EnableModsCommand(modsToEnable, Runner));
+    }
+
+    public static void EnqueueToggleMods(ICollection<string> modsToToggle)
+    {
+        List<string> modsToDisable = new();
+        List<string> modsToEnable = new();
+        try
+        {
+            ModsLock.EnterReadLock();
+            foreach (string modToToggle in modsToToggle)
+            {
+                if (Mods.TryGetValue(modToToggle, out var mod) && mod is not null)
+                {
+                    if (mod.Status is ModStatus.Enabled or ModStatus.Loading)
+                        modsToDisable.Add(modToToggle);
+                    else
+                        modsToEnable.Add(modToToggle);
+                }
+            }
+        }
+        finally
+        {
+            ModsLock.ExitReadLock();
+        }
+
+        EnqueueToggleMods(modsToDisable, modsToEnable);
     }
 
     public static void EnqueueUnloadMods(ICollection<string> modNames)
     {
-        Runner.TryAddCommand(new UnloadModsCommand(modNames, Runner));
+        Runner.AddCommand(new UnloadModsCommand(modNames, Runner));
     }
 
     public static void EnqueueLoadMods(ICollection<string> modNames)
     {
-        //run command that enables mods
+        Runner.AddCommand(new LoadModsListCommand(modNames, Runner));
     }
 
 
@@ -519,7 +559,7 @@ public static class ModManager
         try
         {
             ModsLock.EnterWriteLock();
-            Mods.TryAdd(mod.GetName(), mod);
+            Mods[mod.GetName()] = mod;
         }
         finally
         {

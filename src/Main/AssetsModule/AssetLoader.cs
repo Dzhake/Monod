@@ -114,17 +114,17 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     }
 
     ///<inheritdoc/>
-    public override void TryAddCommand(AssetLoaderCommand command)
+    public override void AddCommand(AssetLoaderCommand command)
     {
         Assets.IncrementTotalCommandsCount();
-        base.TryAddCommand(command);
+        base.AddCommand(command);
     }
 
 
     /// <summary>
     /// Add <see cref="LoadAssetManifestsCommand"/> to queue.
     /// </summary>
-    public void EnqueueLoadAssetManifests() => TryAddCommand(new LoadAssetManifestsCommand(this));
+    public void EnqueueLoadAssetManifests() => AddCommand(new LoadAssetManifestsCommand(this));
 
     /// <summary>
     /// Add <see cref="LoadAssetsInDirCommand"/> with dir being asset loader's root dir to queue.
@@ -135,25 +135,25 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     /// Add <see cref="LoadAssetsInDirCommand"/> to queue.
     /// </summary>
     /// <param name="path">Directory path in this asset loader, assets from where to load.</param>
-    public void EnqueueLoadAssetsInDir(string path) => TryAddCommand(new LoadAssetsInDirCommand(path, this));
+    public void EnqueueLoadAssetsInDir(string path) => AddCommand(new LoadAssetsInDirCommand(path, this));
 
     /// <summary>
     /// Add <see cref="ReloadAssetsInDirCommand"/> to queue.
     /// </summary>
     /// <param name="relativePath">Directory path in this asset loader, assets from where to reload.</param>
-    public void EnqueueReloadAssetsInDir(string relativePath) => TryAddCommand(new ReloadAssetsInDirCommand(relativePath, this));
+    public void EnqueueReloadAssetsInDir(string relativePath) => AddCommand(new ReloadAssetsInDirCommand(relativePath, this));
 
     /// <summary>
     /// Add <see cref="ReloadAssetCommand"/> to queue.
     /// </summary>
     /// <param name="path">File path in this asset loader of the asset to reload.</param>
-    public void EnqueueReloadAsset(string path) => TryAddCommand(new ReloadAssetCommand(path, this));
+    public void EnqueueReloadAsset(string path) => AddCommand(new ReloadAssetCommand(path, this));
 
     /// <summary>
     /// Add <see cref="RemoveAssetsInDirCommand"/> to queue.
     /// </summary>
     /// <param name="relativePath">Directory path in this asset loader.</param>
-    public void EnqueueRemoveAssetsInDir(string relativePath) => TryAddCommand(new RemoveAssetsInDirCommand(relativePath, this));
+    public void EnqueueRemoveAssetsInDir(string relativePath) => AddCommand(new RemoveAssetsInDirCommand(relativePath, this));
 
 
     /// <summary>

@@ -14,7 +14,7 @@ public sealed class Mod
     /// <summary>
     /// CurrentValue status of the mod.
     /// </summary>
-    public ModStatus Status = ModStatus.Enabled;
+    public ModStatus Status { get; set; } = ModStatus.Enabled;
 
     /// <summary>
     /// Reason the mod failed to load. Not null if <see cref="Status"/> is <see cref="ModStatus.FailedToLoad"/>.

@@ -9,7 +9,7 @@ namespace Monod.Utils.Commands;
 public class CommandRunner<T> where T : Command
 {
     /// <summary>
-    /// Queue of commands to run. Commands are run when a new command is enqueued (by <see cref="TryAddCommand"/>) or when a command is finished (by <see cref="Command.Finish"/>). Access only with <see cref="CommandsLock"/>.
+    /// Queue of commands to run. Commands are run when a new command is enqueued (by <see cref="AddCommand"/>) or when a command is finished (by <see cref="Command.Finish"/>). Access only with <see cref="CommandsLock"/>.
     /// </summary>
     protected Queue<T> Commands = new();
 
@@ -38,7 +38,7 @@ public class CommandRunner<T> where T : Command
     /// Add the <paramref name="command"/> to the <see cref="Commands"/>, or run it, if <see cref="LoadingInactive"/> is <see langword="true"/>.
     /// </summary>
     /// <param name="command">Command to add.</param>
-    public virtual void TryAddCommand(T command)
+    public virtual void AddCommand(T command)
     {
         try
         {

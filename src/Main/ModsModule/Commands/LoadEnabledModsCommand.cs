@@ -8,13 +8,13 @@ public class LoadEnabledModsCommand(ModManagerCommandRunner runner) : ModManager
     public override int CurrentProgress => ModManager.FinishedTasksThisCommand;
 
     ///<inheritdoc/>
-    public override string GetText() => "Loading all mods";
+    public override string GetText() => "Loading enabled mods";
 
     ///<inheritdoc/>
     public async override Task Run()
     {
         List<string> manifestPaths = [];
-        foreach (string modName in ModManager.EnabledMods.CurrentValue)
+        foreach (string modName in ModManager.EnabledMods.CurrentPreset)
         {
             string? dir = ModManager.FindModDir(modName);
             if (dir == null || !File.Exists(ModManager.GetModManifestPath(dir)))
