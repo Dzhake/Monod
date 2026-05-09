@@ -29,7 +29,7 @@ public static class SaveUtil
 
     public static void WriteJson(object? obj, string filePath)
     {
-        File.WriteAllText(filePath, JsonSerializer.Serialize(obj, Json.SReadable));
+        File.WriteAllText(filePath, JsonSerializer.Serialize(obj, Json.SCommon));
     }
 
     public static void WriteJson(string dir, object obj, [CallerArgumentExpression(nameof(obj))] string fileName = "")
