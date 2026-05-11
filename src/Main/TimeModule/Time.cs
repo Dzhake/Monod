@@ -36,7 +36,12 @@ public static class Time
     /// <summary>
     /// Time since program started.
     /// </summary>
-    public static TimeSpan RawTotalDeltaTime;
+    public static TimeSpan RawTotalTimeSpan;
+
+    /// <summary>
+    /// Time since program started, in seconds.
+    /// </summary>
+    public static float RawTotalTime;
 
     /// <summary>
     /// Time since program started, multiplied by timescale multipliers at moment those were active.
@@ -75,7 +80,8 @@ public static class Time
         wasActive = isActive;
 
         if (!isActive) return;
-        RawTotalDeltaTime += RawDeltaTimeSpan;
+        RawTotalTimeSpan += RawDeltaTimeSpan;
+        RawTotalTime = (float)RawTotalTimeSpan.TotalSeconds;
         RunTimeScaleCallbacks();
         UpdateDeltaTime();
         TotalTime += DeltaTimeSpan;

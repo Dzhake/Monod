@@ -1,3 +1,5 @@
+using Friflo.Engine.ECS;
+using Friflo.Engine.ECS.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
@@ -27,6 +29,9 @@ public abstract class MonodGame : Game
     /// Main <see cref="AssetManager"/> for vanilla game.
     /// </summary>
     public static AssetManager MainAssetManager = null!;
+    public static EntityStore Store;
+    public static SystemRoot LogicSystemRoot;
+    public static SystemRoot DrawSystemRoot;
 
     public UiSystem MainUiSystem;
 
@@ -43,6 +48,12 @@ public abstract class MonodGame : Game
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
+
+        Store = new();
+        LogicSystemRoot = new();
+        DrawSystemRoot = new();
+        LogicSystemRoot.AddStore(Store);
+        DrawSystemRoot.AddStore(Store);
 
         Exiting += OnExit;
     }
@@ -85,30 +96,46 @@ public abstract class MonodGame : Game
     /// <inheritdoc/>
     protected override void Update(GameTime gameTime)
     {
+        // Meta-modules update (responsible to tracking time and pausing)
         Time.Update(gameTime, IsActive);
         if (GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco && !IsActive) return;
+
+        // Pre-update
         base.Update(gameTime);
         Input.Update();
         MainThread.Update();
 
-        //ModManager.Update();
+        // Early update for modules that may block the normal update
         Assets.Update();
 
-        if (Assets.IsLoading) //Don't care about thread safety, readonly with no side effects other than one frame delay
-        {
-            return;
-        }
-
+        if (Assets.IsLoading) return;
         if (ModManager.InProgress) return;
         //DevConsole.Update(); TODO dev console in-game w/ Console class support like in DD.
 
+        // Normal update
         UpdateM();
         MainUiSystem.Update(gameTime);
 
+        // Post update
         Input.PostUpdate();
     }
 
-    /// <inheritdoc/> 
+    public void UpdateLogicSystems()
+    {
+        LogicSystemRoot.Update(GetUpdateTick());
+    }
+
+    public void UpdateRenderSystems()
+    {
+        DrawSystemRoot.Update(GetUpdateTick());
+    }
+
+    public static UpdateTick GetUpdateTick()
+    {
+        return new UpdateTick(Time.RawDeltaTime, Time.RawTotalTime);
+    }
+
+    /// <inheritdoc/>
     protected override void Draw(GameTime gameTime)
     {
         if (GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco && !IsActive) return;
