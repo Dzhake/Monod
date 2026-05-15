@@ -391,5 +391,8 @@ public static class Input
     /// <returns>Whether the <paramref name="key"/> was pressed on this and previous frames.</returns>
     [Pure]
     public static bool KeyHeld(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) != 0;
+
+    [Pure]
+    public static Vector2 MousePos(InputState? state = null) => (state ?? CurState).Mouse.Position.ToVector2();
     #endregion
 }

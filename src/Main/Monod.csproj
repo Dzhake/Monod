@@ -31,7 +31,7 @@
 		<PackageReference Include="MonoGame.Extended" Version="5.5.1" />
 		<PackageReference Include="FontStashSharp.MonoGame" Version="1.5.5" />
 		<PackageReference Include="Friflo.Engine.ECS" Version="3.6.0" />
-		<PackageReference Include="Friflo.Engine.ECS.Generators" Version="3.6.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+		<PackageReference Include="Friflo.Engine.ECS.Generators" Version="3.6.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<PackageReference Include="Friflo.Engine.ECS.Boost" Version="3.6.0" />
     </ItemGroup>
 </Project>

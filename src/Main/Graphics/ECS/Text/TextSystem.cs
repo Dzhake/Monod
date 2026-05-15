@@ -1,22 +1,25 @@
 ﻿using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using MLEM.Formatting;
 using Monod.ECS.DefaultComponents;
+using Monod.Graphics.Fonts;
+using Monod.TimeModule;
 
-namespace Monod.Graphics.ECS.Sprite;
+namespace Monod.Graphics.ECS.Text;
 
-public class DrawSpriteSystem : QuerySystem<Sprite2D>
+public class TextSystem : QuerySystem<TextComponent>
 {
+    public TextFormatter Formatter = new();
+
     protected override void OnUpdate()
     {
         Query.ForEachEntity(Update);
     }
 
-    private void Update(ref Sprite2D sprite, Entity entity)
+    private void Update(ref TextComponent text, Entity entity)
     {
-        if (sprite.Texture is null) return;
-
+        if (text.tokenized is null) CreateTokenizedString(text);
         var data = entity.Data;
 
         Vector2 position;
@@ -43,8 +46,12 @@ public class DrawSpriteSystem : QuerySystem<Sprite2D>
         else
             depth = 0;
 
-        Vector2 origin = new(sprite.Texture.Width / 2f, sprite.Texture.Height / 2f);
 
-        Renderer.DrawTexture(sprite.Texture, position, null, sprite.color, rotation, origin, scale, SpriteEffects.None, depth);
+        text.tokenized?.Draw(Time.gameTime, Renderer.spriteBatch, position, GlobalFonts.MenuFont, text.color, scale, depth, rotation, new(0, 0));
+    }
+
+    private void CreateTokenizedString(TextComponent text)
+    {
+        text.tokenized = Formatter.Tokenize(GlobalFonts.MenuFont, text.Text, text.Alignment);
     }
 }

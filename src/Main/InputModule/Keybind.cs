@@ -6,7 +6,7 @@ namespace Monod.InputModule;
 /// <summary>
 /// A single binding: key and modifiers, attached to some action.
 /// </summary>
-public readonly record struct Keybind(Key key, KeyModifiers modifiers)
+public readonly record struct Keybind(Key key, KeyModifiers modifiers = KeyModifiers.None)
 {
     /// <summary>
     /// Key used by this Keybinds.

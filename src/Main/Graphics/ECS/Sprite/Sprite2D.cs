@@ -1,4 +1,5 @@
 ﻿using Friflo.Engine.ECS;
+using Friflo.Json.Fliox;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -8,6 +9,7 @@ public struct Sprite2D : IComponent
 {
     public string TexturePath;
     public Color color;
+    [Ignore]
     public Texture2D? Texture;
 
     public Sprite2D(string texturePath)
