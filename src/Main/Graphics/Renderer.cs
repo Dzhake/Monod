@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.Graphics.Fonts.Bitmap;
 
@@ -19,7 +18,7 @@ public static class Renderer
     /// Global <see cref="GraphicsDevice"/>.
     /// </summary>
     public static GraphicsDevice device = null!;
-    
+
     /// <summary>
     /// CurrentValue <see cref="RenderTarget2D"/> for <see cref="device"/>, or null if drawing to BackBuffer. Private field for <see cref="RenderTarget"/>.
     /// </summary>
@@ -34,6 +33,17 @@ public static class Renderer
     /// Global <see cref="SpriteBatch"/>.
     /// </summary>
     public static SpriteBatch spriteBatch = null!;
+
+    private static SpriteBatch? secondSpriteBatch;
+    public static SpriteBatch SecondSpriteBatch
+    {
+        get
+        {
+            secondSpriteBatch ??= new(device);
+            return secondSpriteBatch;
+        }
+        set => secondSpriteBatch = value;
+    }
 
     /// <summary>
     /// Whether <see cref="SpriteBatch.Begin"/> was called, and <see cref="SpriteBatch.End"/> wasn't yet called.
@@ -94,7 +104,7 @@ public static class Renderer
     /// <param name="color">Set this color value in all buffers.</param>
     public static void Clear(Color color) => device?.Clear(color);
 
-    
+
     /// <summary>
     /// Begins a new sprite and text batch with the specified render state.
     /// </summary>
@@ -114,7 +124,7 @@ public static class Renderer
     {
         spriteBatchActive = true;
         spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
-    } 
+    }
 
 
     /// <summary>
@@ -149,7 +159,7 @@ public static class Renderer
     /// <returns>New <see cref="RenderTarget2D"/>, instanced with specified options.</returns>
     public static RenderTarget2D CreateRenderTarget(int width, int height, bool mipMap = false, SurfaceFormat preferredFormat = SurfaceFormat.Color, DepthFormat preferredDepthFormat = DepthFormat.None, int preferredMultiSampleCount = 0, RenderTargetUsage usage = RenderTargetUsage.DiscardContents) => new(device, width, height,
     mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
-    
+
     //Basic drawing functions
 
     /// <summary>
@@ -245,7 +255,7 @@ public static class Renderer
         if (Pixel is null) throw new InvalidOperationException("Pixel is null");
         DrawTexture(Pixel, p1, null, color, 0f, Vector2.Zero, new Vector2(-(p1.X - p2.X), -(p1.Y - p2.Y)));
     }
-        
+
     /// <summary>
     /// Draws a rectangle.
     /// </summary>
