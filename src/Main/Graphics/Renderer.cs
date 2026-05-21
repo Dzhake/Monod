@@ -175,16 +175,16 @@ public static class Renderer
     /// </summary>
     /// <param name="texture">A texture.</param>
     /// <param name="position">The drawing location on render target.</param>
-    /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null - draws full texture.</param>
-    /// <param name="color">A color mask.</param>
+    /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null, draws full texture.</param>
+    /// <param name="color">A color mask. <see cref="Color.White"/> by default.</param>
     /// <param name="rotation">A rotation of this sprite.</param>
-    /// <param name="origin">Center of the rotation. 0,0 by default.</param>
-    /// <param name="scale">A scaling of this sprite.</param>
+    /// <param name="origin">Center of the rotation. <see cref="Vector2.Zero"/> by default.</param>
+    /// <param name="scale">A scaling of this sprite. <see cref="Vector2.One"/> by default.</param>
     /// <param name="effects">Modificators for drawing. Can be combined.</param>
     /// <param name="layerDepth">A depth of the layer of this sprite.</param>
-    public static void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color,
-    float rotation, Vector2 origin, Vector2 scale, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0) => spriteBatch.Draw(texture,
-    position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
+    public static void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle = null, Color? color = null,
+    float rotation = 0, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0) => spriteBatch.Draw(texture,
+    position, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale ?? Vector2.One, effects, layerDepth);
 
     /// <summary>
     /// Submit a text string of sprites for drawing in the current batch.

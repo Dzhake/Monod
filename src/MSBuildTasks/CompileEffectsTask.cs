@@ -30,7 +30,7 @@ public class CompileEffectsTask : Task
     /// <summary>
     /// Constant value to track changes.
     /// </summary>
-    public const string Version = "1.3";
+    public const string Version = "1.4";
 
     /// <summary>
     /// Executes the task, called by MSBuild.
@@ -40,30 +40,30 @@ public class CompileEffectsTask : Task
     {
         if (Effects is null)
         {
-            Log.LogMessage(MessageImportance.High, "Effects was not specified! Must be list of file paths, relative to *PathToContent*, of files which should be compiled");
+            LogInfo("Effects was not specified! Must be list of file paths, relative to *PathToContent*, of files which should be compiled");
             Environment.Exit(3);
             return false;
         }
         if (OutputPath is null)
         {
-            Log.LogMessage(MessageImportance.High, "OutputPath was not specified! Must be absolute directory path, that is root path to assets. Assets' own relative path is appended to this to get a final output directory.");
+            LogInfo("OutputPath was not specified! Must be absolute directory path, that is root path to assets. Assets' own relative path is appended to this to get a final output directory.");
             Environment.Exit(3);
             return false;
         }
         if (PathToContent is null)
         {
-            Log.LogMessage(MessageImportance.High, "PathToContent was not specified! Must be absolute directory path, where assets are located, without their own relative path.");
+            LogInfo("PathToContent was not specified! Must be absolute directory path, where assets are located, without their own relative path.");
             Environment.Exit(3);
             return false;
         }
 
-        Log.LogMessage(MessageImportance.High, $"Running CompileEffectsTask v{Version}");
+        LogInfo($"Running CompileEffectsTask v{Version}");
 
         Effects = Effects.Replace('\\', '/');
         OutputPath = OutputPath.Replace('\\', '/');
         PathToContent = PathToContent.Replace('\\', '/');
 
-        Log.LogMessage(MessageImportance.High, $"Effects: {Effects}");
+        LogInfo($"Effects: {Effects}");
 
         string[] effectFiles = Effects.Split(';');
         Process[] processes = new Process[effectFiles.Length];
@@ -83,13 +83,22 @@ public class CompileEffectsTask : Task
                 {
                     FileName = "mgfxc",
                     Arguments = $"\"{inputPath}\" \"{outputPath}\"",
-                    WindowStyle = ProcessWindowStyle.Hidden
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
                 };
 
                 processes[i] = new()
                 {
-                    StartInfo = startInfo
+                    StartInfo = startInfo,
+                    //EnableRaisingEvents = true
                 };
+
+                processes[i].OutputDataReceived += LogInfo;
+
+                processes[i].ErrorDataReceived += LogError;
+
                 processes[i].Start();
             }
             catch (Exception exception)
@@ -97,10 +106,10 @@ public class CompileEffectsTask : Task
                 int exit = 1;
                 if (exception is Win32Exception) //Probably "The system cannot find the file specified"? I hope that's the only case.
                 {
-                    Log.LogMessage(MessageImportance.High, "(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD via 'mgfxc' (global dotnet tools dir should be at PATH).");
+                    LogInfo("(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD via 'mgfxc' (global dotnet tools dir should be at PATH).");
                     exit = 2;
                 }
-                Log.LogMessage(MessageImportance.High, exception.ToString());
+                LogInfo(exception.ToString());
                 Environment.Exit(exit);
                 return false;
             }
@@ -111,22 +120,45 @@ public class CompileEffectsTask : Task
             try
             {
                 processes[i]?.WaitForExit();
+                if ((processes[i]?.ExitCode ?? 0) != 0)
+                {
+                    Console.WriteLine($"{effectFiles[i]}: compiler exited with code {processes[i].ExitCode}");
+                    Environment.Exit(1);
+                }
+                LogInfo($"{effectFiles[i]}: sucessfully compiled");
             }
             catch (Exception exception)
             {
                 int exit = 1;
                 if (exception is Win32Exception) //Probably "The system cannot find the file specified"? I hope that's the only case.
                 {
-                    Log.LogMessage(MessageImportance.High, "(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD via 'mgfxc' (global dotnet tools dir should be at PATH).");
+                    LogInfo("(Probably) MGFXC could not be started! You need to install it as global dotnet tool, and check that you can run it from CMD via 'mgfxc' (global dotnet tools dir should be at PATH).");
                     exit = 2;
                 }
-                Log.LogMessage(MessageImportance.High, exception.ToString());
+                LogInfo(exception.ToString());
                 Environment.Exit(exit);
                 return false;
             }
         }
 
-        Log.LogMessage(MessageImportance.High, "Finished compiling effects");
+        LogInfo("Finished compiling effects");
         return true;
+    }
+
+    private void LogInfo(string text)
+    {
+        Log.LogMessage(MessageImportance.High, text);
+    }
+
+    private void LogInfo(object? sender, DataReceivedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Data))
+            Log.LogMessage(MessageImportance.High, e.Data);
+    }
+
+    private void LogError(object sender, DataReceivedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(e.Data))
+            Log.LogError(e.Data);
     }
 }
