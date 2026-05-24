@@ -61,6 +61,11 @@ public static class Renderer
     public static Texture2D Pixel = null!;
 
     /// <summary>
+    /// Color with all values set to 0.
+    /// </summary>
+    public static readonly Color EmptyColor = new(0, 0, 0, 0);
+
+    /// <summary>
     /// Window.Handle which can be used to manipulate window with SDL.
     /// </summary>
     public static IntPtr WindowHandle;
@@ -69,6 +74,8 @@ public static class Renderer
     /// <see cref="GameWindow"/> of running game.
     /// </summary>
     public static GameWindow Window = null!;
+    public static Vector2 WindowSize => WindowSizeP.ToVector2();
+    public static Point WindowSizeP => Window.ClientBounds.Size;
 
 
     /// <summary>
