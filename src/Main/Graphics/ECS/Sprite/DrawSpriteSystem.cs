@@ -45,6 +45,6 @@ public class DrawSpriteSystem : QuerySystem<Sprite2D>
 
         Vector2 origin = new(sprite.Texture.Width / 2f, sprite.Texture.Height / 2f);
 
-        Renderer.DrawTexture(sprite.Texture, position, null, sprite.color, rotation, origin, scale, SpriteEffects.None, depth);
+        Renderer.DrawTexture(sprite.Texture, position, sprite.color, null, rotation, origin, scale, SpriteEffects.None, depth);
     }
 }

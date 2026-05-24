@@ -174,14 +174,6 @@ public static class Renderer
     /// </summary>
     /// <param name="texture">A texture.</param>
     /// <param name="position">The drawing location on render target.</param>
-    /// <param name="color">A color mask.</param>
-    public static void DrawTexture(Texture2D texture, Vector2 position, Color color) => spriteBatch.Draw(texture, position, color);
-
-    /// <summary>
-    /// Submit a sprite for drawing in the current batch.
-    /// </summary>
-    /// <param name="texture">A texture.</param>
-    /// <param name="position">The drawing location on render target.</param>
     /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null, draws full texture.</param>
     /// <param name="color">A color mask. <see cref="Color.White"/> by default.</param>
     /// <param name="rotation">A rotation of this sprite.</param>
@@ -189,9 +181,11 @@ public static class Renderer
     /// <param name="scale">A scaling of this sprite. <see cref="Vector2.One"/> by default.</param>
     /// <param name="effects">Modificators for drawing. Can be combined.</param>
     /// <param name="layerDepth">A depth of the layer of this sprite.</param>
-    public static void DrawTexture(Texture2D texture, Vector2 position, Rectangle? sourceRectangle = null, Color? color = null,
-    float rotation = 0, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0) => spriteBatch.Draw(texture,
-    position, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale ?? Vector2.One, effects, layerDepth);
+    public static void DrawTexture(Texture2D texture, Vector2 position, Color? color = null, Rectangle? sourceRectangle = null,
+    float rotation = 0, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
+    {
+        spriteBatch.Draw(texture, position, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale ?? Vector2.One, effects, layerDepth);
+    }
 
     /// <summary>
     /// Submit a text string of sprites for drawing in the current batch.
@@ -248,7 +242,7 @@ public static class Renderer
     public static void DrawLine(Vector2 lineStart, Vector2 lineEnd, Color color, float width = 1f)
     {
         if (Pixel is null) throw new InvalidOperationException("Pixel is null");
-        DrawTexture(Pixel, lineStart, null, color, (float)Math.Atan2(lineEnd.Y - lineStart.Y, lineEnd.X - lineStart.X), new Vector2(0f, 0.5f), new Vector2((lineStart - lineEnd).Length(), width));
+        DrawTexture(Pixel, lineStart, color, null, (float)Math.Atan2(lineEnd.Y - lineStart.Y, lineEnd.X - lineStart.X), new Vector2(0f, 0.5f), new Vector2((lineStart - lineEnd).Length(), width));
     }
 
     /// <summary>
@@ -260,7 +254,7 @@ public static class Renderer
     public static void DrawRect(Vector2 p1, Vector2 p2, Color color)
     {
         if (Pixel is null) throw new InvalidOperationException("Pixel is null");
-        DrawTexture(Pixel, p1, null, color, 0f, Vector2.Zero, new Vector2(-(p1.X - p2.X), -(p1.Y - p2.Y)));
+        DrawTexture(Pixel, p1, color, null, 0f, Vector2.Zero, new Vector2(-(p1.X - p2.X), -(p1.Y - p2.Y)));
     }
 
     /// <summary>

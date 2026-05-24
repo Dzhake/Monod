@@ -1,6 +1,7 @@
 ﻿using Monod.AssetsModule.Commands;
 using Monod.AssetsModule.Exceptions;
 using Monod.AssetsModule.Utils;
+using Monod.InputModule;
 using Monod.LogModule;
 using Monod.Shared.Collections;
 using Monod.Shared.Extensions;
@@ -119,6 +120,11 @@ public static class Assets
     /// </summary>
     public static void Update()
     {
+        if (Input.KeyDown(Key.F5))
+        {
+            ReloadThisFrame = true;
+        }
+
         try
         {
             LoadingInfoLock.EnterUpgradeableReadLock();

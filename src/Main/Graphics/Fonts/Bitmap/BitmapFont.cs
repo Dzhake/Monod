@@ -138,7 +138,7 @@ public class BitmapFont
                 }
             }
 
-            Renderer.DrawTexture(Texture, currentPos, sourceRectangle, (Color)color, rotation, (Vector2)origin, (Vector2)scale, effects, layerDepth);
+            Renderer.DrawTexture(Texture, currentPos, (Color)color, sourceRectangle, rotation, (Vector2)origin, (Vector2)scale, effects, layerDepth);
             currentPos.X += (GlyphSize.X + Spacing.X) * scale.Value.X;
         }
     }
