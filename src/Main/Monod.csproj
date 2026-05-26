@@ -13,25 +13,38 @@
     </PropertyGroup>
     
     <ItemGroup>
+		<!-- Project references -->
 		<ProjectReference Include="..\SDL3-CS\SDL3\SDL3.Core.csproj" />
+
+		<!-- Nuget packages: general -->
+
+		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
 
 		<PackageReference Include="Chasm.SemanticVersioning" Version="2.8.2" />
 		<PackageReference Include="Lib.Harmony" Version="2.4.2" />
-		<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.8" />
 		<PackageReference Include="Linguini.Bundle" Version="0.11.0" />
-		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
 		<PackageReference Include="OneOf" Version="3.0.271" />
-		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
-			<IncludeAssets>build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
+		
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
-		<PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
-		<PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-		<PackageReference Include="MonoGame.Extended" Version="5.5.1" />
+
+		<PackageReference Include="MLEM" Version="8.1.0" />
+		<PackageReference Include="MLEM.Extended" Version="8.1.0" />
+		<PackageReference Include="MLEM.Ui" Version="8.1.0" />
+
+		<PackageReference Include="MonoGame.Extended" Version="6.0.0" />
 		<PackageReference Include="FontStashSharp.MonoGame" Version="1.5.5" />
+		
 		<PackageReference Include="Friflo.Engine.ECS" Version="3.6.0" />
 		<PackageReference Include="Friflo.Engine.ECS.Generators" Version="3.6.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<PackageReference Include="Friflo.Engine.ECS.Boost" Version="3.6.0" />
+
+		<!-- Nuget packages: analyzers -->
+		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
+			<IncludeAssets>build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+		<PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
     </ItemGroup>
 </Project>
