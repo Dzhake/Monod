@@ -193,9 +193,23 @@ public static class Input
     [Pure]
     public static float GetValue(InputState state, Key key, int playerIndex = 0)
     {
-        if (!Players[playerIndex].UsesKeyboard && !IsGamepadKey(key)) return 0;
-        if (IsGamepadKey(key) && Players[playerIndex].GamepadIndex == -1) return 0;
-        if (IsKeyboardKey(key)) return state.Keyboard.IsKeyDown(key).ToInputValue();
+        var imguiIO = MonodGame.imGuiIO;
+        bool keyboardKey = IsKeyboardKey(key);
+        bool gamepadKey = IsGamepadKey(key);
+        bool mouseKey = !(keyboardKey || gamepadKey);
+
+        if (keyboardKey)
+        {
+            if (imguiIO.WantCaptureKeyboard || !Players[playerIndex].UsesKeyboard) return 0;
+            return state.Keyboard.IsKeyDown(key).ToInputValue();
+        }
+
+        if (mouseKey)
+            if (!Players[playerIndex].UsesKeyboard || imguiIO.WantCaptureMouse) return 0;
+        
+        if (gamepadKey)
+            if (Players[playerIndex].GamepadIndex == -1) return 0;
+        
 
         return key switch
         {

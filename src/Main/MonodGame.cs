@@ -17,6 +17,8 @@ using Monod.SaveModule;
 using Monod.TimeModule;
 using Monod.Utils.General;
 using System.Globalization;
+using ImGuiNET;
+using ImGuiNET.SampleProgram.XNA;
 
 namespace Monod;
 
@@ -32,6 +34,8 @@ public abstract class MonodGame : Game
     public static EntityStore Store;
     public static SystemRoot LogicSystemRoot;
     public static SystemRoot DrawSystemRoot;
+    public static ImGuiRenderer imGuiRenderer;
+    public static ImGuiIOPtr imGuiIO => ImGui.GetIO();
 
     public UiSystem MainUiSystem;
 
@@ -77,6 +81,9 @@ public abstract class MonodGame : Game
         MainAssetManager = new AssetManager(new AssetLoader((contentPath)));
         Assets.RegisterAssetManager(MainAssetManager, "");
 
+        imGuiRenderer = new ImGuiRenderer(this); // Initialize the ImGui renderer
+        imGuiRenderer.RebuildFontAtlas(); // Required so fonts are available for rendering
+        
         base.Initialize();
 
         SaveManager.Load(SaveType.Settings, SaveManager.SavesLocation);
@@ -179,9 +186,14 @@ public abstract class MonodGame : Game
         }
 
         DrawM();
-        MainUiSystem.Draw(gameTime, Renderer.spriteBatch);
         base.Draw(gameTime);
+        MainUiSystem.Draw(gameTime, Renderer.spriteBatch);
+        imGuiRenderer.BeforeLayout(Time.DeltaTime);
+        DrawImGui();
+        imGuiRenderer.AfterLayout();
     }
+
+    public virtual void DrawImGui(){ }
 
     /// <summary>
     /// Called when the game should update. Override this to update your game.

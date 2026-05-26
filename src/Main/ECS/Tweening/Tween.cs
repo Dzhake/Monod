@@ -3,9 +3,11 @@ using MLEM.Maths;
 using Monod.TimeModule;
 using Monod.Utils;
 
+namespace Monod.ECS.Tweening;
+
 public interface ILerper<T>
 {
-    public abstract T Lerp(T from, T to, float time);
+    public T Lerp(T from, T to, float time);
 }
 
 public struct Tween<TComponent, TField, TLerper> where TComponent : struct, IComponent where TLerper : ILerper<TField>, new()
@@ -55,8 +57,14 @@ public struct Tween<TComponent, TField, TLerper> where TComponent : struct, ICom
         ref TComponent componentRef = ref data.Get<TComponent>();
         ref TField fieldRef = ref UnsafeUtils.GetField<TComponent, TField>(ref componentRef, FieldOffset);
         if (CurrentTime >= TotalTime)
+        {
             fieldRef = To;
+        }
+            
         else
-            fieldRef = Lerper.Lerp(From, To, CurrentTime / TotalTime);
+        {
+            float time = CurrentTime / TotalTime;
+            fieldRef = Lerper.Lerp(From, To, EasingFunc(time));
+        }
     }
 }
