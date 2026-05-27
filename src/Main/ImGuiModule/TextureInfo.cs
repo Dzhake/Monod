@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Monod;
+namespace Monod.ImGuiModule;
 
 public sealed class TextureInfo
 {

@@ -120,11 +120,6 @@ public static class Assets
     /// </summary>
     public static void Update()
     {
-        if (Input.KeyDown(Key.F5))
-        {
-            ReloadThisFrame = true;
-        }
-
         try
         {
             LoadingInfoLock.EnterUpgradeableReadLock();

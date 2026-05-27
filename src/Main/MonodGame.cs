@@ -1,5 +1,6 @@
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
+using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
@@ -10,15 +11,16 @@ using Monod.AssetsModule;
 using Monod.Graphics;
 using Monod.Graphics.Components;
 using Monod.Graphics.Fonts;
+using Monod.Graphics.Settings;
+using Monod.ImGuiModule;
 using Monod.InputModule;
 using Monod.Localization;
 using Monod.ModsModule;
 using Monod.SaveModule;
 using Monod.TimeModule;
 using Monod.Utils.General;
+using SDL3;
 using System.Globalization;
-using ImGuiNET;
-using ImGuiNET.SampleProgram.XNA;
 
 namespace Monod;
 
@@ -49,6 +51,8 @@ public abstract class MonodGame : Game
         Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
         Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
 
+        SDL.SDL_Init(SDL.SDL_InitFlags.SDL_INIT_VIDEO);
+
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
@@ -70,6 +74,8 @@ public abstract class MonodGame : Game
     /// <inheritdoc/>
     protected override void Initialize()
     {
+        SaveManager.Load(SaveType.Settings, SaveManager.SavesLocation);
+
         Renderer.Initialize(this);
         Input.Initialize(this);
         Assets.Initialize();
@@ -81,12 +87,9 @@ public abstract class MonodGame : Game
         MainAssetManager = new AssetManager(new AssetLoader((contentPath)));
         Assets.RegisterAssetManager(MainAssetManager, "");
 
-        imGuiRenderer = new ImGuiRenderer(this); // Initialize the ImGui renderer
-        imGuiRenderer.RebuildFontAtlas(); // Required so fonts are available for rendering
-        
-        base.Initialize();
+        imGuiRenderer = new ImGuiRenderer(this);
 
-        SaveManager.Load(SaveType.Settings, SaveManager.SavesLocation);
+        base.Initialize();
         ModManager.EnqueueLoadEnabledMods();
     }
 
@@ -105,7 +108,7 @@ public abstract class MonodGame : Game
     {
         // Meta-modules update (responsible to tracking time and pausing)
         Time.Update(gameTime, IsActive);
-        if (GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco && !IsActive) return;
+        if (GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco && !IsActive) return;
 
         // Pre-update
         base.Update(gameTime);
@@ -145,7 +148,7 @@ public abstract class MonodGame : Game
     /// <inheritdoc/>
     protected override void Draw(GameTime gameTime)
     {
-        if (GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco && !IsActive) return;
+        if (GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco && !IsActive) return;
         GraphicsDevice.Clear(Color.Black);
         if (ModManager.InProgress)
         {
@@ -193,7 +196,7 @@ public abstract class MonodGame : Game
         imGuiRenderer.AfterLayout();
     }
 
-    public virtual void DrawImGui(){ }
+    public virtual void DrawImGui() { }
 
     /// <summary>
     /// Called when the game should update. Override this to update your game.

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Monod.Graphics;
+using Monod.Graphics.Settings;
 
 namespace Monod.TimeModule;
 
@@ -71,9 +71,9 @@ public static class Time
     public static void Update(GameTime gameTime, bool isActive)
     {
         Time.gameTime = gameTime;
-        if (GraphicsSettings.FocusLossBehaviour == GraphicsSettings.OnFocusLossBehaviour.Continue) isActive = true;
+        if (GraphicsSettings.FocusLossBehaviour == OnFocusLossBehaviour.Continue) isActive = true;
 
-        if (wasActive || GraphicsSettings.FocusLossBehaviour > GraphicsSettings.OnFocusLossBehaviour.Eco)
+        if (wasActive || GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco)
             RawDeltaTimeSpan = gameTime.ElapsedGameTime;
         else
             RawDeltaTimeSpan += gameTime.ElapsedGameTime;

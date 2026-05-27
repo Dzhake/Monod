@@ -1,7 +1,7 @@
 using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Monod.ImGui;
+namespace Monod.ImGuiModule;
 
 public static class DrawVertDeclaration
 {

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//copypasted from https://github.com/HexaEngine/Hexa.NET.ImGui/tree/main/Examples/ExampleMonoGame with minor modifications, MIT license.
 using System.Runtime.InteropServices;
 using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using ImGui = Hexa.NET.ImGui.ImGui;
 
-namespace Monod.ImGui;
+namespace Monod.ImGuiModule;
 
 public class ImGuiRenderer
 {
@@ -205,9 +203,9 @@ public class ImGuiRenderer
         }
     }
 
-    public virtual void BeforeLayout(GameTime gameTime)
+    public virtual void BeforeLayout(float dt)
     {
-        ImGui.GetIO().DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        ImGui.GetIO().DeltaTime = dt;
         UpdateInput();
         ImGui.NewFrame();
     }

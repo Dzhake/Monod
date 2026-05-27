@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.Graphics.Fonts.Bitmap;
+using Monod.Graphics.Settings;
 
 namespace Monod.Graphics;
 
@@ -94,13 +95,14 @@ public static class Renderer
     /// <exception cref="InvalidOperationException"><see cref="deviceManager"/> is null.</exception>
     public static void Initialize(Game game)
     {
-        if (deviceManager == null) throw new InvalidOperationException("deviceManager is null");
+        if (deviceManager == null) throw new InvalidOperationException("deviceManager is null. Verify that Renderer.OnGameCreated is called.");
         device = game.GraphicsDevice;
         Window = game.Window;
         WindowHandle = Window.Handle;
         spriteBatch = new SpriteBatch(game.GraphicsDevice);
         Pixel = new(device, 1, 1);
         Pixel.SetData([Color.White]);
+        GraphicsSettings.Init();
     }
 
     //Meta drawing functions
