@@ -38,6 +38,7 @@ public abstract class MonodGame : Game
     public static SystemRoot DrawSystemRoot;
     public static ImGuiRenderer imGuiRenderer;
     public static ImGuiIOPtr imGuiIO => ImGui.GetIO();
+    public static Point WindowBoundsRatio = new(16, 9);
 
     public UiSystem MainUiSystem;
 
@@ -56,6 +57,7 @@ public abstract class MonodGame : Game
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
+        Window.ClientSizeChanged += OnWindowSizeChanged;
 
         Store = new();
         LogicSystemRoot = new();
@@ -64,6 +66,12 @@ public abstract class MonodGame : Game
         DrawSystemRoot.AddStore(Store);
 
         Exiting += OnExit;
+    }
+
+    private void OnWindowSizeChanged(object? sender, EventArgs e)
+    {
+        GraphicsSettings.WindowSize = Window.ClientBounds.Size;
+        GraphicsSettings.ApplyWindowSizeChanges();
     }
 
     private void OnExit(object? sender, ExitingEventArgs e)
@@ -108,6 +116,7 @@ public abstract class MonodGame : Game
     {
         // Meta-modules update (responsible to tracking time and pausing)
         Time.Update(gameTime, IsActive);
+        GraphicsSettings.WindowPosition = Window.Position;
         if (GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco && !IsActive) return;
 
         // Pre-update
