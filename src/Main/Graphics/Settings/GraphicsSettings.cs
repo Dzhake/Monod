@@ -53,7 +53,7 @@ public static partial class GraphicsSettings
     public static bool KeepSize = true;
 
     public static DisplayInfo[] Displays = [];
-    public static uint SelectedDisplay = 0;
+    public static int SelectedDisplay = 0;
     public static DisplayInfo CurrentDisplay => Displays[SelectedDisplay];
 
 
@@ -85,18 +85,7 @@ public static partial class GraphicsSettings
                 var mode = SDL.SDL_GetCurrentDisplayMode(displayId);
                 SDL.SDL_GetDisplayBounds(displayId, out var bounds);
 
-                Displays[i] = new DisplayInfo
-                {
-                    Id = displayId,
-                    Name = SDL.SDL_GetDisplayName(displayId),
-
-                    Width = mode->w,
-                    Height = mode->h,
-
-                    RefreshRate = mode->refresh_rate,
-
-                    Bounds = bounds
-                };
+                Displays[i] = new DisplayInfo(displayId, SDL.SDL_GetDisplayName(displayId), mode->w, mode->h, mode->refresh_rate, bounds);
             }
         }
         finally

@@ -15,10 +15,15 @@ public class DisplayInfo
 
     public SDL.SDL_Rect Bounds { get; init; }
 
-    public string FancyName;
+    public string FancyName => $"{Name} ({Width}x{Height} @{RefreshRate:0}Hz)";
 
-    public DisplayInfo()
+    public DisplayInfo(uint id, string name, int width, int height, float refreshRate, SDL.SDL_Rect bounds)
     {
-        FancyName = $"{Name} ({Width}x{Height} @{RefreshRate:0}Hz)";
+        Id = id;
+        Name = name;
+        Width = width;
+        Height = height;
+        RefreshRate = refreshRate;
+        Bounds = bounds;
     }
 }
