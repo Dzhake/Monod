@@ -29,6 +29,8 @@ public static partial class GraphicsSettings
     /// Game window's size in pixels.
     /// </summary>
     public static Point WindowSize = new(1280, 720);
+    public static Point RenderSize = new(1280, 720);
+    public static Point RenderOffset = Point.Zero;
 
     /// <summary>
     /// Position of the window relative to the screen, in pixels.
@@ -47,17 +49,26 @@ public static partial class GraphicsSettings
     /// </summary>
     public static bool KeepSize = true;
 
+    public static bool ListenToEvents = true;
+
     public static DisplayInfo[] Displays = [];
     public static int SelectedDisplay = 0;
     public static DisplayInfo CurrentDisplay => Displays[SelectedDisplay];
 
+    public static bool MouseLock;
 
     public static void Init()
     {
+        Renderer.deviceManager.HardwareModeSwitch = false;
         SDL.SDL_SetWindowMinimumSize(Renderer.Window.Handle, 1280, 720);
         SDL.SDL_SetWindowAspectRatio(Renderer.Window.Handle, 16f / 9f, 16f / 9f);
         RefreshDisplays();
-        ApplyWindowModeChanges();
+        ApplyWindowMode();
+    }
+
+    public static void ApplyMouseLock()
+    {
+        SDL.SDL_SetWindowMouseGrab(Renderer.Window.Handle, MouseLock);
     }
 
     public static unsafe void RefreshDisplays()
@@ -73,7 +84,7 @@ public static partial class GraphicsSettings
             }
 
             Displays = new DisplayInfo[count];
-            uint* displayIds = (uint*)(ptr.ToPointer());
+            uint* displayIds = (uint*)ptr.ToPointer();
 
             for (int i = 0; i < count; i++)
             {
@@ -95,14 +106,15 @@ public static partial class GraphicsSettings
     }
 
     /// <summary>
-    /// Applies changes related to <see cref="windowMode"/> and calls <see cref="ApplyWindowSizeChanges"/>.
+    /// Applies changes related to <see cref="windowMode"/> and calls <see cref="ApplyWindowSize"/>.
     /// </summary>
-    public static void ApplyWindowModeChanges()
+    public static void ApplyWindowMode()
     {
         bool fullscreen = windowMode == WindowMode.Fullscreen;
         DisplayInfo display = Displays[SelectedDisplay];
         GraphicsDeviceManager deviceManager = Renderer.deviceManager;
 
+        nint window = Renderer.Window.Handle;
         switch (windowMode)
         {
             case WindowMode.Fullscreen:
@@ -111,49 +123,58 @@ public static partial class GraphicsSettings
                 deviceManager.PreferredBackBufferHeight = WindowSize.Y;
                 break;
             case WindowMode.Windowed:
-                SDL.SDL_RestoreWindow(Renderer.WindowHandle);
+                SDL.SDL_RestoreWindow(window);
                 WindowSize = new(1280, 720);
                 break;
             case WindowMode.Borderless:
-                SDL.SDL_RestoreWindow(Renderer.WindowHandle);
+                SDL.SDL_RestoreWindow(window);
                 WindowSize = new(display.Width, display.Height);
-                WindowPosition = Point.Zero;
                 break;
             case WindowMode.Maximized:
-                WindowPosition = Point.Zero;
-                SDL.SDL_MaximizeWindow(Renderer.WindowHandle);
+                SDL.SDL_MaximizeWindow(window);
+                SDL.SDL_SyncWindow(window);
+                SDL.SDL_GetWindowSize(window, out WindowSize.X, out WindowSize.Y);
                 break;
         }
 
-        //enabling this breaks mouse position when window is not at 0,0 for some reason. Don't see a reason to turn it on.
-        //Renderer.Window.IsBorderless = windowMode == WindowMode.Borderless;
+        //enabling IsBorderless breaks mouse position when window is not at 0,0 for some reason.
+        Renderer.Window.IsBorderless = windowMode == WindowMode.Borderless;
         deviceManager.IsFullScreen = fullscreen;
-        deviceManager.HardwareModeSwitch = !fullscreen;
-        ApplyWindowSizeChanges();
+        ApplyWindowSize();
     }
 
     /// <summary>
-    /// Applies changes related to <see cref="WindowSize"/>, calls <see cref="ApplyWindowPositionChanges"/> and <see cref="GraphicsDeviceManager.ApplyChanges"/>.
+    /// Applies changes related to <see cref="WindowSize"/>, calls <see cref="ApplyWindowPosition"/> and <see cref="GraphicsDeviceManager.ApplyChanges"/>.
     /// </summary>
-    public static void ApplyWindowSizeChanges()
+    public static void ApplyWindowSize()
     {
         if (WindowSize.X <= 1280) WindowSize.X = 1280;
         //if (WindowSize.Y <= 720) WindowSize.Y = 720;
-        WindowSize.Y = WindowSize.X / MonodGame.WindowBoundsRatio.X * MonodGame.WindowBoundsRatio.Y;
+        //WindowSize.Y = WindowSize.X / MonodGame.WindowBoundsRatio.X * MonodGame.WindowBoundsRatio.Y;
         Renderer.deviceManager.PreferredBackBufferWidth = WindowSize.X;
         Renderer.deviceManager.PreferredBackBufferHeight = WindowSize.Y;
-        ApplyWindowPositionChanges();
+        ApplyWindowPosition();
+        ListenToEvents = false;
         Renderer.deviceManager.ApplyChanges();
+        ListenToEvents = true;
     }
 
     /// <summary>
     /// Applies changes related to <see cref="WindowPosition"/>.
     /// </summary>
-    public static unsafe void ApplyWindowPositionChanges()
+    public static void ApplyWindowPosition()
+    {
+        Renderer.Window.Position = GetWindowPosition();
+    }
+
+    public static unsafe Point GetWindowPosition()
     {
         SDL.SDL_DisplayMode* displayMode = GetSelectDisplayMode();
-        if (displayMode is null) return;
-        Renderer.Window.Position = CenterWindow ? (new Point(displayMode->w, displayMode->h) - WindowSize).Divide(2) : WindowPosition;
+        if (displayMode is null) return WindowPosition;
+        if (windowMode == WindowMode.Windowed)
+            return CenterWindow ? (new Point(displayMode->w, displayMode->h) - WindowSize).Divide(2) : WindowPosition;
+        else
+            return Point.Zero;
     }
 
     private static unsafe SDL.SDL_DisplayMode* GetSelectDisplayMode()

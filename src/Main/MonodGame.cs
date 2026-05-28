@@ -70,8 +70,9 @@ public abstract class MonodGame : Game
 
     private void OnWindowSizeChanged(object? sender, EventArgs e)
     {
+        if (!GraphicsSettings.ListenToEvents) return;
         GraphicsSettings.WindowSize = Window.ClientBounds.Size;
-        GraphicsSettings.ApplyWindowSizeChanges();
+        GraphicsSettings.ApplyWindowSize();
     }
 
     private void OnExit(object? sender, ExitingEventArgs e)

@@ -67,11 +67,6 @@ public static class Renderer
     public static readonly Color EmptyColor = new(0, 0, 0, 0);
 
     /// <summary>
-    /// Window.Handle which can be used to manipulate window with SDL.
-    /// </summary>
-    public static IntPtr WindowHandle;
-
-    /// <summary>
     /// <see cref="GameWindow"/> of running game.
     /// </summary>
     public static GameWindow Window = null!;
@@ -98,11 +93,11 @@ public static class Renderer
         if (deviceManager == null) throw new InvalidOperationException("deviceManager is null. Verify that Renderer.OnGameCreated is called.");
         device = game.GraphicsDevice;
         Window = game.Window;
-        WindowHandle = Window.Handle;
         spriteBatch = new SpriteBatch(game.GraphicsDevice);
         Pixel = new(device, 1, 1);
         Pixel.SetData([Color.White]);
         GraphicsSettings.Init();
+
     }
 
     //Meta drawing functions
@@ -127,14 +122,11 @@ public static class Renderer
     /// <exception cref="InvalidOperationException">Thrown if <see cref="Begin"/> is called next time without previous <see cref="End"/>.</exception>
     /// <remarks>This method uses optional parameters.</remarks>
     /// <remarks>The <see cref="Begin"/> Begin should be called before drawing commands, and you cannot call it again before subsequent <see cref="End"/>.</remarks>
-    public static void Begin(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null,
-    SamplerState? samplerState = null, DepthStencilState? depthStencilState = null,
-    RasterizerState? rasterizerState = null, Effect? effect = null, Matrix? transformMatrix = null)
+    public static void Begin(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Effect? effect = null, Matrix? transformMatrix = null)
     {
         spriteBatchActive = true;
         spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
     }
-
 
     /// <summary>
     /// Ends <see cref="spriteBatch"/>.
