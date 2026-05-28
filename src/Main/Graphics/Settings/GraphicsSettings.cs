@@ -56,6 +56,7 @@ public static partial class GraphicsSettings
     public static DisplayInfo CurrentDisplay => Displays[SelectedDisplay];
 
     public static bool MouseLock;
+    public static bool VSync;
 
     public static void Init()
     {
@@ -64,11 +65,19 @@ public static partial class GraphicsSettings
         SDL.SDL_SetWindowAspectRatio(Renderer.Window.Handle, 16f / 9f, 16f / 9f);
         RefreshDisplays();
         ApplyWindowMode();
+        ApplyMouseLock();
+        ApplyVSync();
     }
 
     public static void ApplyMouseLock()
     {
         SDL.SDL_SetWindowMouseGrab(Renderer.Window.Handle, MouseLock);
+    }
+
+    public static void ApplyVSync()
+    {
+        Renderer.deviceManager.SynchronizeWithVerticalRetrace = VSync;
+        Renderer.deviceManager.ApplyChanges();
     }
 
     public static unsafe void RefreshDisplays()
@@ -123,6 +132,13 @@ public static partial class GraphicsSettings
                 deviceManager.PreferredBackBufferHeight = WindowSize.Y;
                 break;
             case WindowMode.Windowed:
+                //Fix window position not being (and, as the result, being set to 0,0) when swtching from fullscreen to windowed.
+                if (deviceManager.IsFullScreen)
+                {
+                    deviceManager.IsFullScreen = false;
+                    deviceManager.ApplyChanges();
+                }
+
                 SDL.SDL_RestoreWindow(window);
                 WindowSize = new(1280, 720);
                 break;
@@ -138,7 +154,7 @@ public static partial class GraphicsSettings
         }
 
         //enabling IsBorderless breaks mouse position when window is not at 0,0 for some reason.
-        Renderer.Window.IsBorderless = windowMode == WindowMode.Borderless;
+        Renderer.Window.IsBorderless = true;//windowMode == WindowMode.Borderless;
         deviceManager.IsFullScreen = fullscreen;
         ApplyWindowSize();
     }
@@ -187,5 +203,10 @@ public static partial class GraphicsSettings
         }
 
         return displayMode;
+    }
+
+    public static bool IsWindowMaximized(nint window)
+    {
+        return SDL.SDL_GetWindowFlags(window).HasFlag(SDL.SDL_WindowFlags.SDL_WINDOW_MAXIMIZED);
     }
 }

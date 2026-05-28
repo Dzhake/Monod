@@ -71,8 +71,20 @@ public abstract class MonodGame : Game
     private void OnWindowSizeChanged(object? sender, EventArgs e)
     {
         if (!GraphicsSettings.ListenToEvents) return;
-        GraphicsSettings.WindowSize = Window.ClientBounds.Size;
-        GraphicsSettings.ApplyWindowSize();
+        //window was just maximized
+        bool windowMaximized = GraphicsSettings.IsWindowMaximized(Renderer.Window.Handle);
+        bool windowSetToMaximized = GraphicsSettings.windowMode == WindowMode.Maximized;
+        if (windowMaximized != windowSetToMaximized)
+        {
+            GraphicsSettings.windowMode = windowMaximized ? WindowMode.Maximized : WindowMode.Windowed;
+            GraphicsSettings.ApplyWindowMode();
+        }
+        else
+        {
+            GraphicsSettings.WindowSize = Window.ClientBounds.Size;
+            GraphicsSettings.ApplyWindowSize();
+        }
+
     }
 
     private void OnExit(object? sender, ExitingEventArgs e)
