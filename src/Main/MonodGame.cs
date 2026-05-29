@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
 using MLEM.Misc;
-using MLEM.Ui;
 using MLEM.Ui.Style;
 using Monod.AssetsModule;
 using Monod.Graphics;
@@ -33,14 +32,32 @@ public abstract class MonodGame : Game
     /// Main <see cref="AssetManager"/> for vanilla game.
     /// </summary>
     public static AssetManager MainAssetManager = null!;
-    public static EntityStore Store;
-    public static SystemRoot LogicSystemRoot;
-    public static SystemRoot DrawSystemRoot;
-    public static ImGuiRenderer imGuiRenderer;
-    public static ImGuiIOPtr imGuiIO => ImGui.GetIO();
-    public static Point WindowBoundsRatio = new(16, 9);
 
-    public UiSystem MainUiSystem;
+    /// <summary>
+    /// Main <see cref="EntityStore"/> of the game.
+    /// </summary>
+    public static EntityStore Store;
+
+    /// <summary>
+    /// Root of the systems that should be called in <see cref="Update"/> (more specifically, <see cref="UpdateLogicSystems"/>).
+    /// </summary>
+    public required SystemRoot LogicSystemRoot;
+
+
+    /// <summary>
+    /// Root of the systems that should be called in <see cref="Draw"/> (more specifically, <see cref="UpdateDrawSystems"/>).
+    /// </summary>
+    public required SystemRoot DrawSystemRoot;
+
+    /// <summary>
+    /// Object that handles rendering of <see cref="ImGui"/> calls.
+    /// </summary>
+    public ImGuiRenderer imGuiRenderer;
+
+    /// <summary>
+    /// Aspect ratio of the game (X divided by Y).
+    /// </summary>
+    public static float AspectRatio => 16f / 9f;
 
     /// <summary>
     /// Creates a new <see cref="MonodGame"/>.
@@ -84,7 +101,6 @@ public abstract class MonodGame : Game
             GraphicsSettings.WindowSize = Window.ClientBounds.Size;
             GraphicsSettings.ApplyWindowSize();
         }
-
     }
 
     private void OnExit(object? sender, ExitingEventArgs e)
@@ -121,7 +137,6 @@ public abstract class MonodGame : Game
         var style = new UntexturedStyle(Renderer.spriteBatch);
         style.Font = GlobalFonts.MenuFont;
         MlemPlatform.Current = new MlemPlatform.DesktopGl<TextInputEventArgs>((w, c) => w.TextInput += c);
-        MainUiSystem = new UiSystem(this, style);
     }
 
     /// <inheritdoc/>
@@ -146,7 +161,6 @@ public abstract class MonodGame : Game
 
         // Normal update
         UpdateM();
-        MainUiSystem.Update(gameTime);
 
         // Post update
         Input.PostUpdate();
@@ -157,7 +171,7 @@ public abstract class MonodGame : Game
         LogicSystemRoot.Update(GetUpdateTick());
     }
 
-    public void UpdateRenderSystems()
+    public void UpdateDrawSystems()
     {
         DrawSystemRoot.Update(GetUpdateTick());
     }
@@ -212,7 +226,6 @@ public abstract class MonodGame : Game
 
         DrawM();
         base.Draw(gameTime);
-        MainUiSystem.Draw(gameTime, Renderer.spriteBatch);
         imGuiRenderer.BeforeLayout(Time.DeltaTime);
         DrawImGui();
         imGuiRenderer.AfterLayout();

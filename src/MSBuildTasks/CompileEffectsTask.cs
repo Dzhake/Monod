@@ -30,7 +30,7 @@ public class CompileEffectsTask : Task
     /// <summary>
     /// Constant value to track changes.
     /// </summary>
-    public const string Version = "1.4";
+    public const string Version = "1.5";
 
     /// <summary>
     /// Executes the task, called by MSBuild.
@@ -67,6 +67,7 @@ public class CompileEffectsTask : Task
 
         string[] effectFiles = Effects.Split(';');
         Process[] processes = new Process[effectFiles.Length];
+        string[] errorOutputs = new string[effectFiles.Length];
 
         //Start compile processes
         for (int i = 0; i < processes.Length; i++)
@@ -79,6 +80,7 @@ public class CompileEffectsTask : Task
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? "");
             try
             {
+                //Debugger.Launch();
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "mgfxc",
@@ -89,17 +91,20 @@ public class CompileEffectsTask : Task
                     UseShellExecute = false,
                 };
 
-                processes[i] = new()
+                Process process = new()
                 {
                     StartInfo = startInfo,
-                    //EnableRaisingEvents = true
                 };
 
-                processes[i].OutputDataReceived += LogInfo;
+                processes[i] = process;
 
-                processes[i].ErrorDataReceived += LogError;
+                process.OutputDataReceived += LogInfo;
+                int iref = i;
+                process.ErrorDataReceived += (s, args) => { errorOutputs[iref] ??= ""; errorOutputs[iref] += $"{args.Data}\n"; };
 
-                processes[i].Start();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
             catch (Exception exception)
             {
@@ -120,12 +125,15 @@ public class CompileEffectsTask : Task
             try
             {
                 processes[i]?.WaitForExit();
-                if ((processes[i]?.ExitCode ?? 0) != 0)
+                if (errorOutputs[i] is not null && errorOutputs[i].Length != 0)
                 {
-                    Console.WriteLine($"{effectFiles[i]}: compiler exited with code {processes[i].ExitCode}");
-                    Environment.Exit(1);
+                    ParseOutput(errorOutputs[i]);
+                    //LogError($"MGFXC1:{effectFiles[i]}\n{errorOutputs[i]}mgfx compiler exited with code {processes[i].ExitCode}");
                 }
-                LogInfo($"{effectFiles[i]}: sucessfully compiled");
+                else
+                {
+                    LogInfo($"{effectFiles[i]}: sucessfully compiled");
+                }
             }
             catch (Exception exception)
             {
@@ -144,21 +152,145 @@ public class CompileEffectsTask : Task
         LogInfo("Finished compiling effects");
         return true;
     }
+    /*Sample Output:
+         *  Dependency: N:/repos/DerelictDimension/src/Content/Effects/Card.fxh
+         *  N:/repos/DerelictDimension/src/Content/Effects/CardModify.fx(58,9,58,36): warning X3206: implicit truncation of vector type
+         *  N:/repos/DerelictDimension/src/Content/Effects/CardModify.fx(58,9,58,36): error X3017: cannot implicitly convert from 'const float2' to 'float3'
+         *
+         *  Failed to compile 'N:/repos/DerelictDimension/src/Content/Effects/CardModify.fx'!
+         */
+    private void ParseOutput(string s)
+    {
+        if (string.IsNullOrEmpty(s))
+            return;
+
+        foreach (string rawLine in s.Split('\n'))
+        {
+            if (string.IsNullOrWhiteSpace(rawLine))
+                continue;
+
+            string line = rawLine.TrimEnd('\r');
+
+            string[] parts = line.Split(':');
+
+            if (parts.Length < 3)
+                continue;
+
+            int kindIndex = -1;
+            bool isWarning = false;
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                string part = parts[i];
+
+                if (part.Contains(" warning "))
+                {
+                    kindIndex = i;
+                    isWarning = true;
+                    break;
+                }
+
+                if (part.Contains(" error "))
+                {
+                    kindIndex = i;
+                    break;
+                }
+            }
+
+            if (kindIndex < 0)
+                continue;
+
+            // всё до warning/error — file + coords
+            string fileAndCoords = string.Join(":", parts, 0, kindIndex);
+
+            // всё после — message
+            string message = string.Join(":", parts, kindIndex + 1, parts.Length - kindIndex - 1).Trim();
+
+            // part = " warning X3206"
+            string kindPart = parts[kindIndex].Trim();
+
+            string code;
+
+            if (isWarning)
+            {
+                code = kindPart.Replace("warning ", "");
+            }
+            else
+            {
+                code = kindPart.Replace("error ", "");
+            }
+
+            int parenPos = fileAndCoords.LastIndexOf('(');
+            int closeParenPos = fileAndCoords.LastIndexOf(')');
+
+            if (parenPos < 0 || closeParenPos < 0 || closeParenPos <= parenPos)
+                continue;
+
+            string file = fileAndCoords.Substring(0, parenPos);
+
+            string[] coords = fileAndCoords
+                .Substring(parenPos + 1, closeParenPos - parenPos - 1)
+                .Split(',');
+
+            if (coords.Length != 4)
+                continue;
+
+            if (!int.TryParse(coords[0], out int lineNumber) ||
+                !int.TryParse(coords[1], out int columnNumber) ||
+                !int.TryParse(coords[2], out int endLineNumber) ||
+                !int.TryParse(coords[3], out int endColumnNumber))
+            {
+                continue;
+            }
+
+            if (isWarning)
+            {
+                Log.LogWarning(
+                    subcategory: null,
+                    warningCode: code,
+                    helpKeyword: null,
+                    file: file,
+                    lineNumber: lineNumber,
+                    columnNumber: columnNumber,
+                    endLineNumber: endLineNumber,
+                    endColumnNumber: endColumnNumber,
+                    message: message);
+            }
+            else
+            {
+                Log.LogError(
+                    subcategory: null,
+                    errorCode: code,
+                    helpKeyword: null,
+                    file: file,
+                    lineNumber: lineNumber,
+                    columnNumber: columnNumber,
+                    endLineNumber: endLineNumber,
+                    endColumnNumber: endColumnNumber,
+                    message: message);
+            }
+        }
+    }
 
     private void LogInfo(string text)
     {
-        Log.LogMessage(MessageImportance.High, text);
+        if (!string.IsNullOrEmpty(text))
+            Log.LogMessage(MessageImportance.High, text);
     }
 
     private void LogInfo(object? sender, DataReceivedEventArgs e)
     {
-        if (!string.IsNullOrEmpty(e.Data))
-            Log.LogMessage(MessageImportance.High, e.Data);
+        LogInfo(e.Data);
+    }
+
+    private void LogError(string text)
+    {
+        if (!string.IsNullOrEmpty(text))
+            Log.LogError(text);
     }
 
     private void LogError(object sender, DataReceivedEventArgs e)
     {
-        if (!string.IsNullOrEmpty(e.Data))
-            Log.LogError(e.Data);
+        LogError(e.Data);
     }
 }

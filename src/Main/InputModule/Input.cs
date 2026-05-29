@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Hexa.NET.ImGui;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monod.LogModule;
 using Monod.Shared.Extensions;
@@ -193,7 +194,7 @@ public static class Input
     [Pure]
     public static float GetValue(InputState state, Key key, int playerIndex = 0)
     {
-        var imguiIO = MonodGame.imGuiIO;
+        var imguiIO = ImGui.GetIO();
         bool keyboardKey = IsKeyboardKey(key);
         bool gamepadKey = IsGamepadKey(key);
         bool mouseKey = !(keyboardKey || gamepadKey);
@@ -206,10 +207,10 @@ public static class Input
 
         if (mouseKey)
             if (!Players[playerIndex].UsesKeyboard || imguiIO.WantCaptureMouse) return 0;
-        
+
         if (gamepadKey)
             if (Players[playerIndex].GamepadIndex == -1) return 0;
-        
+
 
         return key switch
         {

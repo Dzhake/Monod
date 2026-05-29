@@ -8,7 +8,7 @@ namespace Monod.Graphics.Settings;
 /// <summary>
 /// Represents graphics info which should be serialized in settings file and some methods to change those..
 /// </summary>
-public static partial class GraphicsSettings
+public static class GraphicsSettings
 {
     /// <summary>
     /// Whether the game should not update while the game is paused.
@@ -154,7 +154,7 @@ public static partial class GraphicsSettings
         }
 
         //enabling IsBorderless breaks mouse position when window is not at 0,0 for some reason.
-        Renderer.Window.IsBorderless = true;//windowMode == WindowMode.Borderless;
+        Renderer.Window.IsBorderless = windowMode == WindowMode.Borderless;
         deviceManager.IsFullScreen = fullscreen;
         ApplyWindowSize();
     }

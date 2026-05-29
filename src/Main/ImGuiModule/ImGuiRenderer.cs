@@ -1,12 +1,15 @@
 ﻿//copypasted from https://github.com/HexaEngine/Hexa.NET.ImGui/tree/main/Examples/ExampleMonoGame with minor modifications, MIT license.
-using System.Runtime.InteropServices;
 using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Runtime.InteropServices;
 
 namespace Monod.ImGuiModule;
 
+/// <summary>
+/// Object that handles rendering of <see cref="ImGui"/> calls.
+/// </summary>
 public class ImGuiRenderer
 {
     private const float WHEEL_DELTA = 120;
@@ -34,7 +37,7 @@ public class ImGuiRenderer
     private int _scrollWheelValue;
     private int _horizontalScrollWheelValue;
     private readonly Keys[] _allKeys = Enum.GetValues<Keys>();
-    
+
     public ImGuiRenderer(Game game)
     {
         ArgumentNullException.ThrowIfNull(game);
@@ -547,7 +550,7 @@ public class ImGuiRenderer
         _effect?.Dispose();
 
         // Clean up managed textures
-        foreach(TextureInfo textureInfo in _textures.Values)
+        foreach (TextureInfo textureInfo in _textures.Values)
         {
             if (textureInfo.IsManaged)
             {
