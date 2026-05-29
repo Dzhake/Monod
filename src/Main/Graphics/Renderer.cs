@@ -78,13 +78,19 @@ public static class Renderer
     /// <summary>
     /// <see cref="BlendState.NonPremultiplied"/> is incorrect, according to the https://github.com/MonoGame/MonoGame/issues/6978. This is the correct version.
     /// </summary>
-    public static BlendState NonPremultiplied = new BlendState
+    public static BlendState NonPremultipliedBlend = new()
     {
         ColorSourceBlend = Blend.SourceAlpha,
         ColorDestinationBlend = Blend.InverseSourceAlpha,
         AlphaSourceBlend = Blend.One,
         AlphaDestinationBlend = Blend.InverseSourceAlpha,
     };
+    public static SpriteSortMode? DefaultSpriteSortMode;
+    public static BlendState? DefaultBlendState;
+    public static SamplerState? DefaultSamplerState;
+    public static DepthStencilState? DefaultDepthStencilState;
+    public static RasterizerState? DefaultRasterizerState;
+    public static Effect? DefaultEffect;
 
 
     /// <summary>
@@ -125,20 +131,26 @@ public static class Renderer
     /// <summary>
     /// Begins a new sprite and text batch with the specified render state.
     /// </summary>
-    /// <param name="sortMode">The drawing order for sprite and text drawing. <see cref="SpriteSortMode.Deferred"/> by default.</param>
-    /// <param name="blendState">State of the blending. Uses <see cref="BlendState.AlphaBlend"/> if null.</param>
-    /// <param name="samplerState">State of the sampler. Uses <see cref="SamplerState.LinearClamp"/> if null.</param>
-    /// <param name="depthStencilState">State of the depth-stencil buffer. Uses <see cref="DepthStencilState.None"/> if null.</param>
-    /// <param name="rasterizerState">State of the rasterization. Uses <see cref="RasterizerState.CullCounterClockwise"/> if null.</param>
-    /// <param name="effect">A custom <see cref="Effect"/> to override the default sprite effect. Uses default sprite effect if null.</param>
+    /// <param name="sortMode">The drawing order for sprites and text. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="sortMode"/>, <see cref="DefaultSpriteSortMode"/>, <see cref="SpriteSortMode.Deferred"/>.</param>
+    /// <param name="blendState">State of the blending. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="blendState"/>, <see cref="DefaultBlendState"/>, <see cref="BlendState.AlphaBlend"/>.</param>
+    /// <param name="samplerState">State of the sampler. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="samplerState"/>, <see cref="DefaultSamplerState"/>, <see cref="SamplerState.LinearClamp"/>.</param>
+    /// <param name="depthStencilState">State of the depth-stencil buffer. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="depthStencilState"/>, <see cref="DefaultDepthStencilState"/>, <see cref="DepthStencilState.None"/>.</param>
+    /// <param name="rasterizerState">State of the rasterization. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="rasterizerState"/>, <see cref="DefaultRasterizerState"/>, <see cref="RasterizerState.CullCounterClockwise"/>.</param>
+    /// <param name="effect">A custom <see cref="Effect"/> to override the default sprite effect. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="effect"/>, <see cref="DefaultEffect"/>.</param>
     /// <param name="transformMatrix">An optional matrix used to transform the sprite geometry. Uses <see cref="Matrix.Identity"/> if null.</param>
     /// <exception cref="InvalidOperationException">Thrown if <see cref="Begin"/> is called next time without previous <see cref="End"/>.</exception>
     /// <remarks>This method uses optional parameters.</remarks>
     /// <remarks>The <see cref="Begin"/> Begin should be called before drawing commands, and you cannot call it again before subsequent <see cref="End"/>.</remarks>
-    public static void Begin(SpriteSortMode sortMode = SpriteSortMode.Deferred, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Effect? effect = null, Matrix? transformMatrix = null)
+    public static void Begin(SpriteSortMode? sortMode = null, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Effect? effect = null, Matrix? transformMatrix = null)
     {
         spriteBatchActive = true;
-        spriteBatch.Begin(sortMode, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
+        SpriteSortMode sortModeValue = sortMode ?? DefaultSpriteSortMode ?? SpriteSortMode.Deferred;
+        blendState ??= DefaultBlendState;
+        samplerState ??= DefaultSamplerState;
+        depthStencilState ??= DefaultDepthStencilState;
+        rasterizerState ??= DefaultRasterizerState;
+        effect ??= DefaultEffect;
+        spriteBatch.Begin(sortModeValue, blendState, samplerState, depthStencilState, rasterizerState, effect, transformMatrix);
     }
 
     /// <summary>
