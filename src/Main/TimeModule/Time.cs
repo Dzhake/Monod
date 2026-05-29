@@ -4,7 +4,7 @@ using Monod.Graphics.Settings;
 namespace Monod.TimeModule;
 
 /// <summary>
-/// Class for managing <see cref="DeltaTime"/> and <see cref="TotalTime"/>, and quick access to those.
+/// Class for managing <see cref="DeltaTime"/> and <see cref="TotalTimeSpan"/>, and quick access to those.
 /// </summary>
 public static class Time
 {
@@ -46,7 +46,12 @@ public static class Time
     /// <summary>
     /// Time since program started, multiplied by timescale multipliers at moment those were active.
     /// </summary>
-    public static TimeSpan TotalTime;
+    public static TimeSpan TotalTimeSpan;
+
+    /// <summary>
+    /// Time since program started, multiplied by timescale multipliers at moment those were active, in seconds.
+    /// </summary>
+    public static float TotalTime;
 
     /// <summary>
     /// CurrentValue time scale.
@@ -84,7 +89,7 @@ public static class Time
         RawTotalTime = (float)RawTotalTimeSpan.TotalSeconds;
         RunTimeScaleCallbacks();
         UpdateDeltaTime();
-        TotalTime += DeltaTimeSpan;
+        TotalTimeSpan += DeltaTimeSpan;
     }
 
     /// <summary>
@@ -104,5 +109,6 @@ public static class Time
         DeltaTimeSpan = RawDeltaTimeSpan * TimeScale;
         DeltaTime = (float)DeltaTimeSpan.TotalSeconds;
         RawDeltaTime = (float)RawDeltaTimeSpan.TotalSeconds;
+        TotalTime = (float)TotalTimeSpan.TotalSeconds;
     }
 }

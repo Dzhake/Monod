@@ -29,8 +29,6 @@ public static class GraphicsSettings
     /// Game window's size in pixels.
     /// </summary>
     public static Point WindowSize = new(1280, 720);
-    public static Point RenderSize = new(1280, 720);
-    public static Point RenderOffset = Point.Zero;
 
     /// <summary>
     /// Position of the window relative to the screen, in pixels.
@@ -60,7 +58,6 @@ public static class GraphicsSettings
 
     public static void Init()
     {
-        Renderer.deviceManager.HardwareModeSwitch = false;
         SDL.SDL_SetWindowMinimumSize(Renderer.Window.Handle, 1280, 720);
         SDL.SDL_SetWindowAspectRatio(Renderer.Window.Handle, 16f / 9f, 16f / 9f);
         RefreshDisplays();
@@ -155,7 +152,8 @@ public static class GraphicsSettings
 
         //enabling IsBorderless breaks mouse position when window is not at 0,0 for some reason.
         Renderer.Window.IsBorderless = windowMode == WindowMode.Borderless;
-        deviceManager.IsFullScreen = fullscreen;
+        deviceManager.IsFullScreen = windowMode is WindowMode.Fullscreen or WindowMode.Borderless;
+        deviceManager.HardwareModeSwitch = fullscreen;
         ApplyWindowSize();
     }
 
@@ -165,8 +163,10 @@ public static class GraphicsSettings
     public static void ApplyWindowSize()
     {
         if (WindowSize.X <= 1280) WindowSize.X = 1280;
-        //if (WindowSize.Y <= 720) WindowSize.Y = 720;
-        //WindowSize.Y = WindowSize.X / MonodGame.WindowBoundsRatio.X * MonodGame.WindowBoundsRatio.Y;
+        float renderWidth = (float)Math.Floor(Math.Min(WindowSize.X, WindowSize.Y * MonodGame.AspectRatio));
+        float renderHeight = renderWidth / MonodGame.AspectRatio;
+        Renderer.RenderSize = new((int)renderWidth, (int)renderHeight);
+        Renderer.RenderOffset = new((WindowSize.X - renderWidth) / 2, (WindowSize.Y - renderHeight) / 2);
         Renderer.deviceManager.PreferredBackBufferWidth = WindowSize.X;
         Renderer.deviceManager.PreferredBackBufferHeight = WindowSize.Y;
         ApplyWindowPosition();

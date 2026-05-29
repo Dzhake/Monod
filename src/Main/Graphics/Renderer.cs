@@ -72,6 +72,19 @@ public static class Renderer
     public static GameWindow Window = null!;
     public static Vector2 WindowSize => WindowSizeP.ToVector2();
     public static Point WindowSizeP => Window.ClientBounds.Size;
+    public static Point RenderSize = new(1280, 720);
+    public static Vector2 RenderOffset = Vector2.Zero;
+
+    /// <summary>
+    /// <see cref="BlendState.NonPremultiplied"/> is incorrect, according to the https://github.com/MonoGame/MonoGame/issues/6978. This is the correct version.
+    /// </summary>
+    public static BlendState NonPremultiplied = new BlendState
+    {
+        ColorSourceBlend = Blend.SourceAlpha,
+        ColorDestinationBlend = Blend.InverseSourceAlpha,
+        AlphaSourceBlend = Blend.One,
+        AlphaDestinationBlend = Blend.InverseSourceAlpha,
+    };
 
 
     /// <summary>
