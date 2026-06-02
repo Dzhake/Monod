@@ -1,4 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="$(ProjectDir)../Analyzers.props"/>
+	
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <LangVersion>preview</LangVersion>
@@ -46,16 +48,5 @@
 		<PackageReference Include="Friflo.Engine.ECS" Version="3.6.0" />
 		<PackageReference Include="Friflo.Engine.ECS.Generators" Version="3.6.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 		<PackageReference Include="Friflo.Engine.ECS.Boost" Version="3.6.0" />
-
-		<!-- Nuget packages: analyzers -->
-		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
-			<IncludeAssets>build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-		<PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
-		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-		</PackageReference>
     </ItemGroup>
 </Project>
