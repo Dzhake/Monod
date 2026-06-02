@@ -106,7 +106,7 @@ public static partial class EffectBuilder
     }
 
     private static StringComparer PathComparer => OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-    private static StringComparison PathComparison => OperatingSystem.IsWindows() ? StringComparison.Ordinal : StringComparison.Ordinal;
+    private static StringComparison PathComparison => OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
     [GeneratedRegex(@"^\s*#include\s+""([^""]+)""", RegexOptions.Multiline | RegexOptions.Compiled)]
     private static partial Regex GetIncludeRegex();

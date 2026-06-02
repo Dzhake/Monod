@@ -29,7 +29,7 @@ public class CompileEffectsTask : Task
     /// <summary>
     /// Constant value to track changes.
     /// </summary>
-    public const string Version = "1.5";
+    public const string Version = "1.6";
 
     /// <summary>
     /// Executes the task, called by MSBuild.
@@ -37,12 +37,6 @@ public class CompileEffectsTask : Task
     /// <returns><see langword="true"/> on success, <see langword="false"/> otherwise.</returns>
     public override bool Execute()
     {
-        if (Effects is null)
-        {
-            LogInfo("Effects was not specified! Must be list of file paths, relative to *PathToContent*, of files which should be compiled");
-            Environment.Exit(3);
-            return false;
-        }
         if (OutputPath is null)
         {
             LogInfo("OutputPath was not specified! Must be absolute directory path, that is root path to assets. Assets' own relative path is appended to this to get a final output directory.");
@@ -57,9 +51,8 @@ public class CompileEffectsTask : Task
         }
 
         LogInfo($"Running CompileEffectsTask v{Version}");
-
-        string[] effectFiles = Effects.Split(';');
-        int exitCode = EffectCompiler.Compile(effectFiles, OutputPath, PathToContent, Log);
+        EffectCompiler.Log = Log;
+        int exitCode = EffectBuilder.BuildEffects(PathToContent, OutputPath);
         if (exitCode != 0) Environment.Exit(exitCode);
         return true;
     }

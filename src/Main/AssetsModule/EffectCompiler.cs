@@ -17,19 +17,8 @@ public static class EffectCompiler
 {
 #if TASK
     public static TaskLoggingHelper Log;
+#endif
 
-    /// <summary>
-    /// Compile the provided <paramref name="effectFiles"/> using mgfxc, and return the 'exit code' (see 'returns' part of the docs for more info).
-    /// </summary>
-    /// <param name="effectFiles">Array of paths to .fx files. Might be absolute or relative to <paramref name="rootDir"/>.</param>
-    /// <param name="outputDir">Directory, to where output compiled .mgfx files. Output files will have same relative path to <paramref name="outputDir"/> as input files to <paramref name="rootDir"/>.</param>
-    /// <param name="rootDir">Root directory of <paramref name="effectFiles"/>, to which the files are relative.</param>
-    /// <param name="log">Logger that will be used to output info and errors by the compiler.</param>
-    /// <returns>Exit codes: 0 - success, 1 - exception was caught and logged</returns>
-    public static int Compile(string[] effectFiles, string outputDir, string rootDir, TaskLoggingHelper log)
-    {
-        Log = log;
-#else
     /// <summary>
     /// Compile the provided <paramref name="effectFiles"/> using mgfxc, and return the 'exit code' (see 'returns' part of the docs for more info).
     /// </summary>
@@ -39,7 +28,12 @@ public static class EffectCompiler
     /// <returns>Exit codes: 0 - success, 1 - exception was caught and logged</returns>
     public static int Compile(string[] effectFiles, string outputDir, string rootDir)
     {
-#endif
+        if (effectFiles.Length == 0)
+        {
+            LogInfo("No effect files provided.");
+            return 0;
+        }
+
         for (int effectIdx = 0; effectIdx < effectFiles.Length; effectIdx++)
             effectFiles[effectIdx] = effectFiles[effectIdx].Replace('\\', '/');
 
@@ -49,7 +43,7 @@ public static class EffectCompiler
 #if NET5_0_OR_GREATER
         Assets.Logger.Information("Compiling effects: {Effects}", string.Join(';', effectFiles.Select(file => Path.GetRelativePath(rootDir, file))));
 #else
-        LogInfo($"Effects: {string.Join(";", effectFiles)}");
+        LogInfo($"Compiling effects: {string.Join(";", effectFiles)}");
 #endif
 
         Process[] processes = new Process[effectFiles.Length];
@@ -65,7 +59,6 @@ public static class EffectCompiler
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? "");
             try
             {
-                //Debugger.Launch();
                 ProcessStartInfo startInfo = new()
                 {
                     FileName = "mgfxc",
