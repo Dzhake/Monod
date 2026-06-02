@@ -1,8 +1,10 @@
+using D2Phap.FileWatcherEx;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Monod.AssetsModule.Commands;
 using Monod.AssetsModule.Utils;
 using Monod.Utils.Commands;
 using Monod.Utils.General;
+using Serilog;
 
 namespace Monod.AssetsModule;
 
@@ -24,7 +26,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     /// <summary>
     /// <see cref="FileSystemWatcher"/>, used to detect changes in files that are stored in <see cref="DirectoryPath"/>.
     /// </summary>
-    private FileSystemWatcher? Watcher;
+    private FileSystemWatcherEx? Watcher;
 
     /// <summary>
     /// Amount of currently loaded assets.
@@ -69,48 +71,78 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
 
         Watcher.IncludeSubdirectories = true;
 
-        Watcher.Changed += OnFileChanged;
-        Watcher.Created += OnFileChanged;
-        Watcher.Deleted += OnFileDeleted;
-        Watcher.Renamed += OnFileRenamed;
+        Watcher.OnChanged += OnFileChanged;
+        Watcher.OnCreated += OnFileChanged;
+        Watcher.OnDeleted += OnFileDeleted;
+        Watcher.OnRenamed += OnFileRenamed;
 
-        Watcher.EnableRaisingEvents = true;
+        //Watcher.SynchronizingObject = (System.ComponentModel.ISynchronizeInvoke?)Watcher;
+        Watcher.Start();
     }
 
-    private void OnFileRenamed(object sender, RenamedEventArgs e)
+    private void OnFileRenamed(object? sender, FileChangedEvent e)
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
-        string relativeOldPath = Path.GetRelativePath(DirectoryPath, e.OldFullPath).Replace('\\', '/');
+        string relativeOldPath = Path.GetRelativePath(DirectoryPath, e.OldFullPath!).Replace('\\', '/');
+        Log.Information($"Renamed: {relativeOldPath} -> {relativePath}");
         if (Directory.Exists(e.FullPath))
         {
+            OnDirectoryModified(relativeOldPath);
+            OnDirectoryModified(relativePath);
             EnqueueReloadAssetsInDir(relativePath);
-            EnqueueReloadAssetsInDir(relativeOldPath);
+            EnqueueRemoveAssetsInDir(relativeOldPath);
             return;
         }
 
+        OnAssetModified(relativeOldPath);
+        OnAssetModified(relativePath);
         EnqueueReloadAsset(relativeOldPath);
         EnqueueReloadAsset(relativePath);
     }
 
-    private void OnFileDeleted(object sender, FileSystemEventArgs e)
+    private void OnFileDeleted(object? sender, FileChangedEvent e)
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
+        Log.Information($"Deleted: {relativePath}");
         // just reload it both as a dir and as an asset to be safe, there aren't really any reliable ways to determine whether a file or dir was deleted
 
+        OnAssetModified(relativePath);
+        OnDirectoryModified(relativePath);
         EnqueueRemoveAssetsInDir(relativePath);
         if (!Directory.Exists(e.FullPath)) EnqueueReloadAsset(relativePath);
     }
 
-    private void OnFileChanged(object sender, FileSystemEventArgs e)
+    private void OnFileChanged(object? sender, FileChangedEvent e)
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
+        Log.Information($"Changed: {relativePath}");
         if (Directory.Exists(e.FullPath))
         {
-            EnqueueReloadAssetsInDir(relativePath);
+            /*OnDirectoryModified(relativePath);
+            EnqueueReloadAssetsInDir(relativePath);*/
             return;
         }
 
+        OnAssetModified(relativePath);
         EnqueueReloadAsset(relativePath);
+    }
+
+    private void OnAssetModified(string relativePath)
+    {
+        var format = AssetsUtils.DetectFormatByExtension(Path.GetExtension(relativePath));
+        if (format == AssetFormat.Fx)
+        {
+            EffectBuilder.BuildEffect(relativePath, DirectoryPath);
+        }
+        else if (format == AssetFormat.Fxh)
+        {
+            EffectBuilder.BuildEffectsOnFxhChanged(relativePath, DirectoryPath);
+        }
+    }
+
+    private void OnDirectoryModified(string relativePath)
+    {
+        EffectBuilder.BuildEffectsOnDirChanged(relativePath, DirectoryPath);
     }
 
     ///<inheritdoc/>
@@ -163,6 +195,11 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     {
         using AssetStream? assetStream = LoadAssetStream(path);
         LoadAssetFromAssetStream(path, assetStream);
+    }
+
+    public async Task ReloadAssetAsync(string path)
+    {
+        await LoadAssetAsync(path);
     }
 
     /// <summary>
@@ -244,15 +281,21 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
         string fullPath = Path.Join(DirectoryPath, path);
         if (!File.Exists(fullPath))
             return null;
-        try
+
+        for (int i = 0; i < 5; i++)
         {
-            return new(new MemoryStream(await File.ReadAllBytesAsync(fullPath)), AssetsUtils.DetectTypeByPath(path));
+            try
+            {
+                byte[] content = await File.ReadAllBytesAsync(fullPath);
+                return new(new MemoryStream(content), AssetsUtils.DetectTypeByPath(path));
+            }
+            catch (Exception exception)
+            {
+                Assets.Logger.Error(exception, "An exception occured while trying to open a file (try {I}/5):", i);
+                Thread.Sleep(i * 2000);
+            }
         }
-        catch (Exception exception)
-        {
-            Assets.Logger.Error(exception, "An exception occured while trying to open a file:");
-            return null;
-        }
+        return null;
     }
 
 

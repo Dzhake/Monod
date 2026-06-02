@@ -22,6 +22,4 @@ public static class OS
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) Platform = OSPlatform.Linux;
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)) Platform = OSPlatform.FreeBSD;
     }
-
-
 }

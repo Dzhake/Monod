@@ -14,7 +14,13 @@
     
     <ItemGroup>
 		<!-- Project references -->
-		<ProjectReference Include="..\SDL3-CS\SDL3\SDL3.Core.csproj" />
+		<ProjectReference Include="../SDL3-CS/SDL3/SDL3.Core.csproj" />
+		
+		<!--
+		Added it as a project, because there are some hardcoded consts i might want to change in the future.
+		Usage reason: default file system watcher raises a hell ton of events when VS saves a file. 12 events for one save is to much.
+		-->
+		<ProjectReference Include="../FileWatcherEx/Source/D2Phap.FileWatcherEx/D2Phap.FileWatcherEx.csproj" />
 
 		<!-- Nuget packages: general -->
 

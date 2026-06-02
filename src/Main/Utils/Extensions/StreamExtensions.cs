@@ -13,10 +13,7 @@
    copies or substantial portions of the Software.
 */
 
-using System;
 using System.Diagnostics.Contracts;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Monod.Shared.Extensions;
 
@@ -82,10 +79,10 @@ public static class StreamExtensions
 
 
     /// <summary>
-    /// Converts current stream to <see cref="TEnum:byte[]"/> asynchronously.
+    /// Converts current stream to <see cref="T:byte[]"/> asynchronously.
     /// </summary>
     /// <param name="stream">Stream to convert.</param>
-    /// <returns><see cref="TEnum:byte[]"/> read from <paramref name="stream"/>.</returns>
+    /// <returns><see cref="T:byte[]"/> read from <paramref name="stream"/>.</returns>
     /// <exception cref="InvalidOperationException">readCount doesn't match byteLength</exception>
     [Pure]
     public static async ValueTask<byte[]> ToByteArrayAsync(this Stream stream)
