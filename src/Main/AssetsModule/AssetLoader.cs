@@ -4,7 +4,6 @@ using Monod.AssetsModule.Commands;
 using Monod.AssetsModule.Utils;
 using Monod.Utils.Commands;
 using Monod.Utils.General;
-using Serilog;
 
 namespace Monod.AssetsModule;
 
@@ -84,7 +83,6 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         string relativeOldPath = Path.GetRelativePath(DirectoryPath, e.OldFullPath!).Replace('\\', '/');
-        Log.Information($"Renamed: {relativeOldPath} -> {relativePath}");
         if (Directory.Exists(e.FullPath))
         {
             OnDirectoryModified(relativeOldPath);
@@ -103,7 +101,6 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     private void OnFileDeleted(object? sender, FileChangedEvent e)
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
-        Log.Information($"Deleted: {relativePath}");
         // just reload it both as a dir and as an asset to be safe, there aren't really any reliable ways to determine whether a file or dir was deleted
 
         OnAssetModified(relativePath);
@@ -115,7 +112,6 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     private void OnFileChanged(object? sender, FileChangedEvent e)
     {
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
-        Log.Information($"Changed: {relativePath}");
         if (Directory.Exists(e.FullPath))
         {
             /*OnDirectoryModified(relativePath);
@@ -417,8 +413,10 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
         {
             CacheLock.EnterWriteLock();
             foreach (string asset in Cache.Keys)
+            {
                 if (asset.StartsWith(dirPath))
                     Cache.Remove(asset);
+            }
 
             Cache.TrimExcess();
         }

@@ -32,5 +32,5 @@ public struct Scale2D : IComponent, IEquatable<Scale2D>
     public static bool operator !=(in Scale2D p1, in Scale2D p2) => p1.Value != p2.Value;
 
     public override int GetHashCode() => Value.GetHashCode();
-    public override bool Equals(object obj) => obj is Scale2D otherPos && otherPos.Equals(this);
+    public override bool Equals(object? obj) => obj is Scale2D otherPos && otherPos.Equals(this);
 }

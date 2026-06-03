@@ -38,10 +38,10 @@ public sealed class ReloadAssetsInDirCommand(string dir, AssetLoader loader) : A
         var assetPaths = Loader.FilterPaths(Directory.GetFiles(fullDir, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(Loader.DirectoryPath, item).Replace('\\', '/'))).ToList();
         TotalAssets += assetPaths.Count;
         foreach (string assetPath in assetPaths)
-            MainThread.Add(Task.Run(() => LoadAsset(assetPath)));
+            MainThread.Add(Task.Run(() => LoadAssetAsync(assetPath)));
     }
 
-    private async Task LoadAsset(string assetPath)
+    private async Task LoadAssetAsync(string assetPath)
     {
         await Loader.LoadAssetAsync(assetPath);
         Interlocked.Add(ref LoadedAssets, 1);

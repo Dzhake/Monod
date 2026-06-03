@@ -105,9 +105,9 @@ public static class ModManager
 
         List<Task> loadingManifests = [];
         foreach (string manifestPath in manifestPaths)
-            loadingManifests.Add(LoadManifestAndStartLoadingMod(manifestPath, tasks));
+            loadingManifests.Add(LoadManifestAndStartLoadingModAsync(manifestPath, tasks));
 
-        Task.WaitAll(loadingManifests);
+        await Task.WhenAll(loadingManifests);
         //All mods that could be loaded are loaded by now
 
         tasks.InvalidCurrentRequests();
@@ -140,7 +140,7 @@ public static class ModManager
     }
 
 
-    private static async Task LoadManifestAndStartLoadingMod(string manifestPath, ObservableDict<string, ModLoadInfo> loadInfos)
+    private static async Task LoadManifestAndStartLoadingModAsync(string manifestPath, ObservableDict<string, ModLoadInfo> loadInfos)
     {
         ModManifest? manifest = await LoadManifestAsync(manifestPath);
         if (manifest is null) //failed to load manifest, broken mod is added in LoadManifest if possible
@@ -206,7 +206,7 @@ public static class ModManager
             return;
         }
 
-        bool depsSatisfied = await WaitUntilDepsLoaded(manifest, tasks);
+        bool depsSatisfied = await WaitUntilDepsLoadedAsync(manifest, tasks);
 
         if (EnabledMods.CurrentPreset.Contains(manifest.Id.Name) && depsSatisfied)
         {
@@ -222,7 +222,7 @@ public static class ModManager
         Interlocked.Increment(ref FinishedTasksThisCommand);
     }
 
-    private static async Task<bool> WaitUntilDepsLoaded(ModManifest manifest, ObservableDict<string, ModLoadInfo> tasks)
+    private static async Task<bool> WaitUntilDepsLoadedAsync(ModManifest manifest, ObservableDict<string, ModLoadInfo> tasks)
     {
         if (manifest.Deps is not null)
         {

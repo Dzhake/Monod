@@ -2,7 +2,7 @@
 
 namespace Monod.Utils.Collections;
 
-public sealed class ObservableDict<TKey, TValue> where TValue : class
+public sealed class ObservableDict<TKey, TValue> where TKey : notnull where TValue : class
 {
     private readonly Lock _lock = new();
     private readonly Dictionary<TKey, object> Dict = [];

@@ -28,5 +28,5 @@ public struct Rotation2D : IComponent, IEquatable<Rotation2D>
     public static bool operator !=(in Rotation2D r1, in Rotation2D r2) => r1.Angle != r2.Angle;
 
     public override int GetHashCode() => Angle.GetHashCode();
-    public override bool Equals(object obj) => obj is Rotation2D rotation && rotation.Equals(this);
+    public override bool Equals(object? obj) => obj is Rotation2D rotation && rotation.Equals(this);
 }

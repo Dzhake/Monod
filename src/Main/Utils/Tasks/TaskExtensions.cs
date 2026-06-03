@@ -12,10 +12,8 @@
    The above copyright notice and this permission notice shall be included in all
    copies or substantial portions of the Software.
 */
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
+using System.Runtime.CompilerServices;
 using PureAttribute = System.Diagnostics.Contracts.PureAttribute;
 
 namespace Monod.Utils.Tasks;
@@ -72,23 +70,8 @@ public static class TaskExtensions
     /// <typeparam name="T">Return type of new task.</typeparam>
     /// <param name="task">Task to cast.</param>
     /// <returns>Casted task.</returns>
-    [Pure] public static Task<T> CastUnsafe<T>(this Task task)
+    [Pure]
+    public static Task<T> CastUnsafe<T>(this Task task)
         => Unsafe.As<Task, Task<T>>(ref task);
-
-    /// <summary>
-    /// Applies the specified <paramref name="converter"/> to the specified <paramref name="valueTask"/>.
-    /// </summary>
-    /// <typeparam name="TFrom">Return type of <paramref name="valueTask"/>.</typeparam>
-    /// <typeparam name="TTo">Return type of result.</typeparam>
-    /// <param name="valueTask">Task, to which <paramref name="converter"/> is applied.</param>
-    /// <param name="converter">Converter to apply to <paramref name="valueTask"/>.</param>
-    /// <returns></returns>
-    [Pure] public static ValueTask<TTo> Transform<TFrom, TTo>(this ValueTask<TFrom> valueTask, [InstantHandle] Func<TFrom, TTo> converter)
-    {
-        return valueTask.IsCompletedSuccessfully ? new(converter(valueTask.Result)) : TransformSlow(valueTask, converter);
-
-        static async ValueTask<TTo> TransformSlow(ValueTask<TFrom> task, Func<TFrom, TTo> converter)
-            => converter(await task)!;
-    }
 
 }

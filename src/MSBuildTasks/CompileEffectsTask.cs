@@ -1,6 +1,5 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Monod.AssetsModule;
 using System;
 using System.IO;
 

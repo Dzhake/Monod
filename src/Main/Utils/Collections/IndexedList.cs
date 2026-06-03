@@ -324,7 +324,7 @@ public class IndexedList<T> : ICollection<T>
 /// <summary>
 /// Collection builder for <see cref="IndexedList{T}"/>, to make it work with collection expressions.
 /// </summary>
-public class IndexedListBuilder
+public static class IndexedListBuilder
 {
     /// <summary>
     /// Initializes a new instance of <see cref="IndexedList{T}"/> with specified values.

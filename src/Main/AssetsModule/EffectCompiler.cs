@@ -8,7 +8,11 @@ using Microsoft.Build.Framework;
 using System.ComponentModel;
 using System.Diagnostics;
 
+#if TASK
+namespace Monod.MSBuild;
+#else
 namespace Monod.AssetsModule;
+#endif
 
 /// <summary>
 /// A wrapper around "mgfxc" dotnet tool, that is used to compile provided effects during and build and at runtime.

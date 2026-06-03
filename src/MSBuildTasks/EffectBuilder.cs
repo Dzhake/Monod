@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace Monod.AssetsModule;
+namespace Monod.MSBuild;
 
 public static class EffectBuilder
 {

@@ -14,7 +14,7 @@ public struct Position2D : IComponent, IEquatable<Position2D>
 {
     [Browse(Never)]
     [Ignore]
-    [FieldOffset(0)] public Vector2 Value;  // 12
+    [FieldOffset(0)] public Vector2 Value;  // 8
 
     [FieldOffset(0)] public float X;      // (4)
     [FieldOffset(4)] public float Y;      // (4)
