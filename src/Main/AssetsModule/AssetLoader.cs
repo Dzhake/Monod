@@ -287,7 +287,10 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
             }
             catch (Exception exception)
             {
-                Assets.Logger.Error(exception, "An exception occured while trying to open a file (try {I}/5):", i);
+                if (i == 4)
+                    Assets.Logger.Error(exception, "An exception occured while trying to open a file (try {I}/5):", i);
+                else
+                    Assets.Logger.Warning(exception, "An exception occured while trying to open a file (try {I}/5):", i);
                 Thread.Sleep(i * 2000);
             }
         }

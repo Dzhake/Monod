@@ -11,11 +11,6 @@ namespace Monod.MSBuild;
 public class CompileEffectsTask : Task
 {
     /// <summary>
-    /// List of <see cref="File"/> paths, relative to <see cref="PathToContent"/>, of files which should be compiled.
-    /// </summary>
-    public string? Effects { get; set; }
-
-    /// <summary>
     /// Absolute <see cref="Directory"/> path, where assets should be outputted, before their own path.
     /// </summary>
     public string? OutputPath { get; set; }
@@ -50,6 +45,8 @@ public class CompileEffectsTask : Task
         }
 
         LogInfo($"Running CompileEffectsTask v{Version}");
+        OutputPath = OutputPath.Replace('\\', '/');
+        PathToContent = PathToContent.Replace('\\', '/');
         EffectCompiler.Log = Log;
         int exitCode = EffectBuilder.BuildEffects(PathToContent, OutputPath);
         if (exitCode != 0) Environment.Exit(exitCode);

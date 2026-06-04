@@ -24,7 +24,8 @@ public static class EffectBuilder
         }
         foreach (string file in Directory.EnumerateFiles(rootDir, "*.fx", SearchOption.AllDirectories))
         {
-            if (File.GetLastWriteTime(Path.ChangeExtension(file, "mgfx")) < File.GetLastWriteTime(file)) toCompile.Add(file);
+            string normalizedFile = file.Replace('\\', '/');
+            if (File.GetLastWriteTime(Path.ChangeExtension(normalizedFile, "mgfx")) < File.GetLastWriteTime(normalizedFile)) toCompile.Add(normalizedFile);
         }
         return EffectCompiler.Compile(toCompile.ToArray(), outputDir, rootDir);
     }
@@ -35,7 +36,7 @@ public static class EffectBuilder
 
         foreach (string file in Directory.EnumerateFiles(rootDir, "*.fx", SearchOption.AllDirectories).Concat(Directory.EnumerateFiles(rootDir, "*.fxh", SearchOption.AllDirectories)))
         {
-            string fullFilePath = Path.GetFullPath(file);
+            string fullFilePath = Path.GetFullPath(file.Replace('\\', '/'));
             string? fileDir = Path.GetDirectoryName(fullFilePath);
             if (fileDir is null) continue;
             string text = File.ReadAllText(fullFilePath);

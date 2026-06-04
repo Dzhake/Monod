@@ -1,5 +1,4 @@
 ﻿using Monod.LogModule;
-using Monod.Utils.General;
 
 namespace Monod;
 
@@ -13,7 +12,6 @@ public static class MonodMain
     /// </summary>
     public static void EarlyInitialize()
     {
-        OS.Initialize();
         LogHelper.Initialize();
     }
 }
