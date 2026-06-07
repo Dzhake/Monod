@@ -27,10 +27,22 @@ public struct Position2D : IComponent, IEquatable<Position2D>
         Y = y;
     }
 
+    public Position2D(Vector2 value)
+    {
+        Value = value;
+    }
+
     public bool Equals(Position2D other) => Value == other.Value;
     public static bool operator ==(in Position2D p1, in Position2D p2) => p1.Value == p2.Value;
     public static bool operator !=(in Position2D p1, in Position2D p2) => p1.Value != p2.Value;
 
     public override int GetHashCode() => Value.GetHashCode();
     public override bool Equals(object obj) => obj is Position2D otherPos && otherPos.Equals(this);
+
+    public static implicit operator Vector2(Position2D position) => position.Value;
+    public void Deconstruct(out float x, out float y)
+    {
+        x = X;
+        y = Y;
+    }
 }
