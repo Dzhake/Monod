@@ -40,6 +40,8 @@ public struct Position2D : IComponent, IEquatable<Position2D>
     public override bool Equals(object obj) => obj is Position2D otherPos && otherPos.Equals(this);
 
     public static implicit operator Vector2(Position2D position) => position.Value;
+    public static implicit operator Position2D(Vector2 value) => new(value);
+
     public void Deconstruct(out float x, out float y)
     {
         x = X;
