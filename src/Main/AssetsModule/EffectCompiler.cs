@@ -1,4 +1,5 @@
-﻿#if !TASK
+﻿//note: this file is used in two projects via symlink for convenience. This mess doesn't exactly look convenient, but this way behaviour of compile-time and runtime-time compilation is almost the same, preventing one of those missing important features.
+#if !TASK
 #else
 using System;
 using System.IO;
