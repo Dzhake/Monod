@@ -264,6 +264,13 @@ public static class Renderer
         DrawTexture(Pixel, lineStart, color, null, (float)Math.Atan2(lineEnd.Y - lineStart.Y, lineEnd.X - lineStart.X), new Vector2(0f, 0.5f), new Vector2((lineStart - lineEnd).Length(), width));
     }
 
+    public static void DrawRotRect(float centerX, float centerY, float width, float height, float angle, Color? color = null)
+    {
+        if (Pixel is null) throw new InvalidOperationException("Pixel is null");
+        color ??= Color.White;
+        DrawTexture(Pixel, new(centerX, centerY), color, null, angle, new(0.5f, 0.5f), new Vector2(width, height));
+    }
+
     /// <summary>
     /// Draws a rectangle.
     /// </summary>
@@ -273,7 +280,7 @@ public static class Renderer
     public static void DrawRect(Vector2 p1, Vector2 p2, Color color)
     {
         if (Pixel is null) throw new InvalidOperationException("Pixel is null");
-        DrawTexture(Pixel, p1, color, null, 0f, Vector2.Zero, new Vector2(-(p1.X - p2.X), -(p1.Y - p2.Y)));
+        DrawTexture(Pixel, p1, color, null, 0f, Vector2.Zero, new Vector2(p2.X - p1.X, p2.Y - p1.Y));
     }
 
     /// <summary>
