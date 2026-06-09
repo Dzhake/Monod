@@ -152,7 +152,8 @@ public static class GraphicsSettings
 
         //enabling IsBorderless breaks mouse position when window is not at 0,0 for some reason.
         Renderer.Window.IsBorderless = windowMode == WindowMode.Borderless;
-        deviceManager.IsFullScreen = windowMode is WindowMode.Fullscreen or WindowMode.Borderless;
+        //setting IsFullScreen in borderless breaks window capturing (recording), maybe try to investigate?
+        deviceManager.IsFullScreen = windowMode is WindowMode.Fullscreen;
         deviceManager.HardwareModeSwitch = fullscreen;
         ApplyWindowSize();
     }

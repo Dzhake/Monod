@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using SDL3;
 
-namespace Monod.Graphics;
+namespace Monod.Graphics.Settings;
 
 /// <summary>
 /// Modes of the window, that affect it's possible position, size and <see cref="GraphicsDeviceManager"/> values.
