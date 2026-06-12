@@ -1,6 +1,4 @@
-﻿using Friflo.Engine.ECS;
-using Friflo.Json.Fliox;
-using Microsoft.Xna.Framework;
+﻿using Friflo.Json.Fliox;
 using System.Runtime.InteropServices;
 using static System.Diagnostics.DebuggerBrowsableState;
 using Browse = System.Diagnostics.DebuggerBrowsableAttribute;
@@ -10,7 +8,7 @@ namespace Monod.ECS.DefaultComponents;
 [ComponentKey("Position2D")]
 [StructLayout(LayoutKind.Explicit)]
 [ComponentSymbol("P")]
-public struct Position2D : IComponent, IEquatable<Position2D>
+public record struct Position2D : IComponent, IEquatable<Position2D>
 {
     [Browse(Never)]
     [Ignore]
@@ -35,12 +33,6 @@ public struct Position2D : IComponent, IEquatable<Position2D>
     public bool Equals(Position2D other) => Value == other.Value;
     public static bool operator ==(in Position2D p1, in Position2D p2) => p1.Value == p2.Value;
     public static bool operator !=(in Position2D p1, in Position2D p2) => p1.Value != p2.Value;
-
-    public override int GetHashCode() => Value.GetHashCode();
-    public override bool Equals(object obj) => obj is Position2D otherPos && otherPos.Equals(this);
-
-    public static implicit operator Vector2(Position2D position) => position.Value;
-    public static implicit operator Position2D(Vector2 value) => new(value);
 
     public void Deconstruct(out float x, out float y)
     {

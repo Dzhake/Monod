@@ -76,8 +76,21 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static Effect Effect(AssetInfo info, AssetManager _)
     {
-        return new Effect(Renderer.device, info.AssetStream.ToByteArrayDangerous());
+        try
+        {
+            EffectLock.Enter();
+            return new Effect(Renderer.device, info.AssetStream.ToByteArrayDangerous());
+        }
+        finally
+        {
+            EffectLock.Exit();
+        }
     }
+
+    /// <summary>
+    /// Lock for <see cref="Effect"/> parser, because creating new Effect internally uses non-concurrent dictionary.
+    /// </summary>
+    public static Lock EffectLock = new();
 
     /// <summary>
     /// Parse <see cref="AssetType.Localization"/> and load it to the <see cref="Locale"/>.
