@@ -100,7 +100,7 @@ public static class AssetParsers
     /// <returns><see langword="null"/>. Instead loads asset to the <see cref="Locale"/>.</returns>
     public static object? Localization(AssetInfo info, AssetManager manager)
     {
-        //TODO Locale.AddManager(manager);
+        //TODO (localization - low priority) Locale.AddManager(manager);
         Locale.Load(new StreamReader(info.AssetStream), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
         return null;
     }

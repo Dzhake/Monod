@@ -1,7 +1,5 @@
-using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using Hexa.NET.ImGui;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Font;
 using MLEM.Misc;
@@ -157,7 +155,7 @@ public abstract class MonodGame : Game
 
         if (Assets.IsLoading) return;
         if (ModManager.InProgress) return;
-        //DevConsole.Update(); TODO dev console in-game w/ Console class support like in DD.
+        //DevConsole.Update(); TODO (maybe a bit later - medium-low priority) dev console in-game w/ Console class support like in DD.
 
         // Normal update
         UpdateM();

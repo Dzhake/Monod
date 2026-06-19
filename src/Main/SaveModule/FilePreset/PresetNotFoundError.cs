@@ -9,5 +9,5 @@ public class PresetNotFoundError : FilePresetError
         PresetName = presetName;
     }
 
-    public override string GetText() => $"Preset with name {PresetName} not found"; //TODO localize preset error messages? probably should be done not here, but in preset user.
+    public override string GetText() => $"Preset with name {PresetName} not found"; //TODO (localization - low priority) localize preset error messages? probably should be done not here, but in preset user.
 }

@@ -1,9 +1,7 @@
 ﻿using Hexa.NET.ImGui;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Monod.LogModule;
 using Monod.Shared.Extensions;
-using Serilog;
 using System.Diagnostics.Contracts;
 using System.Text;
 
@@ -298,7 +296,7 @@ public static class Input
         }
         InputSettings settings = Players[playerIndex].Settings;
         if (value <= settings.SticksDeadZone) return 0;
-        return (value - settings.SticksDeadZone) / (1 - settings.SticksDeadZone); //TODO verify that this works
+        return (value - settings.SticksDeadZone) / (1 - settings.SticksDeadZone); //TODO (an easy task - high priority) verify that this works
     }
     #endregion
 

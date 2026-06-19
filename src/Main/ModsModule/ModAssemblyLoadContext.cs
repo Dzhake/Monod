@@ -51,7 +51,7 @@ public class ModAssemblyLoadContext : AssemblyLoadContext, IDisposable
         if (watcher != sender) return;
         //ModManager.ReloadAssembly(mod);
         watcher.EnableRaisingEvents = false; //since assembly is going to be reloaded, this assembly load context will be disposed, so we don't need watcher anymore. Also fixes issue with events being raised twice.
-        // TODO use same load context, only unload the assembly
+        // TODO (mod manager - low priority) use same load context, only unload the assembly
     }
 
     /// <summary>

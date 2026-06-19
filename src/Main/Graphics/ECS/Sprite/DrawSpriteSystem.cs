@@ -20,8 +20,8 @@ public class DrawSpriteSystem : QuerySystem<Sprite2D>
         var data = entity.Data;
 
         Vector2 position;
-        if (data.TryGet<Position2D>(out var position2D))
-            position = position2D.Value;
+        if (data.TryGet<Monod.ECS.DefaultComponents.Transform2D>(out var position2D))
+            position = position2D.Position;
         else
             position = Vector2.Zero;
 
