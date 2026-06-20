@@ -23,7 +23,7 @@ public class TextSystem : QuerySystem<TextComponent>
         var data = entity.Data;
 
         Vector2 position;
-        if (data.TryGet<Monod.ECS.DefaultComponents.Transform2D>(out var position2D))
+        if (data.TryGet<Transform2D>(out var position2D))
             position = position2D.Position;
         else
             position = Vector2.Zero;
