@@ -13,7 +13,7 @@ public static class MathM
     /// <summary>
     /// A small value.
     /// </summary>
-    public static readonly float Epsilon = 0.000001f;
+    public static readonly float Epsilon = 0.00001f;
 
     public static void LerpFloat(ref float from, float to, float amount)
     {

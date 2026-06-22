@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Monod.Shared.Exceptions;
+﻿using Monod.Shared.Exceptions;
 using Monod.Utils.Extensions;
 using SDL3;
 
@@ -13,7 +12,7 @@ public static class GraphicsSettings
     /// <summary>
     /// Whether the game should not update while the game is paused.
     /// </summary>
-    public static OnFocusLossBehaviour FocusLossBehaviour = OnFocusLossBehaviour.Eco;
+    public static OnFocusLossBehaviour FocusLossBehaviour = OnFocusLossBehaviour.TemporaryStop;
 
     public static WindowMode windowMode = WindowMode.Windowed;
 
