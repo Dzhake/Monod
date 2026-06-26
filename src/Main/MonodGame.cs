@@ -74,13 +74,18 @@ public abstract class MonodGame : Game
         Window.AllowUserResizing = true;
         Window.ClientSizeChanged += OnWindowSizeChanged;
 
-        Store = new();
+        CreateStore();
         LogicSystemRoot = new();
         DrawSystemRoot = new();
         LogicSystemRoot.AddStore(Store);
         DrawSystemRoot.AddStore(Store);
 
         Exiting += OnExit;
+    }
+
+    public virtual void CreateStore()
+    {
+        Store = new();
     }
 
     private void OnWindowSizeChanged(object? sender, EventArgs e)
