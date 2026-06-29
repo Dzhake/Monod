@@ -1,3 +1,9 @@
 [submodule "src/SDL3-CS"]
 	path = src/SDL3-CS
 	url = https://github.com/flibitijibibo/SDL3-CS
+[submodule "src/Friflo.Engine.ECS"]
+	path = src/Friflo.Engine.ECS
+	url = https://github.com/friflo/Friflo.Engine.ECS.git
+[submodule "src/FileWatcherEx"]
+	path = src/FileWatcherEx
+	url = ttps://github.com/d2phap/FileWatcherEx.git
