@@ -9,7 +9,6 @@ using Monod.Utils.General;
 using ShadowDusk.Compiler;
 using ShadowDusk.Core;
 using System.Text;
-using System.Text.Json;
 
 namespace Monod.AssetsModule;
 
@@ -106,11 +105,11 @@ public static class AssetParsers
         try
         {
             string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
-            var result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath});
+            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath });
 
             if (result.IsFailure)
             {
-                foreach (var e in result.Error)
+                foreach (ShaderError e in result.Error)
                     Assets.Logger.Error("{File}({Line},{Column}): {Code}: {Message}", e.File, e.Line, e.Column, e.Code, e.Message);
                 return null;
             }
@@ -151,6 +150,8 @@ public static class AssetParsers
 
     public static async Task<object?> Prefab(AssetInfo info, AssetManager assetManager)
     {
-        return await JsonSerializer.DeserializeAsync<Prefab>(info.AssetStream, Json.SReadable);
+        if (!Json.TryDeserialize(info.AssetStream, Json.SReadableWithFields, out Prefab? result, out Exception? error))
+            Assets.Logger.Error(error, "Failed to deserialize prefab at {Path} in {AssetManager}", info.Path, assetManager);
+        return result;
     }
 }

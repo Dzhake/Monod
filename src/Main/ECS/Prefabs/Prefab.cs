@@ -3,7 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace Monod.ECS.Prefabs;
 
-[JsonConverter(typeof(PrefabConverter))]
+[JsonPolymorphic]
+[JsonDerivedType(typeof(EntityPrefab), nameof(EntityPrefab))]
+[JsonDerivedType(typeof(ModificationPrefab), nameof(ModificationPrefab))]
 public abstract class Prefab
 {
     public abstract Entity Instantiate(EntityStore store);
@@ -35,8 +37,9 @@ public sealed class EntityPrefab : Prefab, IDisposable
 // if the class is ever unsealed, implement a proper dispose pattern.
 public sealed class ModificationPrefab : Prefab, IDisposable
 {
-    public string BasePrefabPath;
     public Entity Source;
+
+    public string BasePrefabPath;
 
     [JsonIgnore]
     public Prefab? BasePrefab;
