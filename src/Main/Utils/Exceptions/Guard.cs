@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace Monod.Shared.Exceptions;
 
@@ -36,4 +37,7 @@ public static class Guard
 
     [DoesNotReturn]
     public static void Exception(string message) => throw new Exception(message);
+
+    [DoesNotReturn]
+    public static void JsonException(string message) => throw new JsonException(message);
 }

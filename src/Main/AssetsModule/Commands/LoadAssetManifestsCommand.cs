@@ -34,6 +34,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         string[] manifests = Directory.GetFiles(Loader.DirectoryPath, Assets.MANIFEST_FILENAME, SearchOption.AllDirectories).Select(path => path.Replace('\\', '/')).ToArray();
         if (manifests.Length == 0)
         {
+            Loader.Matchers = AssetLoader.GetDefaultMatchers().ToArray();
             Finish();
             return;
         }
@@ -44,7 +45,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         for (int i = 0; i < manifests.Length; i++)
             files[i] = new(manifests[i]);
         files.Sort(); //deeper = applies earlier
-        List<MatcherInfo> matchers = new();
+        List<MatcherInfo> matchers = AssetLoader.GetDefaultMatchers();
 
         foreach (FileWithDepth file in files)
         {
@@ -57,6 +58,8 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         Loader.Matchers = matchers.ToArray();
         Finish();
     }
+
+    
 
     /// <summary>
     /// Parse matchers from the specified asset manifest (as a <paramref name="stream"/>) with the specified <paramref name="relativePath"/> of the manifest.

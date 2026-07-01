@@ -1,3 +1,4 @@
+using Friflo.Engine.ECS.Serialize;
 using Friflo.Engine.ECS.Systems;
 using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework.Graphics;
@@ -36,6 +37,11 @@ public abstract class MonodGame : Game
     /// </summary>
     public static EntityStore Store;
 
+    public static EntityStore PrefabsStore;
+
+    public static EntitySerializer entitySerializer = new();
+    public static EntityConverter entityConverter = new();
+
     /// <summary>
     /// Root of the systems that should be called in <see cref="Update"/> (more specifically, <see cref="UpdateLogicSystems"/>).
     /// </summary>
@@ -56,6 +62,7 @@ public abstract class MonodGame : Game
     /// Aspect ratio of the game (X divided by Y).
     /// </summary>
     public static float AspectRatio => 16f / 9f;
+
 
     /// <summary>
     /// Creates a new <see cref="MonodGame"/>.

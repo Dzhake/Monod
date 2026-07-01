@@ -10,7 +10,7 @@ namespace Monod.AssetsModule;
 /// <summary>
 /// Provides methods for loading assets from a directory.
 /// </summary>
-public class AssetLoader : CommandRunner<AssetLoaderCommand>
+public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 {
     /// <summary>
     /// Manager that uses this <see cref="AssetLoader"/>.
@@ -35,7 +35,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     /// <summary>
     /// List of <see cref="MatcherInfo"/>s loaded from asset manifests, in order how they should be applied (first one to match means the one to use).
     /// </summary>
-    public MatcherInfo[]? Matchers;
+    public MatcherInfo[]? Matchers = GetDefaultMatchers().ToArray();
 
     /// <summary>
     /// Cache of the assets, with key being path of the asset in this <see cref="AssetManager"/> and value is the asset.
@@ -81,6 +81,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
 
     private void OnFileRenamed(object? sender, FileChangedEvent e)
     {
+        //TODO: check if either of files is actually an asset manifest
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         string relativeOldPath = Path.GetRelativePath(DirectoryPath, e.OldFullPath!).Replace('\\', '/');
         if (Directory.Exists(e.FullPath))
@@ -100,6 +101,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
 
     private void OnFileDeleted(object? sender, FileChangedEvent e)
     {
+        //TODO: reload asset manifests when manifest is deleted
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         // just reload it both as a dir and as an asset to be safe, there aren't really any reliable ways to determine whether a file or dir was deleted
 
@@ -111,6 +113,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
 
     private void OnFileChanged(object? sender, FileChangedEvent e)
     {
+        //TODO: reload asset manifests when manifest is changed
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         if (Directory.Exists(e.FullPath))
         {
@@ -319,6 +322,13 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
         return result;
     }
 
+    public static List<MatcherInfo> GetDefaultMatchers()
+    {
+        return [
+            new MatcherInfo(Globbing.MatcherFromString("**.prefab.json"), new(){ { AssetProps.Parser, (AssetParser)AssetParsers.Prefab } }),
+        ];
+    }
+
 
     /// <summary>
     /// Filter asset paths for <see cref="LoadAssetsInDirCommand"/> using <see cref="AssetManager.Filter"/> and filtering entries that are already in the <see cref="Cache"/>.
@@ -475,5 +485,17 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
         {
             CacheLock.ExitReadLock();
         }
+    }
+
+    public void Dispose()
+    {
+        Watcher?.Dispose();
+        CacheLock.Dispose();
+        Cache?.Clear();
+        Manager = null!;
+        Matchers = null!;
+
+        Assets.ReloadThisFrame = true;
+        Assets.EmitReloadEvent();
     }
 }

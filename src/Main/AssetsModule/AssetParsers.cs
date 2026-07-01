@@ -1,12 +1,15 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.AssetsModule.Utils;
+using Monod.ECS.Prefabs;
 using Monod.Graphics;
 using Monod.Localization;
 using Monod.Shared.Extensions;
+using Monod.Utils.General;
 using ShadowDusk.Compiler;
 using ShadowDusk.Core;
 using System.Text;
+using System.Text.Json;
 
 namespace Monod.AssetsModule;
 
@@ -144,5 +147,10 @@ public static class AssetParsers
     public static async Task<object?> Font(AssetInfo info, AssetManager _)
     {
         return info.AssetStream.ToByteArrayDangerous();
+    }
+
+    public static async Task<object?> Prefab(AssetInfo info, AssetManager assetManager)
+    {
+        return await JsonSerializer.DeserializeAsync<Prefab>(info.AssetStream, Json.SReadable);
     }
 }

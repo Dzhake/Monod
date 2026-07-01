@@ -155,7 +155,8 @@ public sealed class AssetManager : IDisposable
     private void Dispose(bool disposing)
     {
         Assets.UnRegisterAssetsManager(this);
-        //if (!disposing) return;
+        if (!disposing) return;
+        Loader.Dispose();
     }
 
     /// <summary>

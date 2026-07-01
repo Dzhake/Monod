@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Monod.ECS.Prefabs;
 
+[JsonConverter(typeof(PrefabConverter))]
 public abstract class Prefab
 {
     public abstract Entity Instantiate(EntityStore store);
@@ -12,6 +13,11 @@ public abstract class Prefab
 public sealed class EntityPrefab : Prefab, IDisposable
 {
     public Entity Source;
+
+    public EntityPrefab(Entity source)
+    {
+        Source = source;
+    }
 
     public override Entity Instantiate(EntityStore store)
     {
@@ -30,17 +36,15 @@ public sealed class EntityPrefab : Prefab, IDisposable
 public sealed class ModificationPrefab : Prefab, IDisposable
 {
     public string BasePrefabPath;
-    public Entity? Source;
-    public Type[]? RemoveComponents;
+    public Entity Source;
 
     [JsonIgnore]
     public Prefab? BasePrefab;
 
-    public ModificationPrefab(string basePrefabName, Entity? source = null, Type[]? removeComponents = null)
+    public ModificationPrefab(string basePrefabName, Entity source)
     {
         BasePrefabPath = basePrefabName;
         Source = source;
-        RemoveComponents = removeComponents;
         Assets.OnReload += LoadAssets;
         LoadAssets();
     }
@@ -54,14 +58,7 @@ public sealed class ModificationPrefab : Prefab, IDisposable
     {
         Entity entity = BasePrefab?.Instantiate(store) ?? store.CreateEntity();
 
-        if (RemoveComponents is not null)
-        {
-            foreach (var componentTypeToRemove in RemoveComponents)
-                entity.RemoveComponentByType(componentTypeToRemove);
-        }
-
-        if (Source is not null)
-            EntityStore.MergeEntity(Source.Value, entity);
+        EntityStore.MergeEntity(Source, entity);
 
         return entity;
     }
@@ -69,6 +66,6 @@ public sealed class ModificationPrefab : Prefab, IDisposable
     public void Dispose()
     {
         Assets.OnReload -= LoadAssets;
-        Source?.DeleteEntity();
+        Source.DeleteEntity();
     }
 }
