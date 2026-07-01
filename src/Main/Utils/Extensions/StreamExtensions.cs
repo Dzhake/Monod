@@ -14,6 +14,7 @@
 */
 
 using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace Monod.Shared.Extensions;
 
@@ -128,4 +129,14 @@ public static class StreamExtensions
         return ToByteArray(stream);
     }
 
+    /// <summary>
+    /// Read the <paramref name="stream"/> to string asynchronously. Uses <see cref="Encoding.UTF8"/> by default.
+    /// </summary>
+    /// <param name="stream">Stream to read.</param>
+    /// <returns>String read from the <paramref name="stream"/>.</returns>
+    public static async Task<string> ReadStreamAsync(this Stream stream)
+    {
+        using var reader = new StreamReader(stream, Encoding.UTF8);
+        return await reader.ReadToEndAsync();
+    }
 }

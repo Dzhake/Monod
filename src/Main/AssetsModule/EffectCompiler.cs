@@ -18,7 +18,7 @@ namespace Monod.AssetsModule;
 /// <summary>
 /// A wrapper around "mgfxc" dotnet tool, that is used to compile provided effects during and build and at runtime.
 /// </summary>
-public static class EffectCompiler
+public static class OldEffectCompiler
 {
 #if TASK
     public static TaskLoggingHelper Log;

@@ -34,10 +34,13 @@ public static partial class EffectBuilder
 
     public static void BuildEffects(string[] effectFiles, string rootDir)
     {
-        EffectCompiler.Compile(effectFiles, rootDir, rootDir);
+        //EffectCompiler.Compile(effectFiles, rootDir, rootDir);
     }
 
-    public static void BuildEffect(string effectFile, string rootDir) => EffectCompiler.Compile([effectFile], rootDir, rootDir);
+    public static void BuildEffect(string effectFile, string rootDir)
+    {
+        //EffectCompiler.Compile([effectFile], rootDir, rootDir);
+    }
 
     private static Dictionary<string, HashSet<string>> BuildReverseDependencyGraph(string rootDir)
     {

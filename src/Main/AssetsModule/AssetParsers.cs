@@ -4,6 +4,8 @@ using Monod.AssetsModule.Utils;
 using Monod.Graphics;
 using Monod.Localization;
 using Monod.Shared.Extensions;
+using ShadowDusk.Compiler;
+using ShadowDusk.Core;
 using System.Text;
 
 namespace Monod.AssetsModule;
@@ -19,7 +21,7 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
     /// <returns>Parsed asset.</returns>
-    public static byte[] Binary(AssetInfo info, AssetManager _)
+    public static async Task<object?> Binary(AssetInfo info, AssetManager _)
     {
         return info.AssetStream.ToByteArrayDangerous();
     }
@@ -30,7 +32,7 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
     /// <returns>Parsed asset.</returns>
-    public static string Text(AssetInfo info, AssetManager _)
+    public static async Task<object?> Text(AssetInfo info, AssetManager _)
     {
         switch (Assets.ResourcePriority)
         {
@@ -52,7 +54,7 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
     /// <returns>Parsed asset.</returns>
-    public static Texture2D Image(AssetInfo info, AssetManager _)
+    public static async Task<object?> Image(AssetInfo info, AssetManager _)
     {
         return Texture2D.FromStream(Renderer.device, info.AssetStream);
     }
@@ -63,11 +65,12 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
     /// <returns>Parsed asset.</returns>
-    public static SoundEffect Audio(AssetInfo info, AssetManager _)
+    public static async Task<object?> Audio(AssetInfo info, AssetManager _)
     {
         return SoundEffect.FromStream(info.AssetStream);
     }
 
+    /*
     /// <summary>
     /// Parse <see cref="AssetType.Effect"/> as a <see cref="Effect"/> that represents given asset.
     /// </summary>
@@ -86,11 +89,38 @@ public static class AssetParsers
             EffectLock.Exit();
         }
     }
+    */
+
+    private static EffectCompiler effectCompiler = new();
 
     /// <summary>
     /// Lock for <see cref="Effect"/> parser, because creating new Effect internally uses non-concurrent dictionary.
     /// </summary>
-    public static Lock EffectLock = new();
+    private static Lock EffectLock = new();
+
+    public static async Task<object?> Effect(AssetInfo info, AssetManager assetManager)
+    {
+        try
+        {
+            string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
+            var result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath});
+
+            if (result.IsFailure)
+            {
+                foreach (var e in result.Error)
+                    Assets.Logger.Error("{File}({Line},{Column}): {Code}: {Message}", e.File, e.Line, e.Column, e.Code, e.Message);
+                return null;
+            }
+
+            EffectLock.Enter();
+            return new Effect(Renderer.device, result.Value.Data);
+        }
+        finally
+        {
+            EffectLock.Exit();
+        }
+    }
+
 
     /// <summary>
     /// Parse <see cref="AssetType.Localization"/> and load it to the <see cref="Locale"/>.
@@ -98,7 +128,7 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="manager">Manager in which the asset is loaded.</param>
     /// <returns><see langword="null"/>. Instead loads asset to the <see cref="Locale"/>.</returns>
-    public static object? Localization(AssetInfo info, AssetManager manager)
+    public static async Task<object?> Localization(AssetInfo info, AssetManager manager)
     {
         //TODO (localization - low priority) Locale.AddManager(manager);
         Locale.Load(new StreamReader(info.AssetStream), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
@@ -111,7 +141,7 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
     /// <returns>Parsed asset.</returns>
-    public static byte[] Font(AssetInfo info, AssetManager _)
+    public static async Task<object?> Font(AssetInfo info, AssetManager _)
     {
         return info.AssetStream.ToByteArrayDangerous();
     }

@@ -1,6 +1,6 @@
 namespace Monod.AssetsModule.Utils;
 
 /// <summary>
-/// A Func(AssetInfo, object?) analog. Shortcut for shorter code. Returns null if asset could not be parsed.
+/// A Func(AssetInfo, object?) analog. Returns null if asset could not be parsed.
 /// </summary>
-public delegate object? AssetParser(AssetInfo assetInfo, AssetManager manager);
+public delegate Task<object?> AssetParser(AssetInfo assetInfo, AssetManager manager);

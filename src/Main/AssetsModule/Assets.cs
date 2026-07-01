@@ -25,7 +25,7 @@ public static class Assets
     public static readonly string MANIFEST_FILENAME = "assets.json";
 
     /// <summary>
-    /// Logger that should be used by the AssetsModule
+    /// Logger that should be used by the AssetsModule.
     /// </summary>
     public static readonly ILogger Logger = LogHelper.ForModule("Assets");
 

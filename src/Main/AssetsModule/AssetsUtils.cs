@@ -29,7 +29,7 @@ public static class AssetsUtils
     {
         {AssetFormat.Binary, AssetType.Binary },
 
-        {AssetFormat.Fx, AssetType.Ignore },
+        {AssetFormat.Fx, AssetType.Effect },
         {AssetFormat.Fxh, AssetType.Ignore },
 
         {AssetFormat.Text, AssetType.Text },
@@ -45,7 +45,7 @@ public static class AssetsUtils
         {AssetFormat.Ogg, AssetType.Audio },
         {AssetFormat.Wav, AssetType.Audio },
 
-        {AssetFormat.Mgfx, AssetType.Effect },
+        {AssetFormat.Mgfx, AssetType.Ignore },
         {AssetFormat.Ftl, AssetType.Localization },
         {AssetFormat.Ttf, AssetType.Font },
     };

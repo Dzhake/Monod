@@ -47,7 +47,7 @@ public class CompileEffectsTask : Task
         LogInfo($"Running CompileEffectsTask v{Version}");
         OutputPath = OutputPath.Replace('\\', '/');
         PathToContent = PathToContent.Replace('\\', '/');
-        EffectCompiler.Log = Log;
+        OldEffectCompiler.Log = Log;
         int exitCode = EffectBuilder.BuildEffects(PathToContent, OutputPath);
         if (exitCode != 0) Environment.Exit(exitCode);
         return true;

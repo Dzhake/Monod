@@ -190,7 +190,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     public void LoadAsset(string path)
     {
         using AssetStream? assetStream = LoadAssetStream(path);
-        LoadAssetFromAssetStream(path, assetStream);
+        LoadAssetFromAssetStream(path, assetStream).Wait();
     }
 
     public async Task ReloadAssetAsync(string path)
@@ -206,11 +206,11 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
     public async Task LoadAssetAsync(string path)
     {
         using AssetStream? assetStream = await LoadAssetStreamAsync(path);
-        LoadAssetFromAssetStream(path, assetStream);
+        await LoadAssetFromAssetStream(path, assetStream);
     }
 
 
-    private bool LoadAssetFromAssetStream(string path, AssetStream? assetStream)
+    private async Task<bool> LoadAssetFromAssetStream(string path, AssetStream? assetStream)
     {
         if (assetStream is null) //When asset was deleted/renamed?
         {
@@ -228,14 +228,21 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>
 
         AssetInfo assetInfo = assetStream.Value.ToInfo(MatchPath(path).ToArray(), path);
         AssetParser? parser = GetParser(assetInfo);
+
         if (parser is null)
         {
             Assets.Logger.Warning("Could not find parser for the asset with type {Type} at path {Path}. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type, path);
             return false;
         }
 
-        object? asset = parser(assetInfo, Manager);
-        if (asset is null) //failed to load (logged by parser) / loaded to somewhere else by parser
+        Task<object?> assetTask = parser(assetInfo, Manager);
+        if (assetTask is null) //failed to load (logged by parser) / loaded to somewhere else by parser
+        {
+            return false;
+        }
+
+        object? asset = await assetTask;
+        if (asset is null) //same
         {
             return false;
         }
