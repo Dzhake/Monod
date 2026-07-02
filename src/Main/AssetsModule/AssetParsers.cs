@@ -148,10 +148,20 @@ public static class AssetParsers
         return info.AssetStream.ToByteArrayDangerous();
     }
 
+    private static Lock PrefabsLock = new();
+
     public static async Task<object?> Prefab(AssetInfo info, AssetManager assetManager)
     {
-        if (!Json.TryDeserialize(info.AssetStream, Json.SReadableWithFields, out Prefab? result, out Exception? error))
-            Assets.Logger.Error(error, "Failed to deserialize prefab at {Path} in {AssetManager}", info.Path, assetManager);
-        return result;
+        try
+        {
+            PrefabsLock.Enter();
+            if (!Json.TryDeserialize(info.AssetStream, Json.SReadableWithFields, out PrefabAsset? result, out Exception? error))
+                Assets.Logger.Error(error, "Failed to deserialize prefab at {Path} in {AssetManager}", info.Path, assetManager);
+            return result;
+        }
+        finally
+        {
+            PrefabsLock.Exit();
+        }
     }
 }

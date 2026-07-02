@@ -6,13 +6,13 @@ namespace Monod.ECS.Prefabs;
 [JsonPolymorphic]
 [JsonDerivedType(typeof(EntityPrefab), nameof(EntityPrefab))]
 [JsonDerivedType(typeof(ModificationPrefab), nameof(ModificationPrefab))]
-public abstract class Prefab
+public abstract class PrefabAsset
 {
     public abstract Entity Instantiate(EntityStore store);
 }
 
 // if the class is ever unsealed, implement a proper dispose pattern.
-public sealed class EntityPrefab : Prefab, IDisposable
+public sealed class EntityPrefab : PrefabAsset, IDisposable
 {
     public Entity Source;
 
@@ -35,14 +35,14 @@ public sealed class EntityPrefab : Prefab, IDisposable
 }
 
 // if the class is ever unsealed, implement a proper dispose pattern.
-public sealed class ModificationPrefab : Prefab, IDisposable
+public sealed class ModificationPrefab : PrefabAsset, IDisposable
 {
     public Entity Source;
 
     public string BasePrefabPath;
 
     [JsonIgnore]
-    public Prefab? BasePrefab;
+    public PrefabAsset? BasePrefab;
 
     public ModificationPrefab(string basePrefabName, Entity source)
     {
@@ -54,7 +54,7 @@ public sealed class ModificationPrefab : Prefab, IDisposable
 
     public void LoadAssets()
     {
-        BasePrefab = Assets.GetOrDefault<Prefab>(BasePrefabPath);
+        BasePrefab = Assets.GetOrDefault<PrefabAsset>(BasePrefabPath);
     }
 
     public override Entity Instantiate(EntityStore store)

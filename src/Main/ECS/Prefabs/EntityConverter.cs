@@ -18,9 +18,7 @@ public sealed class EntityConverter : JsonConverter<Entity>
 
         var entities = new List<DataEntity>();
 
-        MonodGame.entitySerializer.ReadEntities(
-            entities,
-            new MemoryStream(byteArray));
+        new EntitySerializer().ReadEntities(entities, new MemoryStream(byteArray));
 
         if (entities.Count == 0)
         {
@@ -28,10 +26,11 @@ public sealed class EntityConverter : JsonConverter<Entity>
             return default;
         }
 
-        Entity result = MonodGame.entityConverter.DataEntityToEntity(
-            entities[0],
-            MonodGame.PrefabsStore,
-            out string error);
+        DataEntity dataEntity = entities[0];
+        Entity newEntity = MonodGame.PrefabsStore.CreateEntity();
+        dataEntity.pid = newEntity.Pid;
+
+        Entity result = new Friflo.Engine.ECS.Serialize.EntityConverter().DataEntityToEntity(dataEntity, MonodGame.PrefabsStore, out string error);
 
         if (!string.IsNullOrEmpty(error))
             Guard.JsonException($"Failed to load entity json: {error}");
@@ -42,6 +41,6 @@ public sealed class EntityConverter : JsonConverter<Entity>
 
     public override void Write(Utf8JsonWriter writer, Entity entity, JsonSerializerOptions options)
     {
-        writer.WriteRawValue(MonodGame.entitySerializer.WriteEntity(entity));
+        writer.WriteRawValue(new EntitySerializer().WriteEntity(entity));
     }
 }
