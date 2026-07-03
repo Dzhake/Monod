@@ -1,7 +1,7 @@
 ﻿namespace Monod.MathModule;
 
 /// <summary>
-/// Enum that represents 4 possible directions.
+/// Enum that represents 4 possible directions as flags.
 /// </summary>
 [Flags]
 public enum Direction4
@@ -25,6 +25,12 @@ public enum Direction4
     /// (1, 0)
     /// </summary>
     Right = 1 << 3,
+
+
+    /// <summary>
+    /// All directions.
+    /// </summary>
+    All = Down | Up | Left | Right
 }
 
 public static class Direction4Extensions

@@ -13,24 +13,31 @@ public sealed class EntityConverter : JsonConverter<Entity>
         using var document = JsonDocument.ParseValue(ref reader);
         JsonElement root = document.RootElement;
 
-        string json = $"[{root.GetRawText()}]";
+        string json = root.GetRawText();
+        if (!json.StartsWith('[')) // entity serializer only accepts arrays, so if the prefab is an object, make it one object array.
+            json = $"[{json}]";
         byte[] byteArray = Encoding.UTF8.GetBytes(json);
 
         var entities = new List<DataEntity>();
 
-        new EntitySerializer().ReadEntities(entities, new MemoryStream(byteArray));
+        var entitySerializer = new EntitySerializer();
+        entitySerializer.ReadEntities(entities, new MemoryStream(byteArray));
 
         if (entities.Count == 0)
         {
-            Guard.JsonException("Entity doesn't contain any entity data.");
+            Guard.JsonException("Json doesn't contain any entity data.");
             return default;
         }
 
         DataEntity dataEntity = entities[0];
-        Entity newEntity = MonodGame.PrefabsStore.CreateEntity();
-        dataEntity.pid = newEntity.Pid;
+        if (dataEntity.pid == 0) //some default value. Assigning random pid is not the recommended approach, but it's definitly better than entities overlaping.
+        {
+            Entity newEntity = MonodGame.PrefabsStore.CreateEntity();
+            dataEntity.pid = newEntity.Pid;
+        }
 
-        Entity result = new Friflo.Engine.ECS.Serialize.EntityConverter().DataEntityToEntity(dataEntity, MonodGame.PrefabsStore, out string error);
+        var entityConverter = new Friflo.Engine.ECS.Serialize.EntityConverter();
+        Entity result = entityConverter.DataEntityToEntity(dataEntity, MonodGame.PrefabsStore, out string error);
 
         if (!string.IsNullOrEmpty(error))
             Guard.JsonException($"Failed to load entity json: {error}");
@@ -41,6 +48,7 @@ public sealed class EntityConverter : JsonConverter<Entity>
 
     public override void Write(Utf8JsonWriter writer, Entity entity, JsonSerializerOptions options)
     {
-        writer.WriteRawValue(new EntitySerializer().WriteEntity(entity));
+        var entitySerializer = new EntitySerializer();
+        writer.WriteRawValue(entitySerializer.WriteEntity(entity));
     }
 }
