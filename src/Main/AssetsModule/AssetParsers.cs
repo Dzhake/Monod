@@ -58,7 +58,7 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static async Task<object?> Image(AssetInfo info, AssetManager _)
     {
-        return Texture2D.FromStream(Renderer.device, info.AssetStream);
+        return Texture2D.FromStream(Renderer.device, info.AssetStream, DefaultColorProcessors.PremultiplyAlpha);
     }
 
     /// <summary>

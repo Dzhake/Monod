@@ -43,6 +43,6 @@ public static class Direction4Extensions
     /// <returns>Whether <paramref name="vector"/> matches any of the directions in the <paramref name="directions"/>. I.e., if directions contains left and the vector has negative X and zero Y, then the method will return <see langword="true"/>.</returns>
     public static bool Matches(this Direction4 directions, Vector2 vector)
     {
-        return (directions.HasFlag(Direction4.Down) && vector.X == 0 && vector.Y > 0) || (directions.HasFlag(Direction4.Up) && vector.X == 0 && vector.Y < 0) || (directions.HasFlag(Direction4.Left) && vector.X < 0 && vector.Y == 0) || (directions.HasFlag(Direction4.Right) && vector.X > 0 && vector.Y == 0);
+        return (((directions & Direction4.Down) != 0) && vector.X == 0 && vector.Y > 0) || (((directions & Direction4.Up) != 0) && vector.X == 0 && vector.Y < 0) || (((directions & Direction4.Left) != 0) && vector.X < 0 && vector.Y == 0) || (((directions & Direction4.Right) != 0) && vector.X > 0 && vector.Y == 0);
     }
 }
