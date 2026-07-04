@@ -1,5 +1,6 @@
 using System;
-using ImGuiNET;
+using Friflo.EcGui.Friflo.EcGui;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 

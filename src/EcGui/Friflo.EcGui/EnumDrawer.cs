@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using Friflo.Engine.ECS;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 
@@ -148,7 +148,7 @@ internal sealed class EnumDrawer : TypeDrawer
 			return DrawFlags(in drawValue, num);
 		}
 		EnumName value;
-		bool num2 = ImGui.BeginCombo(preview_value: (!nameByValue.TryGetValue(num, out value)) ? TextUtils.LongAsSpan(num) : ((ReadOnlySpan<char>)value.Name), label: "##field", flags: ImGuiComboFlags.HeightLarge | ImGuiComboFlags.NoArrowButton);
+		bool num2 = ImGui.BeginCombo(preview_value: (!nameByValue.TryGetValue(num, out value)) ? TextUtils.LongAsBytes(num) : ((ReadOnlySpan<char>)value.Name), label: "##field", flags: ImGuiComboFlags.HeightLarge | ImGuiComboFlags.NoArrowButton);
 		ItemFlags result = TypeDrawer.Flags();
 		if (num2)
 		{
@@ -276,7 +276,7 @@ internal sealed class EnumDrawer : TypeDrawer
 				ImGui.PushStyleColor(ImGuiCol.ButtonHovered, flag ? GlobalColors.flagHoveredSet : GlobalColors.flagHovered);
 				ImGui.PushStyleColor(ImGuiCol.Text, flag ? GlobalColors.flagTextSet : GlobalColors.flagText);
 				Span<char> uiFlag = enumBitValue.name.UiFlag;
-				bool num4 = ImGui.Button(uiFlag.IsEmpty ? TextUtils.IntAsSpan(enumBitValue.index) : ((ReadOnlySpan<char>)uiFlag), size);
+				bool num4 = ImGui.Button(uiFlag.IsEmpty ? TextUtils.IntAsBytes(enumBitValue.index) : ((ReadOnlySpan<char>)uiFlag), size);
 				ImGui.PopStyleColor(3);
 				itemFlags |= TypeDrawer.Flags();
 				if (ImGui.BeginItemTooltip())

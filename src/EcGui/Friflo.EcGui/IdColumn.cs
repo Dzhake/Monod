@@ -1,6 +1,6 @@
 using System.Numerics;
 using Friflo.Engine.ECS;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 
@@ -43,7 +43,7 @@ internal sealed class IdColumn : Column
 		}
 		ImGui.SetCursorPos(cursorPos + new Vector2(0f, 0f - ImGui.GetStyle().FramePadding.Y));
 		ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, default(Vector2));
-		ImGui.Selectable(TextUtils.IntAsSpan(entity.Id), drawCell.selected, ImGuiSelectableFlags.None, drawCell.Size);
+		ImGui.Selectable(TextUtils.IntAsBytes(entity.Id), drawCell.selected, ImGuiSelectableFlags.None, drawCell.Size);
 		ImGui.PopStyleVar();
 		if (isNull)
 		{

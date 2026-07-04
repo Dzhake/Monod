@@ -1,7 +1,8 @@
 using System;
 using System.Text;
+using Friflo.EcGui.Friflo.EcGui;
 using Friflo.Engine.ECS;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 
@@ -40,7 +41,7 @@ internal sealed class InspectorRelation
 		drawNode.PushClipRect();
 		ImGui.SetNextItemOpen(expandRelation);
 		ImGui.PushItemFlag(ImGuiItemFlags.NoTabStop, enabled: true);
-		expandRelation = ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanTextWidth | ImGuiTreeNodeFlags.NavLeftJumpsBackHere);
+		expandRelation = ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanLabelWidth | ImGuiTreeNodeFlags.LabelSpanAllColumns);
 		ImGui.PopItemFlag();
 		drawNode.PopClipRect();
 		ImGui.SameLine(context.rect.left);

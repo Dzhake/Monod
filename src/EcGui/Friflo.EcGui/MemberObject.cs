@@ -1,7 +1,8 @@
 using System;
 using System.Text;
+using Friflo.EcGui.Friflo.EcGui;
 using Friflo.Engine.ECS;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 
@@ -46,7 +47,7 @@ internal sealed class MemberObject : IMember
 		{
 			drawNode.PushClipRect();
 		}
-		expandObject = ImGui.TreeNodeEx(memberDrawer.label, flag ? (ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanTextWidth | ImGuiTreeNodeFlags.NavLeftJumpsBackHere) : (ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.NavLeftJumpsBackHere));
+		expandObject = ImGui.TreeNodeEx(memberDrawer.label, flag ? (ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanLabelWidth | ImGuiTreeNodeFlags.LabelSpanAllColumns) : (ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.LabelSpanAllColumns));
 		if (flag)
 		{
 			drawNode.PopClipRect();

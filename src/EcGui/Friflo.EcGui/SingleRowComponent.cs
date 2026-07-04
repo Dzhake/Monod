@@ -1,7 +1,8 @@
 using System;
 using System.Text;
+using Friflo.EcGui.Friflo.EcGui;
 using Friflo.Engine.ECS;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 
@@ -38,14 +39,14 @@ internal sealed class SingleRowComponent : IInspectorComponent
 		{
 			ImGui.SetNextItemOpen(expandComponent);
 			ImGui.PushItemFlag(ImGuiItemFlags.NoTabStop, enabled: true);
-			expandComponent = ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanTextWidth | ImGuiTreeNodeFlags.NavLeftJumpsBackHere);
+			expandComponent = ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanLabelWidth | ImGuiTreeNodeFlags.LabelSpanAllColumns);
 			ImGui.PopItemFlag();
 			ImGui.SameLine(context.rect.left);
 		}
 		else
 		{
 			ImGui.PushItemFlag(ImGuiItemFlags.NoTabStop, enabled: true);
-			expandComponent = ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanTextWidth | ImGuiTreeNodeFlags.NavLeftJumpsBackHere);
+			expandComponent = ImGui.TreeNodeEx(label, ImGuiTreeNodeFlags.AllowOverlap | ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.SpanLabelWidth | ImGuiTreeNodeFlags.LabelSpanAllColumns);
 			ImGui.PopItemFlag();
 			ImGui.SameLine(context.rect.left);
 			ImGui.SetNextItemWidth(drawNode.Size.X);

@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
+using Friflo.EcGui.Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 

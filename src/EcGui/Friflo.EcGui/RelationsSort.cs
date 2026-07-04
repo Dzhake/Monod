@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Friflo.Engine.ECS;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 

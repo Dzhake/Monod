@@ -1,7 +1,7 @@
 using System;
 using System.Numerics;
 using System.Text;
-using ImGuiNET;
+using Hexa.NET.ImGui;
 
 namespace Friflo.EcGui;
 
@@ -55,7 +55,7 @@ internal static class DrawContainer
 
 	internal static float CalcIndexWidth(int count)
 	{
-		return Math.Max(ImGui.CalcTextSize(TextUtils.IntAsSpan((int)MathF.Pow(10f, MathF.Floor(MathF.Log10(MathF.Max(count - 1, 1f)))))).X + UI.Scl(12f), UI.Scl(53f));
+		return Math.Max(ImGui.CalcTextSize(TextUtils.IntAsBytes((int)MathF.Pow(10f, MathF.Floor(MathF.Log10(MathF.Max(count - 1, 1f)))))).X + UI.Scl(12f), UI.Scl(53f));
 	}
 
 	private static ItemFlags DrawHeader(IContainer container, ItemMember[] itemMembers, ref int moreRow, bool scrollX, float indexWidth, out bool addItem)
