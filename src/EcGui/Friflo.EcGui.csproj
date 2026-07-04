@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<AssemblyName>Friflo.EcGui</AssemblyName>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<TargetFramework>net10.0</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup>
+		<LangVersion>latest</LangVersion>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+	</PropertyGroup>
+	<ItemGroup>
+		
+		<ProjectReference Include="..\Friflo.Engine.ECS\src\ECS\Friflo.Engine.ECS.csproj" />
+
+		<PackageReference Include="Hexa.NET.ImGui" Version="2.2.9" />
+		
+	</ItemGroup>
+</Project>

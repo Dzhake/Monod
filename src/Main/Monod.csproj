@@ -16,6 +16,7 @@
     
     <ItemGroup>
 		<!-- Project references -->
+		
 		<ProjectReference Include="../SDL3-CS/SDL3/SDL3.Core.csproj" />
 		
 		<!--
@@ -23,15 +24,16 @@
 		Usage reason: default file system watcher raises a hell ton of events when VS saves a file. 12 events for one save is too much.
 		-->
 		<ProjectReference Include="../FileWatcherEx/Source/D2Phap.FileWatcherEx/D2Phap.FileWatcherEx.csproj" />
+
 		<ProjectReference Include="../Friflo.Engine.ECS/src/ECS.Boost/Friflo.Engine.ECS.Boost.csproj" />
 		<ProjectReference Include="../Friflo.Engine.ECS/src/ECS/Friflo.Engine.ECS.csproj" />
-
+		
+		
 		<!-- Nuget packages: general -->
 
 		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.4.1" />
 
 		<PackageReference Include="ShadowDusk.Compiler" Version="0.11.0" />
-
 		<PackageReference Include="Chasm.SemanticVersioning" Version="2.8.2" />
 		<PackageReference Include="Lib.Harmony" Version="2.4.2" />
 		<PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.8" />
@@ -48,8 +50,5 @@
 
 		<PackageReference Include="MonoGame.Extended" Version="6.0.0" />
 		<PackageReference Include="FontStashSharp.MonoGame" Version="1.5.5" />
-
-		<!-- PackageReference Include="Friflo.Engine.ECS" Version="3.6.0" / -->
-		<!-- PackageReference Include="Friflo.Engine.ECS.Boost" Version="3.6.0" / -->
     </ItemGroup>
 </Project>

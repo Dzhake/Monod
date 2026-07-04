@@ -1,0 +1,188 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Friflo.EcGui;
+
+internal sealed class DictionaryContainer<TDictionary, TKey, TValue> : IContainer, IDisposable where TDictionary : IDictionary<TKey, TValue> where TKey : notnull
+{
+	private int count;
+
+	private TDictionary? dictionary;
+
+	private IEnumerator<KeyValuePair<TKey, TValue>>? enumerator;
+
+	private int index;
+
+	private DrawValue drawValue;
+
+	private static readonly Stack<DictionaryContainer<TDictionary, TKey, TValue>> Pool = new Stack<DictionaryContainer<TDictionary, TKey, TValue>>();
+
+	public int Count => count;
+
+	public bool IsNull => ItemUtils.IsNull(dictionary);
+
+	public Type ItemType => typeof(TValue);
+
+	public KeyValuePair<TKey, TValue> Current => enumerator.Current;
+
+	public override string ToString()
+	{
+		return $"index: {index}  count: {count}";
+	}
+
+	private DictionaryContainer()
+	{
+	}
+
+	internal static IContainer Get(TDictionary? dictionary, in DrawValue drawValue)
+	{
+		if (!Pool.TryPop(out DictionaryContainer<TDictionary, TKey, TValue> result))
+		{
+			result = new DictionaryContainer<TDictionary, TKey, TValue>();
+		}
+		result.drawValue = drawValue;
+		result.count = dictionary?.Count ?? 0;
+		result.dictionary = dictionary;
+		return result;
+	}
+
+	public void Dispose()
+	{
+		count = -1;
+		dictionary = default(TDictionary);
+		enumerator = null;
+		index = -1;
+		Pool.Push(this);
+	}
+
+	public void StartIterator()
+	{
+		index = -1;
+		enumerator = dictionary.GetEnumerator();
+	}
+
+	public bool MoveNext()
+	{
+		index++;
+		return enumerator.MoveNext();
+	}
+
+	public void SeekCurrent(int offset)
+	{
+		IEnumerator<KeyValuePair<TKey, TValue>> enumerator = this.enumerator;
+		for (int i = 0; i < offset; i++)
+		{
+			if (!enumerator.MoveNext())
+			{
+				break;
+			}
+			index++;
+		}
+	}
+
+	public void Add(int index)
+	{
+		KeyValuePair<TKey, TValue> item = ItemUtils.CreateKeyValuePair<TKey, TValue>();
+		TDictionary val = this.dictionary;
+		TDictionary val2;
+		if (val == null)
+		{
+			val2 = (this.dictionary = ItemUtils.CreateContainer<TDictionary>());
+			val = val2;
+			drawValue.SetValue(val);
+		}
+		KeyValuePair<TKey, TValue>[] array = val.ToArray();
+		val.Clear();
+		if (val is Dictionary<TKey, TValue> dictionary)
+		{
+			dictionary.EnsureCapacity(array.Length + 1);
+		}
+		for (int i = 0; i < array.Length; i++)
+		{
+			if (i == index)
+			{
+				val.Add(item);
+			}
+			ref TDictionary reference = ref val;
+			val2 = default(TDictionary);
+			if (val2 == null)
+			{
+				val2 = reference;
+				reference = ref val2;
+			}
+			KeyValuePair<TKey, TValue> item2 = array[i];
+			reference.Add(item2);
+		}
+		if (index == array.Length)
+		{
+			val.Add(item);
+		}
+	}
+
+	public void Remove(int index)
+	{
+		if (index == -1)
+		{
+			ref TDictionary reference = ref dictionary;
+			TDictionary val = default(TDictionary);
+			if (val == null)
+			{
+				val = reference;
+				reference = ref val;
+				if (val == null)
+				{
+					return;
+				}
+			}
+			reference.Clear();
+			return;
+		}
+		int num = 0;
+		foreach (var (key, _) in dictionary)
+		{
+			if (num++ == index)
+			{
+				dictionary.Remove(key);
+				break;
+			}
+		}
+	}
+
+	internal void ChangeDictionaryKey(TKey key)
+	{
+		KeyValuePair<TKey, TValue> current = Current;
+		TDictionary val = dictionary;
+		if (!val.ContainsKey(key))
+		{
+			ref TDictionary reference = ref val;
+			TDictionary val2 = default(TDictionary);
+			if (val2 == null)
+			{
+				val2 = reference;
+				reference = ref val2;
+			}
+			TKey key2 = current.Key;
+			reference.Remove(key2);
+			ref TDictionary reference2 = ref val;
+			val2 = default(TDictionary);
+			if (val2 == null)
+			{
+				val2 = reference2;
+				reference2 = ref val2;
+			}
+			TValue value = current.Value;
+			reference2.Add(key, value);
+			enumerator = val.GetEnumerator();
+			for (int i = 0; i <= index; i++)
+			{
+				enumerator.MoveNext();
+			}
+		}
+	}
+
+	internal void ChangeDictionaryValue(TValue value)
+	{
+		dictionary[Current.Key] = value;
+	}
+}
