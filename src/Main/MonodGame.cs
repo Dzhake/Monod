@@ -130,7 +130,9 @@ public abstract class MonodGame : Game
 
         Renderer.spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        string contentPath = $"{AppContext.BaseDirectory}Content";
+        string contentBase = AppContext.BaseDirectory;
+        string contentPath = Path.Join(contentBase, "Content");
+        if (!Directory.Exists(contentPath)) contentPath = Path.GetFullPath(Path.Join($"{contentBase}", "..", "Content"));
         MainAssetManager = new AssetManager(new AssetLoader(contentPath));
         Assets.RegisterAssetManager(MainAssetManager, "");
 
