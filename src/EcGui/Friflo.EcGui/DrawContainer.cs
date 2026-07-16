@@ -77,7 +77,7 @@ internal static class DrawContainer
 			else
 			{
 				ItemMember obj = itemMembers[i - 1];
-				ImGui.TableSetupColumn(init_width_or_weight: obj.drawer.typeDrawer.DefaultWidth, label: obj.name, flags: flags);
+				ImGui.TableSetupColumn(initWidthOrWeight: obj.drawer.typeDrawer.DefaultWidth, label: obj.name, flags: flags);
 			}
 		}
 		ImGui.PushStyleVar(ImGuiStyleVar.CellPadding, new Vector2(ImGui.GetStyle().CellPadding.X, 0f));
@@ -105,7 +105,7 @@ internal static class DrawContainer
 				{
 					StringBuilder sb = TextUtils.Clear().Append("Add: ");
 					TypeUtils.AppendTypeName(sb, container.ItemType);
-					ImGui.Text(TextUtils.AsSpan(sb));
+					ImGui.Text(TextUtils.AsBytes(sb));
 					ImGui.EndTooltip();
 				}
 			}
@@ -134,9 +134,9 @@ internal static class DrawContainer
 		return itemFlags;
 	}
 
-	private unsafe static ImGuiListClipperPtr CreateListClipper()
+	private static ImGuiListClipperPtr CreateListClipper()
 	{
-		return new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper_ImGuiListClipper());
+		return ImGui.ImGuiListClipper();
 	}
 
 	private static ItemFlags DrawExpansion(IContainer container, ItemMember[] itemMembers, in DrawValue drawValue)

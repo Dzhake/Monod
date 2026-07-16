@@ -1,5 +1,6 @@
+using System;
 using System.Numerics;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using Hexa.NET.ImGui;
@@ -34,7 +35,7 @@ public static class EcGui
 			style.WindowMenuButtonPosition = ImGuiDir.None;
 			style.HoverStationaryDelay = 0.5f;
 			style.ScrollbarSize = 20f;
-			RangeAccessor<Vector4> colors = style.Colors;
+			Span<Vector4> colors = style.Colors;
 			colors[38] = colors[2];
 			colors[37] = colors[11];
 			colors[34] = new Vector4(0f, 0f, 0f, 0f);

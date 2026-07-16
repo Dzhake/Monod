@@ -126,30 +126,23 @@ internal sealed class SetContainer<TSet, T> : IContainer, IDisposable where TSet
 
 	public void Remove(int index)
 	{
+		if (set is null) return;
+
 		if (index == -1)
 		{
-			ref TSet reference = ref set;
-			TSet val = default(TSet);
-			if (val == null)
-			{
-				val = reference;
-				reference = ref val;
-				if (val == null)
-				{
-					return;
-				}
-			}
-			reference.Clear();
+			set.Clear();
 			return;
 		}
-		int num = 0;
+
+		int i = 0;
 		foreach (T item in set)
 		{
-			if (num++ == index)
+			if (i == index)
 			{
 				set.Remove(item);
 				break;
 			}
+			i++;
 		}
 	}
 

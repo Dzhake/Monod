@@ -1,9 +1,8 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
+using FileSystemLinks;
 
 namespace Monod.MSBuild;
 
@@ -46,16 +45,22 @@ public sealed class CreateSymlink : Task
 
             if (Source is null)
             {
-                Log.LogMessage(MessageImportance.High, "Source was not specified! Must be single absolute file path, where the symlink will point.");
-                Environment.Exit(3);
+                Log.LogMessage(MessageImportance.High, "Source was not specified! Must be single absolute file (directory) path, where the symlink will point.");
                 return false;
             }
+
             if (Destination is null)
             {
-                Log.LogMessage(MessageImportance.High, "Destination was not specified! Must be single absolute file path, where the symlink will be created.");
-                Environment.Exit(3);
+                Log.LogMessage(MessageImportance.High, "Destination was not specified! Must be single absolute file (directory) path, where the symlink will be created.");
                 return false;
             }
+
+            Source = Source.Replace('\\', '/');
+            Source = Source.TrimEnd('/');
+
+            Destination = Destination.Replace('\\', '/');
+            Destination = Destination.TrimEnd('/');
+
 
             if (File.Exists(Destination))
             {
@@ -81,7 +86,7 @@ public sealed class CreateSymlink : Task
             if (TryCreateViaShell())
                 return true;
 
-            Log.LogError($"Failed to create symlink to '{Source}' at '{Destination}'");
+            Log.LogError($"Failed to create symlink at '{Destination}' to '{Source}'");
             return false;
         }
         catch (Exception ex)
@@ -102,13 +107,13 @@ public sealed class CreateSymlink : Task
             else
                 File.CreateSymbolicLink(Destination, Source);
 
-            Log.LogMessage($"Symlink created: {Source} -> {Destination}"); //default method no need to say "via .NET"
+            Log.LogMessage(MessageImportance.High, $"Symlink created: {Destination} -> {Source}");
             return true;
         }
         catch (Exception ex)
         {
-            Log.LogMessage(MessageImportance.High,
-                $"Failed to create symlink via .NET to '{Source}' at '{Destination}': {ex.Message}");
+            Log.LogError(MessageImportance.High,
+                $"Failed to create symlink at '{Destination}' to '{Source}': {ex.Message}");
             return false;
         }
     }
@@ -119,56 +124,21 @@ public sealed class CreateSymlink : Task
         try
         {
             bool isDir = Directory.Exists(Source);
-
-            ProcessStartInfo psi;
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (isDir)
             {
-                string args = isDir
-                    ? $"/c mklink /D \"{Destination}\" \"{Source}\""
-                    : $"/c mklink \"{Destination}\" \"{Source}\"";
-
-                psi = new ProcessStartInfo
-                {
-                    FileName = "cmd.exe",
-                    Arguments = args
-                };
+                FileSystemLink.CreateDirectorySymbolicLink(Destination, Source);
             }
             else
             {
-                string args = $"-s \"{Source}\" \"{Destination}\"";
-
-                psi = new ProcessStartInfo
-                {
-                    FileName = "ln",
-                    Arguments = args
-                };
+                FileSystemLink.CreateFileSymbolicLink(Destination, Source);
             }
-
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
-            psi.RedirectStandardError = true;
-            psi.RedirectStandardOutput = true;
-
-            using var p = Process.Start(psi);
-            p.WaitForExit();
-
-            if (p.ExitCode == 0)
-            {
-                Log.LogMessage(MessageImportance.High, $"Symlink created via shell: '{Source}' -> '{Destination}'");
-                return true;
-            }
-
-            string err = p.StandardError.ReadToEnd();
-            Log.LogMessage(MessageImportance.High,
-                $"Failed to create symlink via shell for {Source}: {err}");
-
-            return false;
+            //NativeSymlink.Create(Destination!, Source!, isDir);
+            Log.LogWarning($"Created symlink via shell: {Destination} -> {Source}");
+            return true;
         }
         catch (Exception ex)
         {
-            Log.LogMessage(MessageImportance.High,
-                $"Shell symlink failed: {ex.Message}");
+            Log.LogError($"Shell symlink failed: {ex.Message}");
             return false;
         }
     }

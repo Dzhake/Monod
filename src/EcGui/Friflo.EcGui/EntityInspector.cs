@@ -449,11 +449,11 @@ public sealed class EntityInspector
         ImGui.Text("Label width");
         ImGui.SetItemTooltip("Width of component and member names.");
         ImGui.SetNextItemWidth(UI.Scl(600f));
-        ImGui.SliderInt("##label-width", ref labelWidth, 0, 100, null, ImGuiSliderFlags.AlwaysClamp);
+        ImGui.SliderInt("##label-width", ref labelWidth, 0, 100, (string?)null, ImGuiSliderFlags.AlwaysClamp);
         ImGui.Text("Max table rows");
         ImGui.SetItemTooltip("The maximum numbers of table rows\r\nto display arrays and collections.");
         ImGui.SetNextItemWidth(UI.Scl(600f));
-        ImGui.SliderInt("##max-rows", ref maxRowCount, 3, 30, null, ImGuiSliderFlags.AlwaysClamp);
+        ImGui.SliderInt("##max-rows", ref maxRowCount, 3, 30, (string?)null, ImGuiSliderFlags.AlwaysClamp);
         ImGui.Checkbox("Fixed table height", ref fixedTabledHeight);
         ImGui.SetItemTooltip("The height of tables is fixed to\nMax table rows");
         ImGui.Checkbox("Tooltips", ref showTooltips);

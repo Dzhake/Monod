@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using Friflo.Engine.ECS;
 using Hexa.NET.ImGui;
+using Hexa.NET.Utilities.Text;
 
 namespace Friflo.EcGui;
 
@@ -148,7 +149,7 @@ internal sealed class EnumDrawer : TypeDrawer
 			return DrawFlags(in drawValue, num);
 		}
 		EnumName value;
-		bool num2 = ImGui.BeginCombo(preview_value: (!nameByValue.TryGetValue(num, out value)) ? TextUtils.LongAsBytes(num) : ((ReadOnlySpan<char>)value.Name), label: "##field", flags: ImGuiComboFlags.HeightLarge | ImGuiComboFlags.NoArrowButton);
+		bool num2 = ImGui.BeginCombo(previewValue: (!nameByValue.TryGetValue(num, out value)) ? TextUtils.LongAsBytes(num) : TextUtils.AsBytes(value.Name), label: "##field", flags: ImGuiComboFlags.HeightLarge | ImGuiComboFlags.NoArrowButton);
 		ItemFlags result = TypeDrawer.Flags();
 		if (num2)
 		{
@@ -162,7 +163,7 @@ internal sealed class EnumDrawer : TypeDrawer
 				long num3 = key;
 				EnumName enumName = value2;
 				bool selected = num3 == num;
-				if (ImGui.Selectable(enumName.Name, selected))
+				if (ImGui.Selectable(TextUtils.AsBytes(enumName.Name), selected))
 				{
 					setValue(in drawValue, num3);
 				}
@@ -276,7 +277,7 @@ internal sealed class EnumDrawer : TypeDrawer
 				ImGui.PushStyleColor(ImGuiCol.ButtonHovered, flag ? GlobalColors.flagHoveredSet : GlobalColors.flagHovered);
 				ImGui.PushStyleColor(ImGuiCol.Text, flag ? GlobalColors.flagTextSet : GlobalColors.flagText);
 				Span<char> uiFlag = enumBitValue.name.UiFlag;
-				bool num4 = ImGui.Button(uiFlag.IsEmpty ? TextUtils.IntAsBytes(enumBitValue.index) : ((ReadOnlySpan<char>)uiFlag), size);
+				bool num4 = ImGui.Button(uiFlag.IsEmpty ? TextUtils.IntAsBytes(enumBitValue.index) : TextUtils.AsBytes(uiFlag), size);
 				ImGui.PopStyleColor(3);
 				itemFlags |= TypeDrawer.Flags();
 				if (ImGui.BeginItemTooltip())
@@ -288,7 +289,7 @@ internal sealed class EnumDrawer : TypeDrawer
 					handler.AppendFormatted(enumBitValue.index);
 					handler.AppendLiteral("   Type: ");
 					handler.AppendFormatted(enumType.Name);
-					ImGui.Text(TextUtils.AsSpan(stringBuilder.Append(ref handler)));
+					ImGui.Text(TextUtils.AsBytes(stringBuilder.Append(ref handler)));
 					ImGui.EndTooltip();
 				}
 				if (num4)

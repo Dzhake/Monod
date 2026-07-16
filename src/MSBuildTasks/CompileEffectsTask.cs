@@ -31,6 +31,9 @@ public class CompileEffectsTask : Task
     /// <returns><see langword="true"/> on success, <see langword="false"/> otherwise.</returns>
     public override bool Execute()
     {
+        Log.LogMessage("CompileEffects task is currently obsolute, you're supposed to build effects at runtime.");
+        return false;
+
         if (OutputPath is null)
         {
             LogInfo("OutputPath was not specified! Must be absolute directory path, that is root path to assets. Assets' own relative path is appended to this to get a final output directory.");
@@ -47,7 +50,8 @@ public class CompileEffectsTask : Task
         LogInfo($"Running CompileEffectsTask v{Version}");
         OutputPath = OutputPath.Replace('\\', '/');
         PathToContent = PathToContent.Replace('\\', '/');
-        OldEffectCompiler.Log = Log;
+        //OldEffectCompiler.cs was a symlink to "../Main/AssetsModule/EffectCompiler.cs"
+        //OldEffectCompiler.Log = Log;
         int exitCode = EffectBuilder.BuildEffects(PathToContent, OutputPath);
         if (exitCode != 0) Environment.Exit(exitCode);
         return true;

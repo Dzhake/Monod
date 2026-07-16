@@ -1,1 +1,0 @@
-../Main/AssetsModule/EffectCompiler.cs

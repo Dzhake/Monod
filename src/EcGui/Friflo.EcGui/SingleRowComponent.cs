@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Hexa.NET.ImGui;
 
@@ -67,7 +67,7 @@ internal sealed class SingleRowComponent : IInspectorComponent
 			handler.AppendLiteral(" - size: ");
 			handler.AppendFormatted(componentType.StructSize);
 			stringBuilder4.Append(ref handler);
-			ImGui.Text(TextUtils.AsSpan(stringBuilder3));
+			ImGui.Text(TextUtils.AsBytes(stringBuilder3));
 			ImGui.EndTooltip();
 		}
 		ImGui.SetNextItemWidth(context.rect.size.X);

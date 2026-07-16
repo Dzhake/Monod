@@ -1,4 +1,4 @@
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using System;
 
 namespace Friflo.EcGui;

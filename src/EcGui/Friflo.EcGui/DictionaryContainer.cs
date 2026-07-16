@@ -122,63 +122,47 @@ internal sealed class DictionaryContainer<TDictionary, TKey, TValue> : IContaine
 
 	public void Remove(int index)
 	{
+		if (dictionary == null)
+			return;
+
 		if (index == -1)
 		{
-			ref TDictionary reference = ref dictionary;
-			TDictionary val = default(TDictionary);
-			if (val == null)
-			{
-				val = reference;
-				reference = ref val;
-				if (val == null)
-				{
-					return;
-				}
-			}
-			reference.Clear();
+			dictionary.Clear();
 			return;
 		}
-		int num = 0;
+
+		int i = 0;
+		TKey keyToRemove = default!;
+
 		foreach (var (key, _) in dictionary)
 		{
-			if (num++ == index)
+			if (i++ == index)
 			{
-				dictionary.Remove(key);
-				break;
+				keyToRemove = key;
+				goto RemoveKey;
 			}
 		}
+
+		return;
+
+	RemoveKey:
+		dictionary.Remove(keyToRemove);
 	}
 
 	internal void ChangeDictionaryKey(TKey key)
 	{
-		KeyValuePair<TKey, TValue> current = Current;
-		TDictionary val = dictionary;
-		if (!val.ContainsKey(key))
-		{
-			ref TDictionary reference = ref val;
-			TDictionary val2 = default(TDictionary);
-			if (val2 == null)
-			{
-				val2 = reference;
-				reference = ref val2;
-			}
-			TKey key2 = current.Key;
-			reference.Remove(key2);
-			ref TDictionary reference2 = ref val;
-			val2 = default(TDictionary);
-			if (val2 == null)
-			{
-				val2 = reference2;
-				reference2 = ref val2;
-			}
-			TValue value = current.Value;
-			reference2.Add(key, value);
-			enumerator = val.GetEnumerator();
-			for (int i = 0; i <= index; i++)
-			{
-				enumerator.MoveNext();
-			}
-		}
+		var current = Current;
+
+		if (dictionary.ContainsKey(key))
+			return;
+
+		dictionary.Remove(current.Key);
+		dictionary.Add(key, current.Value);
+
+		enumerator = dictionary.GetEnumerator();
+
+		for (int i = 0; i <= index; i++)
+			enumerator.MoveNext();
 	}
 
 	internal void ChangeDictionaryValue(TValue value)

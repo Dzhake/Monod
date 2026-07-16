@@ -1,8 +1,9 @@
 using System;
 using System.Text;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Hexa.NET.ImGui;
+using Hexa.NET.Utilities.Text;
 
 namespace Friflo.EcGui;
 
@@ -47,9 +48,12 @@ internal sealed class InspectorRelation
 		ImGui.SameLine(context.rect.left);
 		if (drawNode.ShowTooltips && ImGui.BeginItemTooltip())
 		{
-			StringBuilder sb = TextUtils.Clear();
-			TypeUtils.AppendTypeName(sb, memberDrawer.member.memberType);
-			ImGui.Text(TextUtils.AsSpan(sb));
+			unsafe
+			{
+				StringBuilder sb = TextUtils.Clear();
+				TypeUtils.AppendTypeName(sb, memberDrawer.member.memberType);
+				ImGui.Text(TextUtils.AsBytes(sb));
+			}
 			ImGui.EndTooltip();
 		}
 		ImGui.SetNextItemWidth(context.rect.size.X);

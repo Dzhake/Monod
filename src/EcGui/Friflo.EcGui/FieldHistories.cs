@@ -148,12 +148,12 @@ internal sealed class FieldHistories<TComponent, TMember> : FieldHistories where
 				{
 					val = default(TMember);
 				}
-				global::_003CPrivateImplementationDetails_003E.InlineArrayAsSpan<HistoryArray<TMember>, TMember>(ref valueRefOrAddDefault.array, 1024)[index] = val;
+				valueRefOrAddDefault.array[index] = val;
 				valueRefOrAddDefault.lastSample = num;
 			}
 			else
 			{
-				global::_003CPrivateImplementationDetails_003E.InlineArrayAsSpan<HistoryArray<TMember>, TMember>(ref valueRefOrAddDefault.array, 1024)[index] = default(TMember);
+				valueRefOrAddDefault.array[index] = default(TMember);
 			}
 		}
 		if (!allFields)
@@ -169,7 +169,7 @@ internal sealed class FieldHistories<TComponent, TMember> : FieldHistories where
 				ref FieldHistory<TMember> valueRefOrAddDefault2 = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary2, key2, out exists2);
 				if (valueRefOrAddDefault2.lastSample > num2)
 				{
-					global::_003CPrivateImplementationDetails_003E.InlineArrayAsSpan<HistoryArray<TMember>, TMember>(ref valueRefOrAddDefault2.array, 1024)[index] = default(TMember);
+					valueRefOrAddDefault2.array[index] = default;
 				}
 				else
 				{
@@ -198,7 +198,7 @@ internal sealed class FieldHistories<TComponent, TMember> : FieldHistories where
 				{
 					val2 = default(TMember);
 				}
-				global::_003CPrivateImplementationDetails_003E.InlineArrayAsSpan<HistoryArray<TMember>, TMember>(ref valueRefOrAddDefault3.array, 1024)[index] = val2;
+				valueRefOrAddDefault3.array[index] = val2;
 				valueRefOrAddDefault3.lastSample = num;
 			}
 		}

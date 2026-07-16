@@ -32,7 +32,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<sbyte>, sbyte>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -40,7 +40,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<short>, short>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -48,7 +48,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<int>, int>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -56,7 +56,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<long>, long>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -64,7 +64,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = (int)global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<byte>, byte>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -72,7 +72,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = (int)global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<ushort>, ushort>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -80,7 +80,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<uint>, uint>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -88,7 +88,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<ulong>, ulong>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -96,7 +96,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<float>, float>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -104,7 +104,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = (float)global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<double>, double>(in source, 1024)[i];
+			target[(i + start) % 1024] = (float)source[i];
 		}
 	}
 
@@ -112,7 +112,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = (float)global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<decimal>, decimal>(in source, 1024)[i];
+			target[(i + start) % 1024] = (float)source[i];
 		}
 	}
 
@@ -120,7 +120,7 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = (int)global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<char>, char>(in source, 1024)[i];
+			target[(i + start) % 1024] = source[i];
 		}
 	}
 
@@ -128,46 +128,46 @@ internal static class FieldHistoryUtils
 	{
 		for (int i = 0; i < 1024; i++)
 		{
-			target[(i + start) % 1024] = (global::_003CPrivateImplementationDetails_003E.InlineArrayAsReadOnlySpan<HistoryArray<bool>, bool>(in source, 1024)[i] ? 1 : 0);
+			target[(i + start) & 1023] = source[i] ? 1 : 0;
 		}
 	}
 
-	private static void CopyEnumHistory_SByte<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_SByte<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<sbyte>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_Int16<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_Int16<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<short>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_Int32<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_Int32<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<int>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_Int64<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_Int64<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<long>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_Byte<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_Byte<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<byte>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_UInt16<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_UInt16<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<ushort>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_UInt32<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_UInt32<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<uint>>(ref Unsafe.AsRef(ref source)), target, start);
 	}
 
-	private static void CopyEnumHistory_UInt64<TEnum>(in HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
+	private static void CopyEnumHistory_UInt64<TEnum>(ref HistoryArray<TEnum> source, float[] target, int start) where TEnum : struct
 	{
 		CopyHistory(in Unsafe.As<HistoryArray<TEnum>, HistoryArray<ulong>>(ref Unsafe.AsRef(ref source)), target, start);
 	}

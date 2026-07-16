@@ -1,6 +1,6 @@
 using System;
 using System.Text;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Hexa.NET.ImGui;
 
@@ -58,7 +58,7 @@ internal sealed class MemberObject : IMember
 		{
 			StringBuilder sb = TextUtils.Clear().Append("Type: ");
 			TypeUtils.AppendTypeName(sb, objectPath.memberType);
-			ImGui.Text(TextUtils.AsSpan(sb));
+			ImGui.Text(TextUtils.AsBytes(sb));
 			ImGui.EndTooltip();
 		}
 		if (flag)

@@ -6,11 +6,13 @@ internal struct ConfirmPopup
 {
 	internal readonly string title;
 
+	internal readonly string Button;
+
 	private bool setKeyboardFocus;
 
 	public ConfirmPopup(string title, string button)
 	{
-		_003Cbutton_003EP = button;
+		Button = button;
 		setKeyboardFocus = false;
 		this.title = title;
 	}
@@ -36,6 +38,6 @@ internal struct ConfirmPopup
 		bool num = ImGui.InputText("##confirmValue", ref value, 50u, ImGuiInputTextFlags.EnterReturnsTrue);
 		ImGui.PopStyleColor();
 		ImGui.SetCursorPosX((ImGui.GetWindowWidth() - ImGui.CalcTextSize("Save").X) / 2f);
-		return num | ImGui.Button(_003Cbutton_003EP);
+		return num | ImGui.Button(Button);
 	}
 }

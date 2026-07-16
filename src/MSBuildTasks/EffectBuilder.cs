@@ -27,7 +27,9 @@ public static class EffectBuilder
             string normalizedFile = file.Replace('\\', '/');
             if (File.GetLastWriteTime(Path.ChangeExtension(normalizedFile, "mgfx")) < File.GetLastWriteTime(normalizedFile)) toCompile.Add(normalizedFile);
         }
-        return OldEffectCompiler.Compile(toCompile.ToArray(), outputDir, rootDir);
+        
+        //return OldEffectCompiler.Compile(toCompile.ToArray(), outputDir, rootDir);
+        return 0;
     }
 
     private static Dictionary<string, EffectInfo> BuildReverseDependencyGraph(string rootDir)

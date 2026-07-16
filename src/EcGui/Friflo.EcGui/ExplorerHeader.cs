@@ -151,7 +151,7 @@ internal sealed class ExplorerHeader
         ImGui.SetNextItemWidth(UI.Scl(160f));
         ImGui.PushStyleColor(ImGuiCol.FrameBg, default(Vector4));
         ImGui.PushItemFlag(ImGuiItemFlags.NoTabStop | ImGuiItemFlags.NoNav, enabled: true);
-        ImGui.InputText("##edit-count", array, (uint)array.Length, ImGuiInputTextFlags.ReadOnly);
+        ImGui.InputText("##edit-count", ref array[0], (uint)array.Length, ImGuiInputTextFlags.ReadOnly);
         ImGui.PopItemFlag();
         ImGui.PopStyleColor();
         if (enableTooltips)
@@ -590,7 +590,7 @@ internal sealed class ExplorerHeader
                 stringBuilder3.Append(ref handler);
             }
             ImGui.SameLine();
-            ImGui.Text(TextUtils.AsSpan(stringBuilder));
+            ImGui.Text(TextUtils.AsBytes(stringBuilder));
         }
         if (expandQueryComponents)
         {
@@ -630,7 +630,7 @@ internal sealed class ExplorerHeader
             handler.AppendFormatted(num2);
             StringBuilder sb = stringBuilder4.Append(ref handler);
             ImGui.SameLine();
-            ImGui.Text(TextUtils.AsSpan(sb));
+            ImGui.Text(TextUtils.AsBytes(sb));
         }
         if (expandQueryTags)
         {
@@ -736,7 +736,7 @@ internal sealed class ExplorerHeader
         ImGui.SetNextItemWidth(ImGui.GetWindowWidth() - num - UI.Scl(60f));
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0f, 4f));
         ImGui.PushItemFlag(ImGuiItemFlags.NoTabStop, enabled: true);
-        ImGui.InputText("##", array, (uint)array.Length, ImGuiInputTextFlags.ReadOnly);
+        ImGui.InputText("##", ref array[0], (uint)array.Length, ImGuiInputTextFlags.ReadOnly);
         ImGui.PopItemFlag();
         ImGui.SameLine();
         bool num2 = ImGui.Button("...");
@@ -794,7 +794,7 @@ internal sealed class ExplorerHeader
         ImGui.SetNextItemWidth(ImGui.GetWindowWidth() - num - UI.Scl(60f));
         ImGui.PushStyleVar(ImGuiStyleVar.ItemSpacing, new Vector2(0f, 4f));
         ImGui.PushItemFlag(ImGuiItemFlags.NoTabStop, enabled: true);
-        ImGui.InputText("##", array, (uint)array.Length, ImGuiInputTextFlags.ReadOnly);
+        ImGui.InputText("##", ref array[0], (uint)array.Length, ImGuiInputTextFlags.ReadOnly);
         ImGui.PopItemFlag();
         ImGui.SameLine();
         bool num2 = ImGui.Button("...");

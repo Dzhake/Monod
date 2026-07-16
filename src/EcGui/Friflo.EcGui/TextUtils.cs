@@ -29,6 +29,11 @@ public static class TextUtils
     public static ref byte[] AsBytes(StringBuilder sb)
     {
         Span<char> span = AsSpan(sb);
+        return ref AsBytes(span);
+    }
+
+    public static ref byte[] AsBytes(Span<char> span)
+    {
         int byteCount = Encoding.UTF8.GetByteCount(span);
         if (_bytes.Length < byteCount + 1)
         {

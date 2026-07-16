@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>Library</OutputType>
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
@@ -16,6 +17,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.13.9" />
+        <ProjectReference Include="../FileSystemLinks/FileSystemLinks/FileSystemLinks.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Hexa.NET.ImGui;
 

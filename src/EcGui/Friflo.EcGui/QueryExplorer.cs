@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Reflection;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Friflo.Engine.ECS.Systems;
 using Hexa.NET.ImGui;
@@ -259,7 +259,7 @@ public sealed class QueryExplorer
 
 	private unsafe static ImGuiListClipperPtr CreateListClipper()
 	{
-		return new ImGuiListClipperPtr(ImGuiNative.ImGuiListClipper_ImGuiListClipper());
+		return new ImGuiListClipperPtr(ImGui.ImGuiListClipper());
 	}
 
 	private void DrawTable()
@@ -284,7 +284,7 @@ public sealed class QueryExplorer
 			{
 				imGuiTableColumnFlags |= ImGuiTableColumnFlags.NoReorder;
 			}
-			ImGui.TableSetupColumn(init_width_or_weight: UI.Scl(item.GetDefaultWidth(embedExpansions)), label: item.Name, flags: imGuiTableColumnFlags);
+			ImGui.TableSetupColumn(initWidthOrWeight: UI.Scl(item.GetDefaultWidth(embedExpansions)), label: item.Name, flags: imGuiTableColumnFlags);
 		}
 		ImGui.TableSetupScrollFreeze(freezeColumns, (!columnFilter) ? 1 : 2);
 		ImGui.TableHeadersRow();

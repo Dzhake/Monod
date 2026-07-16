@@ -7,3 +7,6 @@
 [submodule "src/FileWatcherEx"]
 	path = src/FileWatcherEx
 	url = ttps://github.com/d2phap/FileWatcherEx.git
+[submodule "src/FileSystemLinks"]
+	path = src/FileSystemLinks
+	url = https://github.com/DarkDaskin/FileSystemLinks.git

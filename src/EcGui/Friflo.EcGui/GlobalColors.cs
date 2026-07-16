@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using Hexa.NET.ImGui;
 
@@ -63,7 +64,7 @@ internal static class GlobalColors
 		{
 			stylesUpdated = true;
 			UI.scale = ImGui.GetFontSize() / 40f;
-			RangeAccessor<Vector4> colors = ImGui.GetStyle().Colors;
+			Span<Vector4> colors = ImGui.GetStyle().Colors;
 			frameBg = colors[7];
 			float w = frameBg.W;
 			windowBg = colors[2];

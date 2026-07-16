@@ -1,5 +1,5 @@
 using System.Numerics;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 using Hexa.NET.ImGui;
 
@@ -23,7 +23,7 @@ internal struct DrawNode
 	{
 		Vector2 vector = ImGui.GetWindowPos() + new Vector2(0f - ImGui.GetScrollX(), ImGui.GetCursorPosY() - ImGui.GetScrollY());
 		Vector2 clip_rect_max = vector + new Vector2(context.rect.left - UI.Scl(10f), ImGui.GetFrameHeight());
-		ImGui.PushClipRect(vector, clip_rect_max, intersect_with_current_clip_rect: true);
+		ImGui.PushClipRect(vector, clip_rect_max, intersectWithCurrentClipRect: true);
 	}
 
 	internal void PopClipRect()

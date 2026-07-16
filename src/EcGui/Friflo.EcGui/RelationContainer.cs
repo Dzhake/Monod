@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Friflo.EcGui.Friflo.EcGui;
+using Friflo.EcGui;
 using Friflo.Engine.ECS;
 
 namespace Friflo.EcGui;
