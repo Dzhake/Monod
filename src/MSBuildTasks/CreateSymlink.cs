@@ -2,7 +2,6 @@
 using Microsoft.Build.Utilities;
 using System;
 using System.IO;
-using FileSystemLinks;
 
 namespace Monod.MSBuild;
 
@@ -45,13 +44,13 @@ public sealed class CreateSymlink : Task
 
             if (Source is null)
             {
-                Log.LogMessage(MessageImportance.High, "Source was not specified! Must be single absolute file (directory) path, where the symlink will point.");
+                Log.LogError("Source was not specified! Must be single absolute file (directory) path, where the symlink will point.");
                 return false;
             }
 
             if (Destination is null)
             {
-                Log.LogMessage(MessageImportance.High, "Destination was not specified! Must be single absolute file (directory) path, where the symlink will be created.");
+                Log.LogError("Destination was not specified! Must be single absolute file (directory) path, where the symlink will be created.");
                 return false;
             }
 
@@ -107,13 +106,12 @@ public sealed class CreateSymlink : Task
             else
                 File.CreateSymbolicLink(Destination, Source);
 
-            Log.LogMessage(MessageImportance.High, $"Symlink created: {Destination} -> {Source}");
+            Log.LogWarning($"Symlink created: {Destination} -> {Source}");
             return true;
         }
         catch (Exception ex)
         {
-            Log.LogError(MessageImportance.High,
-                $"Failed to create symlink at '{Destination}' to '{Source}': {ex.Message}");
+            Log.LogError($"Failed to create symlink (via dotnet) at {Destination} to {Source}: {ex.Message}");
             return false;
         }
     }
@@ -124,21 +122,14 @@ public sealed class CreateSymlink : Task
         try
         {
             bool isDir = Directory.Exists(Source);
-            if (isDir)
-            {
-                FileSystemLink.CreateDirectorySymbolicLink(Destination, Source);
-            }
-            else
-            {
-                FileSystemLink.CreateFileSymbolicLink(Destination, Source);
-            }
-            //NativeSymlink.Create(Destination!, Source!, isDir);
+            NativeSymlink.Create(Destination!, Source!, isDir);
             Log.LogWarning($"Created symlink via shell: {Destination} -> {Source}");
+            //TODO: figure out why messages are not logged. Currently i'll just use warnings.
             return true;
         }
         catch (Exception ex)
         {
-            Log.LogError($"Shell symlink failed: {ex.Message}");
+            Log.LogError($"Failed to create symlink (via shell) at {Destination} to {Source}: {ex.Message}");
             return false;
         }
     }

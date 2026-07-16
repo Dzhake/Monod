@@ -26,7 +26,10 @@ public static class NativeSymlink
         const int SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE = 0x2;
 
         // this flag might cause method to error with windows version lower than 10
-        int flags = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
+        int flags = 0;
+
+        if (Environment.OSVersion.Version is { Major: >= 11 } or { Major: 10, Build: >= 14972 })
+            flags |= SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
 
         if (isDirectory)
             flags |= SYMBOLIC_LINK_FLAG_DIRECTORY;
