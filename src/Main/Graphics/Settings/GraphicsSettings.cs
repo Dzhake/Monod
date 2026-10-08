@@ -95,8 +95,8 @@ public static class GraphicsSettings
             {
                 uint displayId = displayIds[i];
 
-                var mode = SDL.SDL_GetCurrentDisplayMode(displayId);
-                SDL.SDL_GetDisplayBounds(displayId, out var bounds);
+                SDL.SDL_DisplayMode* mode = SDL.SDL_GetCurrentDisplayMode(displayId);
+                SDL.SDL_GetDisplayBounds(displayId, out SDL.SDL_Rect bounds);
 
                 Displays[i] = new DisplayInfo(displayId, SDL.SDL_GetDisplayName(displayId), mode->w, mode->h, mode->refresh_rate, bounds);
             }
@@ -195,7 +195,7 @@ public static class GraphicsSettings
 
     private static unsafe SDL.SDL_DisplayMode* GetSelectDisplayMode()
     {
-        var displayMode = SDL.SDL_GetCurrentDisplayMode(CurrentDisplay.Id);
+        SDL.SDL_DisplayMode* displayMode = SDL.SDL_GetCurrentDisplayMode(CurrentDisplay.Id);
         if (displayMode is null)
         {
             string error = SDL.SDL_GetError();

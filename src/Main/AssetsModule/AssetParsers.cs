@@ -42,7 +42,7 @@ public static class AssetParsers
                 return Encoding.UTF8.GetString(info.AssetStream.ToByteArrayDangerous());
             case ResourcePriorityType.Memory:
                 StreamReader reader = new(info.AssetStream, Encoding.UTF8);
-                string text = reader.ReadToEnd();
+                string text = await reader.ReadToEndAsync();
                 reader.Dispose();
                 return text;
             default:
@@ -71,27 +71,6 @@ public static class AssetParsers
     {
         return SoundEffect.FromStream(info.AssetStream);
     }
-
-    /*
-    /// <summary>
-    /// Parse <see cref="AssetType.Effect"/> as a <see cref="Effect"/> that represents given asset.
-    /// </summary>
-    /// <param name="info">Asset info to parse.</param>
-    /// <param name="_">Unused.</param>
-    /// <returns>Parsed asset.</returns>
-    public static Effect Effect(AssetInfo info, AssetManager _)
-    {
-        try
-        {
-            EffectLock.Enter();
-            return new Effect(Renderer.device, info.AssetStream.ToByteArrayDangerous());
-        }
-        finally
-        {
-            EffectLock.Exit();
-        }
-    }
-    */
 
     private static EffectCompiler effectCompiler = new();
 
@@ -132,7 +111,7 @@ public static class AssetParsers
     /// <returns><see langword="null"/>. Instead loads asset to the <see cref="Locale"/>.</returns>
     public static async Task<object?> Localization(AssetInfo info, AssetManager manager)
     {
-        //TODO (localization - low priority) Locale.AddManager(manager);
+        //TODO (localization - low priority) Locale.AddManager(manager); -- for localization-only hot reload, because we assume localization is handled by separate asset managers than normal assets, we can only reload asset managers that handle localization
         Locale.Load(new StreamReader(info.AssetStream), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
         return null;
     }

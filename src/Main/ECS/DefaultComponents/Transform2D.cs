@@ -38,7 +38,7 @@ public record struct Transform2D : IComponent, IEquatable<Transform2D>
     /// </summary>
     [FieldOffset(24)] public float Rotation;
 
-    public readonly override string ToString() => $"{{ Position: {PosX}, {PosY}; Scale: {ScaleX}, {ScaleY}; Flip: {FlipX}, {FlipY}; Rotation: {Rotation} }}";
+    public override readonly string ToString() => $"{{ Position: {PosX}, {PosY}; Scale: {ScaleX}, {ScaleY}; Flip: {FlipX}, {FlipY}; Rotation: {Rotation} }}";
 
     public Transform2D(float posX, float posY, float scaleX = 1, float scaleY = 1, bool flipX = false, bool flipY = false, float rotation = 0)
     {

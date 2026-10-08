@@ -1,6 +1,4 @@
-﻿using Friflo.Engine.ECS;
-using Friflo.Json.Fliox;
-using Microsoft.Xna.Framework;
+﻿using Friflo.Json.Fliox;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Monod.Graphics.ECS.Sprite;
@@ -11,7 +9,7 @@ public struct Sprite2D : IComponent
     public Color color;
     public SpriteEffects spriteEffects;
     [Ignore]
-    public Texture2D? Texture;
+    public MTexture? Texture;
 
     public Sprite2D(string texturePath)
     {

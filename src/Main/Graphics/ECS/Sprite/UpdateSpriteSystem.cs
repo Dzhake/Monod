@@ -1,5 +1,4 @@
-﻿using Friflo.Engine.ECS;
-using Friflo.Engine.ECS.Systems;
+﻿using Friflo.Engine.ECS.Systems;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.AssetsModule;
 
@@ -17,7 +16,7 @@ public class UpdateSpriteSystem : QuerySystem<Sprite2D>
         public void Execute(ref Sprite2D sprite)
         {
             if (sprite.Texture is not null && !Assets.ReloadThisFrame) return;
-            sprite.Texture = Assets.Get<Texture2D>(sprite.TexturePath);
+            sprite.Texture = new(Assets.Get<Texture2D>(sprite.TexturePath));
         }
     }
 }
