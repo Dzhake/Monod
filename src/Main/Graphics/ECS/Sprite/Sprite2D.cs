@@ -10,6 +10,7 @@ public struct Sprite2D : IComponent
     public SpriteEffects spriteEffects;
     [Ignore]
     public MTexture? Texture;
+    public bool InvalidateTexture;
 
     public Sprite2D(string texturePath)
     {
