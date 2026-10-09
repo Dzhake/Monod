@@ -129,7 +129,7 @@ public sealed class AssetManager : IDisposable
     }
 
     /// <summary>
-    /// Load asset at the specified path in the cache synchronously, replacing already loaded assets. Useful for quickly loading fonts for the startup loading screen.
+    /// Load asset at the specified path in the cache synchronously, replacing already loaded assets. Useful for quickly loading assets needed for the startup loading screen.
     /// </summary>
     public void LoadAsset(string path)
     {

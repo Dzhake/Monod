@@ -128,7 +128,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
     private void OnAssetModified(string relativePath)
     {
-        var format = AssetsUtils.DetectFormatByExtension(Path.GetExtension(relativePath));
+        AssetFormat format = AssetsUtils.DetectFormatByExtension(Path.GetExtension(relativePath));
         if (format == AssetFormat.Fx)
         {
             EffectBuilder.BuildEffect(relativePath, DirectoryPath);
@@ -177,8 +177,8 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// <summary>
     /// Add <see cref="ReloadAssetCommand"/> to queue.
     /// </summary>
-    /// <param name="path">File path in this asset loader of the asset to reload.</param>
-    public void EnqueueReloadAsset(string path) => AddCommand(new ReloadAssetCommand(path, this));
+    /// <param name="filePath">File path in this asset loader of the asset to reload.</param>
+    public void EnqueueReloadAsset(string filePath) => AddCommand(new ReloadAssetCommand(filePath, this));
 
     /// <summary>
     /// Add <see cref="RemoveAssetsInDirCommand"/> to queue.
@@ -190,10 +190,10 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// <summary>
     /// Load asset at the specified path in the cache synchronously, <b>replacing</b> already loaded assets. Useful for quickly loading fonts for the startup loading screen.
     /// </summary>
-    public void LoadAsset(string path)
+    public void LoadAsset(string filePath)
     {
-        using AssetStream? assetStream = LoadAssetStream(path);
-        LoadAssetFromAssetStream(path, assetStream).Wait();
+        using AssetStream? assetStream = LoadAssetStream(filePath);
+        LoadAssetFromAssetStream(FilePathToLoaderPath(filePath), assetStream).Wait();
     }
 
     public async Task ReloadAssetAsync(string path)
@@ -202,14 +202,14 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     }
 
     /// <summary>
-    /// Load asset at the <paramref name="path"/> asynchronously, <b>replacing</b> existing assets.
+    /// Load asset at the <paramref name="filePath"/> asynchronously, <b>replacing</b> existing assets.
     /// </summary>
-    /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
+    /// <param name="filePath">Path of the asset in this <see cref="AssetLoader"/>.</param>
     /// <returns>Async task.</returns>
-    public async Task LoadAssetAsync(string path)
+    public async Task LoadAssetAsync(string filePath)
     {
-        using AssetStream? assetStream = await LoadAssetStreamAsync(path);
-        await LoadAssetFromAssetStream(path, assetStream);
+        using AssetStream? assetStream = await LoadAssetStreamAsync(filePath);
+        await LoadAssetFromAssetStream(FilePathToLoaderPath(filePath), assetStream);
     }
 
 
@@ -239,13 +239,8 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
         }
 
         Task<object?> assetTask = parser(assetInfo, Manager);
-        if (assetTask is null) //failed to load (logged by parser) / loaded to somewhere else by parser
-        {
-            return false;
-        }
-
         object? asset = await assetTask;
-        if (asset is null) //same
+        if (asset is null) //failed to load (logged by parser) / loaded to somewhere else by parser
         {
             return false;
         }
@@ -257,17 +252,17 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// <summary>
     /// Load stream of the asset at the specified path. Loads new asset each time.
     /// </summary>
-    /// <param name="path">Path of the asset to load in this <see cref="AssetLoader"/>.</param>
+    /// <param name="filePath">Path of the asset to load in this <see cref="AssetLoader"/>.</param>
     /// <returns>New <see cref="AssetStream"/> with the <see cref="AssetStream.Stream"/> reading the asset and the type respective to the loaded asset, or null if the asset was not found.</returns>
-    protected AssetStream? LoadAssetStream(string path)
+    protected AssetStream? LoadAssetStream(string filePath)
     {
-        path = path.Replace('\\', '/');
-        string fullPath = Path.Join(DirectoryPath, path);
+        string fullPath = Path.Join(DirectoryPath, filePath);
+        fullPath = fullPath.Replace('\\', '/');
         if (!File.Exists(fullPath))
             return null;
         try
         {
-            return new(File.OpenRead(fullPath), AssetsUtils.DetectTypeByPath(path));
+            return new(File.OpenRead(fullPath), AssetsUtils.DetectTypeByPath(filePath));
         }
         catch (Exception exception)
         {
@@ -327,6 +322,11 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
         return [
             new MatcherInfo(Globbing.MatcherFromString("**.prefab.json"), new(){ { AssetProps.Parser, (AssetParser)AssetParsers.Prefab } }),
         ];
+    }
+
+    public static string FilePathToLoaderPath(string filePath)
+    {
+        return Path.ChangeExtension(filePath, null);
     }
 
 
