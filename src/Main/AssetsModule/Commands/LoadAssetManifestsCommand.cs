@@ -1,5 +1,7 @@
 ﻿using Monod.AssetsModule.Utils;
 using Monod.Utils.General;
+using OneOf;
+using OneOf.Types;
 using System.Text.Json;
 
 namespace Monod.AssetsModule.Commands;
@@ -29,7 +31,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
     public override string GetText() => $"{Loader} is loading asset manifests";
 
     ///<inheritdoc/>
-    public async override Task Run()
+    public override async Task Run()
     {
         string[] manifests = Directory.GetFiles(Loader.DirectoryPath, Assets.MANIFEST_FILENAME, SearchOption.AllDirectories).Select(path => path.Replace('\\', '/')).ToArray();
         if (manifests.Length == 0)
@@ -41,7 +43,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
 
         TotalManifests = manifests.Length;
 
-        FileWithDepth[] files = new FileWithDepth[manifests.Length];
+        var files = new FileWithDepth[manifests.Length];
         for (int i = 0; i < manifests.Length; i++)
             files[i] = new(manifests[i]);
         files.Sort(); //deeper = applies earlier
@@ -51,7 +53,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         {
             string manifest = file.FilePath;
             Stream manifestStream = File.OpenRead(manifest);
-            matchers.AddRange(ParseAssetManifest(manifestStream, Path.GetRelativePath(Loader.DirectoryPath, Path.GetDirectoryName(manifest) ?? "")));
+            matchers.AddRange(ParseAssetManifest(manifestStream, Path.GetRelativePath(Loader.DirectoryPath, Path.GetDirectoryName(manifest) ?? ""), Loader));
             LoadedManifests++;
         }
 
@@ -59,7 +61,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
         Finish();
     }
 
-    
+
 
     /// <summary>
     /// Parse matchers from the specified asset manifest (as a <paramref name="stream"/>) with the specified <paramref name="relativePath"/> of the manifest.
@@ -67,7 +69,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
     /// <param name="stream"><see cref="Stream"/> that reads the asset manifest.</param>
     /// <param name="relativePath">Path of the asset manifest relative to <see cref="AssetManager"/>'s root directory. Used to prefix each match with it, making matchers use subdirectory of the manifest.</param>
     /// <returns>List of <see cref="MatcherInfo"/>s parsed from the specified asset manifest.</returns>
-    private static List<MatcherInfo> ParseAssetManifest(Stream stream, string relativePath)
+    private static List<MatcherInfo> ParseAssetManifest(Stream stream, string relativePath, AssetLoader loader)
     {
         var document = JsonDocument.Parse(stream, Json.DCommon);
 
@@ -80,7 +82,8 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
             foreach (JsonProperty inner in match.Value.EnumerateObject())
             {
                 AssetProp id = AssetProp.Info.GetValue(inner.Name);
-                properties[id] = AssetProps.ParseAssetProp(inner.Value.GetRawText(), id);
+                OneOf<object, Error> parseResult = AssetProps.ParseAssetProp(inner.Value.GetRawText(), id);
+                parseResult.Switch(property => properties[id] = property, error => Assets.Logger.Error("Failed to parse asset manifest in \"{Loader}\" at path \"{RelativePath}\" for match \"{Match}\" with property name \"{PropertyName}\":  {Error}", loader, relativePath, match.Name, inner.Name, error));
             }
 
             result.Add(new MatcherInfo(Globbing.MatcherFromString(match.Name, relativePath), properties));

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Monod.Utils.General;
 
@@ -8,6 +7,11 @@ namespace Monod.Utils.General;
 /// </summary>
 public static class ReflectionUtils
 {
+    /// <summary>
+    /// Equal to "BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic".
+    /// </summary>
+    public static readonly BindingFlags StaticAnyAccess = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
     /// <summary>
     /// Creates an instance of the type designated by the specified generic parameter
     /// </summary>
