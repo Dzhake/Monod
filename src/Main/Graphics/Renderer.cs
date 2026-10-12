@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Monod.Graphics.Fonts.Bitmap;
 using Monod.Graphics.Settings;
 
@@ -207,6 +206,24 @@ public static class Renderer
     }
 
     /// <summary>
+    /// Submit a sprite for drawing in the current batch.
+    /// </summary>
+    /// <param name="texture">A texture.</param>
+    /// <param name="destinationRectangle">The drawing bounds on screen.</param>
+    /// <param name="sourceRectangle">An optional region on the texture which will be rendered. If null, draws full texture.</param>
+    /// <param name="color">A color mask. <see cref="Color.White"/> by default.</param>
+    /// <param name="rotation">A rotation of this sprite.</param>
+    /// <param name="origin">Center of the rotation. <see cref="Vector2.Zero"/> by default.</param>
+    /// <param name="scale">A scaling of this sprite. <see cref="Vector2.One"/> by default.</param>
+    /// <param name="effects">Modificators for drawing. Can be combined.</param>
+    /// <param name="layerDepth">A depth of the layer of this sprite.</param>
+    public static void DrawTexture(Texture2D texture, Rectangle destinationRectangle, Color? color = null, Rectangle? sourceRectangle = null,
+    float rotation = 0, Vector2? origin = null, Vector2? scale = null, SpriteEffects effects = SpriteEffects.None, float layerDepth = 0)
+    {
+        spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color ?? Color.White, rotation, origin ?? Vector2.Zero, effects, layerDepth);
+    }
+
+    /// <summary>
     /// Submit a text string of sprites for drawing in the current batch.
     /// </summary>
     /// <param name="font">A font.</param>
@@ -268,7 +285,7 @@ public static class Renderer
     {
         if (Pixel is null) throw new InvalidOperationException("Pixel is null");
         color ??= Color.White;
-        DrawTexture(Pixel, new(centerX, centerY), color, null, angle, new(0.5f, 0.5f), new Vector2(width, height));
+        DrawTexture(Pixel, new Vector2(centerX, centerY), color, null, angle, new(0.5f, 0.5f), new Vector2(width, height));
     }
 
     /// <summary>
