@@ -1,5 +1,4 @@
 ﻿using Monod.ECS.DefaultComponents;
-using System.Runtime.CompilerServices;
 
 namespace Monod.Utils.Extensions;
 
@@ -80,6 +79,13 @@ public static class EntityExtensions
         }
     }
 
+    /// <summary>
+    /// Get the component if entity has it, or get a reference to component in the <see cref="CommandBuffer"/>'s cache (warning: don't use the reference after <see cref="CommandBuffer.Playback"/> call!)
+    /// </summary>
+    /// <typeparam name="T">Type of the component.</typeparam>
+    /// <param name="data">Data of the entity.</param>
+    /// <param name="cb">Command buffer that handles adding component if absent.</param>
+    /// <returns>See summary.</returns>
     public static ref T Ensure<T>(this EntityData data, CommandBuffer cb) where T : struct, IComponent
     {
         if (data.Has<T>())
@@ -88,10 +94,18 @@ public static class EntityExtensions
         }
         else
         {
-            return ref cb.AddAndGetComponent(data.Id, new T());
+            return ref cb.AddComponent<T>(data.Id);
         }
     }
 
+    /// <summary>
+    /// Same as <see cref="Ensure{T}(EntityData, CommandBuffer)"/>, but also returns whether the component was added or already was there. Useful for running the component some default values.
+    /// </summary>
+    /// <typeparam name="T">Type of the component.</typeparam>
+    /// <param name="data">Data of the entity.</param>
+    /// <param name="cb">Command buffer that handles adding component if absent.</param>
+    /// <param name="added">Whether the component was added of already was there.</param>
+    /// <returns>See summary.</returns>
     public static ref T Ensure<T>(this EntityData data, CommandBuffer cb, out bool added) where T : struct, IComponent
     {
         if (data.Has<T>())
@@ -102,7 +116,7 @@ public static class EntityExtensions
         else
         {
             added = true;
-            return ref cb.AddAndGetComponent(data.Id, new T());
+            return ref cb.AddComponent<T>(data.Id);
         }
     }
 }
