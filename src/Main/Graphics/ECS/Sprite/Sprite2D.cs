@@ -12,6 +12,11 @@ public struct Sprite2D : IComponent
     public MTexture? Texture;
     public bool InvalidateTexture;
 
+    public Sprite2D()
+    {
+        color = Color.White;
+    }
+
     public Sprite2D(string texturePath)
     {
         TexturePath = texturePath;

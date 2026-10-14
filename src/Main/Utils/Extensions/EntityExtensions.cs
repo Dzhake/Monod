@@ -1,4 +1,5 @@
 ﻿using Monod.ECS.DefaultComponents;
+using System.Runtime.CompilerServices;
 
 namespace Monod.Utils.Extensions;
 
@@ -76,6 +77,32 @@ public static class EntityExtensions
             ref Transform2D transform = ref entity.GetComponent<Transform2D>();
             rotation = transform.GetFlippedRotation();
             return transform.Position;
+        }
+    }
+
+    public static ref T Ensure<T>(this EntityData data, CommandBuffer cb) where T : struct, IComponent
+    {
+        if (data.Has<T>())
+        {
+            return ref data.Get<T>();
+        }
+        else
+        {
+            return ref cb.AddAndGetComponent(data.Id, new T());
+        }
+    }
+
+    public static ref T Ensure<T>(this EntityData data, CommandBuffer cb, out bool added) where T : struct, IComponent
+    {
+        if (data.Has<T>())
+        {
+            added = false;
+            return ref data.Get<T>();
+        }
+        else
+        {
+            added = true;
+            return ref cb.AddAndGetComponent(data.Id, new T());
         }
     }
 }
