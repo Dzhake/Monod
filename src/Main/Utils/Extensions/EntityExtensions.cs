@@ -55,7 +55,7 @@ public static class EntityExtensions
     public static Vector2 GetLocalPos(this Entity entity)
     {
         if (!entity.HasComponent<Transform2D>()) return Vector2.Zero;
-        else return entity.GetComponent<Transform2D>().Position;
+        else return entity.GetComponent<Transform2D>().position;
     }
 
     /// <summary>
@@ -75,7 +75,7 @@ public static class EntityExtensions
         {
             ref Transform2D transform = ref entity.GetComponent<Transform2D>();
             rotation = transform.GetFlippedRotation();
-            return transform.Position;
+            return transform.position;
         }
     }
 
@@ -94,7 +94,7 @@ public static class EntityExtensions
         }
         else
         {
-            return ref cb.AddComponent<T>(data.Id);
+            return ref cb.AddComponent(data.Id, new T());
         }
     }
 
@@ -116,7 +116,7 @@ public static class EntityExtensions
         else
         {
             added = true;
-            return ref cb.AddComponent<T>(data.Id);
+            return ref cb.AddComponent(data.Id, new T());
         }
     }
 }
