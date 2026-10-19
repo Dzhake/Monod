@@ -47,6 +47,22 @@ public static class EntityExtensions
         return pos;
     }
 
+    public static Vector2 GetParentPos(this Entity entity, out float rotation)
+    {
+        Vector2 pos = Vector2.Zero;
+        rotation = 0;
+        Entity parent = entity.Parent;
+        while (!parent.IsNull)
+        {
+            Vector2 parentPos = parent.GetLocalPos(out float parentRot);
+            pos.Rotate(parentRot);
+            rotation += parentRot;
+            pos += parentPos;
+            parent = parent.Parent;
+        }
+        return pos;
+    }
+
     /// <summary>
     /// Returns position of the entity from its <see cref="Transform2D"/>, or <see cref="Vector2.Zero"/> if the entity doesn't have <see cref="Transform2D"/> component.
     /// </summary>
@@ -55,7 +71,7 @@ public static class EntityExtensions
     public static Vector2 GetLocalPos(this Entity entity)
     {
         if (!entity.HasComponent<Transform2D>()) return Vector2.Zero;
-        else return entity.GetComponent<Transform2D>().position;
+        else return entity.GetComponent<Transform2D>().Position;
     }
 
     /// <summary>
@@ -75,7 +91,7 @@ public static class EntityExtensions
         {
             ref Transform2D transform = ref entity.GetComponent<Transform2D>();
             rotation = transform.GetFlippedRotation();
-            return transform.position;
+            return transform.Position;
         }
     }
 

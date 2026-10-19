@@ -81,7 +81,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
     private void OnFileRenamed(object? sender, FileChangedEvent e)
     {
-        //TODO: check if either of files is actually an asset manifest
+        //TODO (asset manifests, low priority): check if either of files is actually an asset manifest
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         string relativeOldPath = Path.GetRelativePath(DirectoryPath, e.OldFullPath!).Replace('\\', '/');
         if (Directory.Exists(e.FullPath))
@@ -101,7 +101,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
     private void OnFileDeleted(object? sender, FileChangedEvent e)
     {
-        //TODO: reload asset manifests when manifest is deleted
+        //TODO (asset manifests, low priority): reload asset manifests when manifest is deleted
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         // just reload it both as a dir and as an asset to be safe, there aren't really any reliable ways to determine whether a file or dir was deleted
 
@@ -113,7 +113,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
     private void OnFileChanged(object? sender, FileChangedEvent e)
     {
-        //TODO: reload asset manifests when manifest is changed
+        //TODO (asset manifests, low priority): reload asset manifests when manifest is changed
         string relativePath = Path.GetRelativePath(DirectoryPath, e.FullPath).Replace('\\', '/');
         if (Directory.Exists(e.FullPath))
         {

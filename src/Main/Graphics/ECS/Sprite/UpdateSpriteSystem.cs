@@ -17,7 +17,7 @@ public class UpdateSpriteSystem : QuerySystem<Sprite2D>
         {
             if (sprite.Texture is not null && !Assets.ReloadThisFrame && !sprite.InvalidateTexture) return;
             sprite.InvalidateTexture = false;
-            sprite.Texture = new(Assets.Get<Texture2D>(sprite.TexturePath));
+            sprite.Texture = string.IsNullOrEmpty(sprite.TexturePath) ? null : new(Assets.Get<Texture2D>(sprite.TexturePath));
         }
     }
 }

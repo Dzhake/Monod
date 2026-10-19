@@ -5,6 +5,8 @@ using Browse = System.Diagnostics.DebuggerBrowsableAttribute;
 
 namespace Monod.ECS.DefaultComponents;
 
+// TODO (low priority) potentially turn Position into a property that automatically sets PhysicsDirty, and add method like SetPositionBypassingPhysicsDirty (need to make a better name) that just sets Position field directly?
+
 [ComponentKey("Transform2D")]
 [StructLayout(LayoutKind.Explicit)]
 [ComponentSymbol("T")]
@@ -26,7 +28,7 @@ public record struct Transform2D : IComponent, IEquatable<Transform2D>
     /// <summary>
     /// Whether entity is facing right (false) or left (true).
     /// </summary>
-    [FieldOffset(16)] public bool FlipX; // 4
+    [FieldOffset(16)] public bool FlipX; // 4 TODO (high priority) check whether it's 1 works correctly here
 
     /// <summary>
     /// Whether entity is facing down (false) or true (true).
@@ -36,11 +38,21 @@ public record struct Transform2D : IComponent, IEquatable<Transform2D>
     /// <summary>
     /// Rotation in radians, clockwise.
     /// </summary>
-    [FieldOffset(24)] public float Rotation;
+    [FieldOffset(24)] public float Rotation; //4
+
+    /// <summary>
+    /// Whether the physics body for this entity has outdated transformation.
+    /// </summary>
+    [FieldOffset(28)] public bool PhysicsDirty; // 1
 
     public override readonly string ToString() => $"{{ Position: {PosX}, {PosY}; Scale: {ScaleX}, {ScaleY}; Flip: {FlipX}, {FlipY}; Rotation: {Rotation} }}";
 
-    public Transform2D(float posX, float posY, float scaleX = 1, float scaleY = 1, bool flipX = false, bool flipY = false, float rotation = 0)
+    public Transform2D()
+    {
+        PhysicsDirty = true;
+    }
+
+    public Transform2D(float posX, float posY, float scaleX = 1, float scaleY = 1, bool flipX = false, bool flipY = false, float rotation = 0) : this()
     {
         PosX = posX;
         PosY = posY;
@@ -59,9 +71,9 @@ public record struct Transform2D : IComponent, IEquatable<Transform2D>
     /// <param name="flipX">Whether entity is facing right (false) or left (true).</param>
     /// <param name="flipY">Whether entity is facing down (false) or true (true).</param>
     /// <param name="rotation"></param>
-    public Transform2D(Vector2 position, Vector2? scale = null, bool flipX = false, bool flipY = false, float rotation = 0)
+    public Transform2D(Vector2 position, Vector2? scale = null, bool flipX = false, bool flipY = false, float rotation = 0) : this()
     {
-        Position = position;
+        this.Position = position;
         Scale = scale ?? Vector2.One;
         FlipX = flipX;
         FlipY = flipY;
@@ -72,15 +84,11 @@ public record struct Transform2D : IComponent, IEquatable<Transform2D>
     /// Get rotation after appling <see cref="FlipX"/> and <see cref="FlipY"/>.
     /// </summary>
     /// <returns>Rotation after appling <see cref="FlipX"/> and <see cref="FlipY"/>.</returns>
-    public float GetFlippedRotation()
+    public readonly float GetFlippedRotation()
     {
         if (FlipX && FlipY) return Rotation + MathF.PI;
         if (FlipX) return MathF.PI - Rotation;
         if (FlipY) return -Rotation;
         return Rotation;
     }
-
-    public bool Equals(Transform2D other) => this.Position == other.Position && this.Scale == other.Scale;
-    public static bool operator ==(in Transform2D t1, in Transform2D t2) => t1.Position == t2.Position && t1.Scale == t2.Scale;
-    public static bool operator !=(in Transform2D t1, in Transform2D t2) => !(t1 == t2);
 }

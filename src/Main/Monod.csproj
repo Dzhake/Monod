@@ -51,5 +51,6 @@
 
 		<PackageReference Include="MonoGame.Extended" Version="6.0.0" />
 		<PackageReference Include="FontStashSharp.MonoGame" Version="1.5.5" />
+		<PackageReference Include="Apos.Shapes" Version="0.8.6" />
     </ItemGroup>
 </Project>

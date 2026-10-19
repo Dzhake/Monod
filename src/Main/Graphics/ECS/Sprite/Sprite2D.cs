@@ -6,7 +6,7 @@ namespace Monod.Graphics.ECS.Sprite;
 public struct Sprite2D : IComponent
 {
     public string TexturePath;
-    public Color color;
+    public Color color = Color.White;
     public SpriteEffects spriteEffects;
     [Ignore]
     public MTexture? Texture;
@@ -14,13 +14,11 @@ public struct Sprite2D : IComponent
 
     public Sprite2D()
     {
-        color = Color.White;
     }
 
     public Sprite2D(string texturePath)
     {
         TexturePath = texturePath;
-        color = Color.White;
     }
 
     public Sprite2D(string texturePath, Color? color = null, SpriteEffects spriteEffects = SpriteEffects.None)

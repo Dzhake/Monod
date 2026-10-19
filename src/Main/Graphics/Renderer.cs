@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Apos.Shapes;
+using Microsoft.Xna.Framework.Graphics;
 using Monod.Graphics.Fonts.Bitmap;
 using Monod.Graphics.Settings;
 
@@ -44,16 +45,25 @@ public static class Renderer
         }
         set => secondSpriteBatch = value;
     }
+    public static ShapeBatch shapeBatch;
 
     /// <summary>
     /// Whether <see cref="SpriteBatch.Begin"/> was called, and <see cref="SpriteBatch.End"/> wasn't yet called.
     /// </summary>
     private static bool spriteBatchActive;
-
     /// <summary>
     /// Whether <see cref="SpriteBatch.Begin"/> was called, and <see cref="SpriteBatch.End"/> wasn't yet called.
     /// </summary>
     public static bool SpriteBatchActive => spriteBatchActive;
+
+    /// <summary>
+    /// Whether <see cref="ShapeBegin"/> was called, and <see cref="ShapeEnd"/> wasn't yet called.
+    /// </summary>
+    private static bool shapeBatchActive;
+    /// <summary>
+    /// Whether <see cref="ShapeBegin"/> was called, and <see cref="ShapeEnd"/> wasn't yet called.
+    /// </summary>
+    public static bool ShapeBatchActive => shapeBatchActive;
 
     /// <summary>
     /// 1x1 white pixel texture for drawing all primitive stuff like lines and rectangles.
@@ -112,10 +122,10 @@ public static class Renderer
         device = game.GraphicsDevice;
         Window = game.Window;
         spriteBatch = new SpriteBatch(game.GraphicsDevice);
+        shapeBatch = new(device);
         Pixel = new(device, 1, 1);
         Pixel.SetData([Color.White]);
         GraphicsSettings.Init();
-
     }
 
     //Meta drawing functions
@@ -153,12 +163,40 @@ public static class Renderer
     }
 
     /// <summary>
+    /// Start the <see cref="shapeBatch"/>. The view matrix is where a camera goes, and shapes stay crisp under it because they are rasterized at the size they end up on screen rather than scaled up.
+    /// </summary>
+    /// <param name="view">Camera transform. Defaults to identity.</param>
+    /// <param name="projection">Defaults to an orthographic projection over the current viewport, with y pointing down.</param>
+    /// <param name="blendState">State of the blending. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="blendState"/>, <see cref="DefaultBlendState"/>, <see cref="BlendState.AlphaBlend"/>.</param>
+    /// <param name="samplerState">State of the sampler. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="samplerState"/>, <see cref="DefaultSamplerState"/>, <see cref="SamplerState.LinearClamp"/>.</param>
+    /// <param name="depthStencilState">State of the depth-stencil buffer. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="depthStencilState"/>, <see cref="DefaultDepthStencilState"/>, <see cref="DepthStencilState.None"/>.</param>
+    /// <param name="rasterizerState">State of the rasterization. The effective value is determined by the first non-<see langword="null"/> value in the following order: <paramref name="rasterizerState"/>, <see cref="DefaultRasterizerState"/>, <see cref="RasterizerState.CullCounterClockwise"/>.</param>
+    public static void ShapeBegin(Matrix? view = null, Matrix? projection = null, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null)
+    {
+        shapeBatchActive = true;
+        blendState ??= DefaultBlendState;
+        samplerState ??= DefaultSamplerState;
+        depthStencilState ??= DefaultDepthStencilState;
+        rasterizerState ??= DefaultRasterizerState;
+        shapeBatch.Begin(view, projection, blendState, samplerState, depthStencilState, rasterizerState);
+    }
+
+    /// <summary>
     /// Ends <see cref="spriteBatch"/>.
     /// </summary>
     public static void End()
     {
         spriteBatchActive = false;
         spriteBatch.End();
+    }
+
+    /// <summary>
+    /// Ends <see cref="shapeBatch"/>.
+    /// </summary>
+    public static void ShapeEnd()
+    {
+        shapeBatchActive = false;
+        shapeBatch.End();
     }
 
     /// <summary>

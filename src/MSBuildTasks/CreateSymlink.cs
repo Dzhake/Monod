@@ -117,14 +117,14 @@ public sealed class CreateSymlink : Task
     }
 #endif
 
-    bool TryCreateViaShell()
+    private bool TryCreateViaShell()
     {
         try
         {
             bool isDir = Directory.Exists(Source);
             NativeSymlink.Create(Destination!, Source!, isDir);
             Log.LogWarning($"Created symlink via shell: {Destination} -> {Source}");
-            //TODO: figure out why messages are not logged. Currently i'll just use warnings.
+            //TODO (debugging - very low priority): figure out why messages are not logged. Currently i'll just use warnings.
             return true;
         }
         catch (Exception ex)

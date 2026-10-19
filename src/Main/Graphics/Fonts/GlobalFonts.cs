@@ -1,3 +1,4 @@
+using Apos.Shapes;
 using MLEM.Font;
 
 namespace Monod.Graphics.Fonts;
@@ -11,4 +12,6 @@ public static class GlobalFonts
     /// Font used for menus (including loading screens).
     /// </summary>
     public static GenericFont MenuFont;
+
+    public static ShapeFont ShapeMenuFont;
 }
