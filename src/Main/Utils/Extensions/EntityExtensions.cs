@@ -135,4 +135,30 @@ public static class EntityExtensions
             return ref cb.AddComponent(data.Id, new T());
         }
     }
+
+    /// <summary>
+    /// Delegate for the <see cref="ApplyRecursive{T}(in Entity, ApplyRecursiveAction{T})"/>. Meant to be 'applied' to the <paramref name="entity"/> if it has the <typeparamref name="T"/> component.
+    /// </summary>
+    /// <typeparam name="T">Type of the component.</typeparam>
+    /// <param name="entity">Entity with the component.</param>
+    /// <param name="component">The component.</param>
+    public delegate void ApplyRecursiveAction<T>(in Entity entity, ref T component) where T : struct, IComponent;
+
+    /// <summary>
+    /// Call the <paramref name="callback"/> for the <paramref name="entity"/> and each child entity of the <paramref name="entity"/>, if it has the <typeparamref name="T"/> component.
+    /// </summary>
+    /// <typeparam name="T">Type of the component.</typeparam>
+    /// <param name="entity">Entity. The callback is applied to the entity, and all of its child entity, recursively.</param>
+    /// <param name="callback">Callback to call.</param>
+    public static void ApplyRecursive<T>(in this Entity entity, ApplyRecursiveAction<T> callback) where T : struct, IComponent
+    {
+        if (entity.HasComponent<T>()) callback(in entity, ref entity.GetComponent<T>());
+        foreach (Entity child in entity.ChildEntities)
+            ApplyRecursive(child, callback);
+    }
+
+    /// <summary>
+    /// Set <see cref="Transform2D.PhysicsDirty"/> for the <paramref name="entity"/> and all of its child entities.
+    /// </summary>
+    public static void SetTransformDirtyRecursive(this Entity entity) => entity.ApplyRecursive<Transform2D>((in entity, ref transform) => transform.PhysicsDirty = true);
 }
