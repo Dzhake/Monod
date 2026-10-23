@@ -22,13 +22,13 @@ public record struct Transform2D : IComponent, IEquatable<Transform2D>
     [Browse(Never)]
     [Ignore]
     [FieldOffset(8)] public Vector2 Scale; // 8
-    [FieldOffset(8)] public float ScaleX;
-    [FieldOffset(12)] public float ScaleY;
+    [FieldOffset(8)] public float ScaleX = 1;
+    [FieldOffset(12)] public float ScaleY = 1;
 
     /// <summary>
     /// Whether entity is facing right (false) or left (true).
     /// </summary>
-    [FieldOffset(16)] public bool FlipX; // 4 TODO (high priority) check whether it's 1 works correctly here
+    [FieldOffset(16)] public bool FlipX; // 4   TODO (high priority) check whether the field size is actually 1 and it works correctly
 
     /// <summary>
     /// Whether entity is facing down (false) or true (true).
