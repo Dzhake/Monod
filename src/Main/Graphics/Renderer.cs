@@ -331,8 +331,8 @@ public static class Renderer
     /// </summary>
     /// <param name="p1">Rectangle's top left corner.</param>
     /// <param name="p2">Rectangle's bottom right corner.</param>
-    /// <param name="color">Rectangle's color.</param>
-    public static void DrawRect(Vector2 p1, Vector2 p2, Color color)
+    /// <param name="color">Rectangle's color, <see cref="Color.White"/> by default.</param>
+    public static void DrawRect(Vector2 p1, Vector2 p2, Color? color = null)
     {
         if (Pixel is null) throw new InvalidOperationException("Pixel is null");
         DrawTexture(Pixel, p1, color, null, 0f, Vector2.Zero, new Vector2(p2.X - p1.X, p2.Y - p1.Y));
