@@ -84,7 +84,7 @@ public static class AssetParsers
         try
         {
             string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
-            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath });
+            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.Vulkan });
 
             if (result.IsFailure)
             {
