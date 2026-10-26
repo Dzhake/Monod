@@ -95,6 +95,8 @@ public static class EntityExtensions
         }
     }
 
+
+
     /// <summary>
     /// Get the component if entity has it, or get a reference to component in the <see cref="CommandBuffer"/>'s cache (warning: don't use the reference after <see cref="CommandBuffer.Playback"/> call!)
     /// </summary>
@@ -136,6 +138,8 @@ public static class EntityExtensions
         }
     }
 
+
+
     /// <summary>
     /// Delegate for the <see cref="ApplyRecursive{T}(in Entity, ApplyRecursiveAction{T})"/>. Meant to be 'applied' to the <paramref name="entity"/> if it has the <typeparamref name="T"/> component.
     /// </summary>
@@ -161,4 +165,19 @@ public static class EntityExtensions
     /// Set <see cref="Transform2D.PhysicsDirty"/> for the <paramref name="entity"/> and all of its child entities.
     /// </summary>
     public static void SetTransformDirtyRecursive(this Entity entity) => entity.ApplyRecursive<Transform2D>((in entity, ref transform) => transform.PhysicsDirty = true);
+
+
+    /// <summary>
+    /// Get the first entity with the <typeparamref name="T"/> component, starting with <paramref name="entity"/> and going up the hierarchy.
+    /// </summary>
+    /// <typeparam name="T">Type of the component.</typeparam>
+    /// <param name="entity"></param>
+    /// <returns>Entity with the <typeparamref name="T"/> component.</returns>
+    public static Entity GetFirstEntityWithComp<T>(in this Entity entity) where T : struct, IComponent
+    {
+        Entity bodyEntity = entity;
+        while (!bodyEntity.IsNull && !bodyEntity.HasComponent<T>())
+            bodyEntity = bodyEntity.Parent;
+        return bodyEntity;
+    }
 }
