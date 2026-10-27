@@ -32,10 +32,13 @@
 		
 		<!-- Nuget packages: general -->
 
-		<PackageReference Include="MonoGame.Framework.Native" Version="3.8.6" />
+		<PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.6" />
+		<!--
+		These are for MonoGame.Framework.Native; i'll leave them here to not forget them when i switch to Native.
+		<PackageReference Include="MonoGame.Runtime.Windows.Vulkan" Version="3.8.6" />
 		<PackageReference Include="MonoGame.Runtime.Mac.Vulkan" Version="3.8.6" />
 		<PackageReference Include="MonoGame.Runtime.Linux.Vulkan" Version="3.8.6" />
-		<PackageReference Include="MonoGame.Runtime.Windows.Vulkan" Version="3.8.6" />
+		-->
 
 		<PackageReference Include="ShadowDusk.Compiler" Version="0.21.0" />
 		<PackageReference Include="Chasm.SemanticVersioning" Version="2.8.2" />

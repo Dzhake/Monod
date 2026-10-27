@@ -38,15 +38,15 @@ public static class AssetParsers
     {
         switch (Assets.ResourcePriority)
         {
-            case ResourcePriorityType.Performance:
-                return Encoding.UTF8.GetString(info.AssetStream.ToByteArrayDangerous());
-            case ResourcePriorityType.Memory:
-                StreamReader reader = new(info.AssetStream, Encoding.UTF8);
-                string text = await reader.ReadToEndAsync();
-                reader.Dispose();
-                return text;
-            default:
-                throw new IndexOutOfRangeException();
+        case ResourcePriorityType.Performance:
+            return Encoding.UTF8.GetString(info.AssetStream.ToByteArrayDangerous());
+        case ResourcePriorityType.Memory:
+            StreamReader reader = new(info.AssetStream, Encoding.UTF8);
+            string text = await reader.ReadToEndAsync();
+            reader.Dispose();
+            return text;
+        default:
+            throw new IndexOutOfRangeException();
         }
     }
 
@@ -84,7 +84,7 @@ public static class AssetParsers
         try
         {
             string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
-            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.Vulkan });
+            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
 
             if (result.IsFailure)
             {
