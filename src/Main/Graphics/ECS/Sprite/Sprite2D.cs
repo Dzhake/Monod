@@ -8,6 +8,8 @@ public struct Sprite2D : IComponent
     public string TexturePath;
     public Color color = Color.White;
     public SpriteEffects spriteEffects;
+    public bool Visible = true;
+
     [Ignore]
     public MTexture? Texture;
     public bool InvalidateTexture;
@@ -16,12 +18,7 @@ public struct Sprite2D : IComponent
     {
     }
 
-    public Sprite2D(string texturePath)
-    {
-        TexturePath = texturePath;
-    }
-
-    public Sprite2D(string texturePath, Color? color = null, SpriteEffects spriteEffects = SpriteEffects.None)
+    public Sprite2D(string texturePath = "", Color? color = null, SpriteEffects spriteEffects = SpriteEffects.None)
     {
         TexturePath = texturePath;
         this.color = color ?? Color.White;

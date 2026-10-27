@@ -6,7 +6,7 @@ namespace Monod.InputModule;
 /// <summary>
 /// A single binding: key and modifiers, attached to some action.
 /// </summary>
-public readonly record struct Keybind(Key key, KeyModifiers modifiers = KeyModifiers.None)
+public readonly record struct Keybind(Key key, KeyModifiers modifiers = KeyModifiers.Any)
 {
     /// <summary>
     /// Key used by this Keybinds.
@@ -29,8 +29,6 @@ public readonly record struct Keybind(Key key, KeyModifiers modifiers = KeyModif
     [Pure]
     public bool IsActive(InputState state, int playerIndex)
     {
-        return modifiers == KeyModifiers.Any || modifiers == state.GetActiveModifiers()
-            ? Input.GetValue(state, key, playerIndex) != 0
-            : false;
+        return (modifiers == KeyModifiers.Any || modifiers == state.GetActiveModifiers()) && Input.GetValue(state, key, playerIndex) != 0;
     }
 }

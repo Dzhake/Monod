@@ -53,7 +53,7 @@ public static class Input
     public static InputState PrevState = new();
 
     /// <summary>
-    /// Default/backup input map for all players. Should not be modified, and should be used for "restore to defaults".
+    /// Default/backup input map for all players. Should not be modified outside adding new input actions, and should be used for "restore to defaults".
     /// </summary>
     public static KeyMap DefaultMap = new();
 
@@ -103,7 +103,7 @@ public static class Input
         MouseState mouse = Mouse.GetState();
         float mouseWheelDiff = mouse.ScrollWheelValue - PrevState.Mouse.ScrollWheelValue;
         float horizontalMouseWheelDiff = mouse.HorizontalScrollWheelValue - PrevState.Mouse.HorizontalScrollWheelValue;
-        GamePadState[] gamepads = new GamePadState[MaximumGamePadCount];
+        var gamepads = new GamePadState[MaximumGamePadCount];
         for (int i = 0; i < MaximumGamePadCount; i++)
         {
             gamepads[i] = GamePad.GetState(i);
@@ -172,7 +172,11 @@ public static class Input
         return Key.None;
     }
 
-    public static bool AnyKey(int playerIndex) => FirstKeyPressed(playerIndex) != Key.None;
+    /// <summary>
+    /// Check whether the player at <paramref name="playerIndex"/> pressed any key this frame.
+    /// </summary>
+    /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
+    public static bool AnyKeyPressed(int playerIndex) => FirstKeyPressed(playerIndex) != Key.None;
 
     /// <summary>
     /// Check whether the <paramref name="key"/> is a key on a keyboard.
@@ -192,7 +196,7 @@ public static class Input
     [Pure]
     public static float GetValue(InputState state, Key key, int playerIndex = 0)
     {
-        var imguiIO = ImGui.GetIO();
+        ImGuiIOPtr imguiIO = ImGui.GetIO();
         bool keyboardKey = IsKeyboardKey(key);
         bool gamepadKey = IsGamepadKey(key);
         bool mouseKey = !(keyboardKey || gamepadKey);
@@ -204,10 +208,10 @@ public static class Input
         }
 
         if (mouseKey)
-            if (!Players[playerIndex].UsesKeyboard || imguiIO.WantCaptureMouse) return 0;
+            if (imguiIO.WantCaptureMouse || !Players[playerIndex].UsesKeyboard) return 0;
 
-        if (gamepadKey)
-            if (Players[playerIndex].GamepadIndex == -1) return 0;
+        if (gamepadKey && Players[playerIndex].GamepadIndex == -1)
+            return 0;
 
 
         return key switch
@@ -280,7 +284,7 @@ public static class Input
     /// </summary>
     /// <param name="value">Stick's position, between -1 and 1. If <paramref name="positiveValues"/> is <see langword="true"/>, then negative value is ignored, and vice versa.</param>
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
-    /// <param name="positiveValues">Whether method should only accept positives values or negative ones.</param>
+    /// <param name="positiveValues">Whether method should only accept positives values or only negative ones. If the value doesn't match, returns zero.</param>
     /// <returns>Value, after applying settings to it, always non-negative.</returns>
     [Pure]
     public static float ApplyStickSettings(float value, int playerIndex, bool positiveValues)
@@ -313,45 +317,40 @@ public static class Input
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is down this frame.
     /// </summary>
-    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="actionIndex">Index of the action in <see cref="InputActionIndex.Info"/> (the value).</param>
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
-    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
     public static bool ActionDown(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Down();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is up this frame.
     /// </summary>
-    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="actionIndex">Index of the action in <see cref="InputActionIndex.Info"/> (the value).</param>
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
-    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
     public static bool ActionUp(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Up();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is pressed this frame.
     /// </summary>
-    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="actionIndex">Index of the action in <see cref="InputActionIndex.Info"/> (the value).</param>
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
-    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
     public static bool ActionPressed(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Pressed();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is released this frame.
     /// </summary>
-    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="actionIndex">Index of the action in <see cref="InputActionIndex.Info"/> (the value).</param>
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
-    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
     public static bool ActionReleased(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Released();
 
     /// <summary>
     /// Check whether the <paramref name="actionIndex"/> is held this frame.
     /// </summary>
-    /// <param name="actionIndex">Index of the action in <see cref="ActionNames"/> (the value).</param>
+    /// <param name="actionIndex">Index of the action in <see cref="InputActionIndex.Info"/> (the value).</param>
     /// <param name="playerIndex">Index of the player in <see cref="Players"/>.</param>
-    /// <returns>Whether the <paramref name="actionIndex"/> is down this frame.</returns>
     [Pure]
     public static bool ActionHeld(InputActionIndex actionIndex, int playerIndex = 0) => Players[playerIndex].Map[actionIndex].Held();
 
@@ -364,7 +363,6 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is down this frame.</returns>
     [Pure]
     public static bool KeyDown(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) != 0;
 
@@ -373,7 +371,6 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is up this frame.</returns>
     [Pure]
     public static bool KeyUp(Key key, int playerIndex = 0) => GetValue(CurState, key, playerIndex) == 0;
 
@@ -383,7 +380,6 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is pressed on this frame but wasn't pressed on previous one.</returns>
     [Pure]
     public static bool KeyPressed(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) == 0 && GetValue(CurState, key, playerIndex) != 0;
 
@@ -392,7 +388,6 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> is not pressed on this frame but was pressed on previous one.</returns>
     [Pure]
     public static bool KeyReleased(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) == 0;
 
@@ -401,7 +396,6 @@ public static class Input
     /// </summary>
     /// <param name="key">Key to check.</param>
     /// <param name="playerIndex">Index of the player for whom to check.</param>
-    /// <returns>Whether the <paramref name="key"/> was pressed on this and previous frames.</returns>
     [Pure]
     public static bool KeyHeld(Key key, int playerIndex = 0) => GetValue(PrevState, key, playerIndex) != 0 && GetValue(CurState, key, playerIndex) != 0;
 
