@@ -22,8 +22,10 @@ public sealed class ReloadAssetCommand(string path, AssetLoader loader) : AssetL
     public override int CurrentProgress => IsFinished ? 1 : 0;
 
     ///<inheritdoc/>
-    public async override Task Run()
+    public override async Task Run()
     {
+        Assets.Reloading = true;
+
         await Loader.LoadAssetAsync(Path);
         Finish();
     }

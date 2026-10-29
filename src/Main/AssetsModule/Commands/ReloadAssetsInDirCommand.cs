@@ -27,8 +27,10 @@ public sealed class ReloadAssetsInDirCommand(string dir, AssetLoader loader) : A
     private int LoadedAssets;
 
     ///<inheritdoc/>
-    public async override Task Run()
+    public override async Task Run()
     {
+        Assets.Reloading = true;
+
         string fullDir = Path.Join(Loader.DirectoryPath, Dir);
         if (!Directory.Exists(fullDir))
         {

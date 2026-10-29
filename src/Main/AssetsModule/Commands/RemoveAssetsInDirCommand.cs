@@ -22,8 +22,10 @@ public sealed class RemoveAssetsInDirCommand(string dir, AssetLoader loader) : A
     public override int CurrentProgress => IsFinished ? 1 : 0;
 
     ///<inheritdoc/>
-    public async override Task Run()
+    public override async Task Run()
     {
+        Assets.Reloading = true;
+
         Loader.RemoveDirFromCache(Dir);
         Finish();
     }

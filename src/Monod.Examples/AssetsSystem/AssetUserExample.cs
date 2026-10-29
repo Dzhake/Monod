@@ -29,7 +29,7 @@ public class AssetUserExample : IDisposable
     public AssetUserExample(string assetPath)
     {
         AssetPath = assetPath; // Store the path, so we can use it later.
-        Assets.OnReload += LoadAssets; // Subscribe "LoadAssets" to "Assets.OnReload", so when assets reload "LoadAssets" is called. 
+        Assets.OnLoad += LoadAssets; // Subscribe "LoadAssets" to "Assets.OnLoad", so when assets reload "LoadAssets" is called. 
         LoadAssets(); // Load assets (after setting the "AssetPath" !).
     }
 
@@ -42,11 +42,11 @@ public class AssetUserExample : IDisposable
     }
     
     /// <summary>
-    /// Unsubscribe from "Assets.OnReload". Derived class should override "Dispose" to unsubscribe themself too, if needed.
+    /// Unsubscribe from "Assets.OnLoad". Derived class should override "Dispose" to unsubscribe themself too, if needed.
     /// </summary>
     protected void UnsubscribeSelf()
     {
-        Assets.OnReload -= LoadAssets;
+        Assets.OnLoad -= LoadAssets;
     }
 
     /// <summary>

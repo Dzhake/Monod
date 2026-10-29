@@ -18,6 +18,7 @@ using Monod.SaveModule;
 using Monod.TimeModule;
 using Monod.Utils.General;
 using SDL3;
+using SoLoud;
 using System.Globalization;
 
 namespace Monod;
@@ -58,6 +59,8 @@ public abstract class MonodGame : Game
     /// </summary>
     public ImGuiRenderer imGuiRenderer;
 
+    public Soloud soloud;
+
     /// <summary>
     /// Aspect ratio of the game (X divided by Y).
     /// </summary>
@@ -76,6 +79,12 @@ public abstract class MonodGame : Game
 
         SDL.SDL_Init(SDL.SDL_InitFlags.SDL_INIT_VIDEO);
 
+        soloud = new();
+        soloud.init();
+        var speech = new Speech();
+        speech.setText("Hello c sharp world!");
+        soloud.play(speech);
+
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
         Window.AllowUserResizing = true;
@@ -88,6 +97,11 @@ public abstract class MonodGame : Game
         DrawSystemRoot.AddStore(Store);
 
         Exiting += OnExit;
+    }
+
+    ~MonodGame()
+    {
+        soloud?.deinit();
     }
 
     public virtual void CreateStore()

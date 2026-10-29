@@ -1,11 +1,9 @@
 ﻿using Monod.AssetsModule.Commands;
 using Monod.AssetsModule.Exceptions;
 using Monod.AssetsModule.Utils;
-using Monod.InputModule;
 using Monod.LogModule;
 using Monod.Shared.Collections;
 using Monod.Shared.Extensions;
-using Serilog;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
@@ -72,7 +70,7 @@ public static class Assets
     /// <summary>
     /// Event that is raised when some <see cref="AssetLoader"/>s finish reloading assets. Use <see cref="ReloadThisFrame"/> (recommended) or this to determine when to reload assets.
     /// </summary>
-    public static EventBus OnReload = new();
+    public static EventBus OnLoad = new();
 
     /// <summary>
     /// Dictionary of asset types and parsers that should be able to parse the specified format. Should be used if the loaded asset doesn't specify some custom parser.
@@ -108,6 +106,7 @@ public static class Assets
             CommandsTotal = 0;
             CommandsFinished = 0;
             ActiveCommand = null;
+            Reloading = false;
         }
         finally
         {
@@ -123,10 +122,11 @@ public static class Assets
         try
         {
             LoadingInfoLock.EnterUpgradeableReadLock();
+            ReloadThisFrame = false;
 
             if (!IsLoading)
             {
-                foreach (var assetManager in Managers.Values)
+                foreach (AssetManager assetManager in Managers.Values)
                 {
                     if (!assetManager.Loader.LoadingInactive)
                     {
@@ -138,7 +138,7 @@ public static class Assets
                 if (!IsLoading) return;
             }
 
-            foreach (var assetManager in Managers.Values)
+            foreach (AssetManager assetManager in Managers.Values)
             {
                 AssetLoaderCommand? command = assetManager.Loader.ActiveCommand;
                 if (command is not null)
@@ -151,6 +151,8 @@ public static class Assets
             if (CommandsTotal == CommandsFinished)
             {
                 Logger.Information("Finished executing {Count} commands", CommandsTotal);
+                ReloadThisFrame = true;
+                EmitReloadEvent();
                 ResetLoadInfo();
             }
         }
@@ -248,7 +250,7 @@ public static class Assets
     [Pure]
     public static T Get<T>(string fullPath)
     {
-        SplitPath(fullPath, out var prefix, out var relativePath);
+        SplitPath(fullPath, out ReadOnlySpan<char> prefix, out ReadOnlySpan<char> relativePath);
         string prefixString = prefix.ToString();
         AssetManager? manager = GetManager(prefixString);
         if (manager is null)
@@ -269,7 +271,7 @@ public static class Assets
     [Pure]
     public static T? GetOrDefault<T>(string fullPath)
     {
-        SplitPath(fullPath, out var prefix, out var relativePath);
+        SplitPath(fullPath, out ReadOnlySpan<char> prefix, out ReadOnlySpan<char> relativePath);
         AssetManager? manager = GetManager(prefix.ToString());
         if (manager is null) return default;
         return manager.GetOrDefault<T>(relativePath.ToString());
@@ -294,7 +296,7 @@ public static class Assets
 
 
     [Pure]
-    public static bool ManagerRegistered(string prefix)
+    public static bool IsManagerRegistered(string prefix)
     {
         return Managers.ContainsKey(prefix);
     }
@@ -325,7 +327,7 @@ public static class Assets
     /// <summary>
     /// Invoke all subscribed listeners, to make them reload assets.
     /// </summary>
-    public static void EmitReloadEvent() => OnReload.Emit();
+    public static void EmitReloadEvent() => OnLoad.Emit();
 
 
     /// <summary>

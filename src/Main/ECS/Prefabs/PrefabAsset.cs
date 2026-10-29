@@ -48,7 +48,7 @@ public sealed class ModificationPrefab : PrefabAsset, IDisposable
     {
         BasePrefabPath = basePrefabName;
         Source = source;
-        Assets.OnReload += LoadAssets;
+        Assets.OnLoad += LoadAssets;
         LoadAssets();
     }
 
@@ -68,7 +68,7 @@ public sealed class ModificationPrefab : PrefabAsset, IDisposable
 
     public void Dispose()
     {
-        Assets.OnReload -= LoadAssets;
+        Assets.OnLoad -= LoadAssets;
         Source.DeleteEntity();
     }
 }

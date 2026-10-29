@@ -307,7 +307,7 @@ public static class ModManager
     public static void LoadModAssets(Mod mod)
     {
         string name = mod.GetName();
-        if (Assets.ManagerRegistered(name))
+        if (Assets.IsManagerRegistered(name))
         {
             Logger.Warning("Trying to load assets for mod, but manager with this name is already registered: \"{ModName}\"", name);
             return;
