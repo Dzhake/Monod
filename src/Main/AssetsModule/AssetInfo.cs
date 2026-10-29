@@ -4,14 +4,14 @@ using Monod.AssetsModule.Utils;
 namespace Monod.AssetsModule;
 
 /// <summary>
-/// Struct for storing info required to load an asset: an <see cref="AssetStream"/> and <see cref="PropertiesArray"/> of the asset.
+/// Stores info required to load an asset: an <see cref="GetStreamAsync"/> and <see cref="PropertiesArray"/> of the asset.
 /// </summary>
-public readonly struct AssetInfo : IEquatable<AssetInfo>
+public class AssetInfo
 {
     /// <summary>
     /// <see cref="Stream"/> reading the asset.
     /// </summary>
-    public readonly Stream AssetStream;
+    private readonly Stream? AssetStream;
 
     /// <summary>
     /// Type of the asset.
@@ -19,28 +19,31 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     public readonly AssetType Type;
 
     /// <summary>
-    /// Properties of <see cref="MatcherInfo"/>s that asset's path matched to. Use <see cref="GetProperty"/> to get a property.
+    /// Properties of <see cref="MatcherInfo"/>s that asset's path matched to. Use <see cref="GetProperty"/> to get a property. Not-null 
     /// </summary>
-    public readonly Dictionary<AssetProp, object>[] PropertiesArray;
+    public Dictionary<AssetProp, object>[]? PropertiesArray;
 
     /// <summary>
-    /// Path of the asset.
+    /// Path of the asset in this asset manager.
     /// </summary>
     public readonly string Path;
 
     /// <summary>
-    /// Initialize a new instance of <see cref="AssetInfo"/> using the specified <paramref name="assetStream"/> and the <paramref name="propertiesArray"/>.
+    /// File path of the asset relative to the <see cref="AssetLoader.DirectoryPath"/>, or <see langword="null"/> if the file doesn't exist, never <see langword="null"/> when parsing asset.
     /// </summary>
-    /// <param name="assetStream"><see cref="Stream"/>, reading the asset.</param>
-    /// <param name="type">Type of the asset.</param>
-    /// <param name="propertiesArray">Properties dictionary of the asset with key being an <see cref="AssetProps"/> and the value is parsed property.</param>
-    /// <param name="path">Path of the asset.</param>
-    public AssetInfo(Stream assetStream, AssetType type, Dictionary<AssetProp, object>[] propertiesArray, string path)
+    public readonly string? FilePath;
+
+    /// <summary>
+    /// Full path to the file of the asset, or <see langword="null"/> if the file doesn't exist, never <see langword="null"/> when parsing asset.
+    /// </summary>
+    public readonly string? FullPath;
+
+    public AssetInfo(string? fullPath, string? filePath, string path, AssetType type)
     {
-        AssetStream = assetStream;
-        PropertiesArray = propertiesArray;
-        Type = type;
+        FullPath = fullPath;
+        FilePath = filePath;
         Path = path;
+        Type = type;
     }
 
     /// <summary>
@@ -50,37 +53,23 @@ public readonly struct AssetInfo : IEquatable<AssetInfo>
     /// <returns>Id of the property if it was found and casted successfully, default(T) otherwise</returns>
     public T? GetProperty<T>(AssetProp id)
     {
-        foreach (var properties in PropertiesArray)
+        if (PropertiesArray is null) return default;
+
+        foreach (Dictionary<AssetProp, object> properties in PropertiesArray)
             if (properties.TryGetValue(id, out object? property))
             {
                 if (property is T castedProperty) return castedProperty;
                 AssetPropertyTypeMismatchException.Throw(property, Type, typeof(T));
             }
-        return default(T);
+
+        return default;
+    }
+
+    public async Task<Stream> GetStreamAsync()
+    {
+        return File.OpenRead(FullPath);
     }
 
     /// <inheritdoc />
-    public bool Equals(AssetInfo other) => AssetStream.Equals(other.AssetStream) && PropertiesArray.Equals(other.PropertiesArray) && Type.Equals(other.Type);
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj) => obj is AssetInfo other && Equals(other);
-
-    /// <inheritdoc />
     public override int GetHashCode() => HashCode.Combine(AssetStream, Type, PropertiesArray);
-
-    /// <summary>
-    /// Indicates whether two <see cref="AssetInfo"/> are equal.
-    /// </summary>
-    /// <param name="left">One <see cref="AssetInfo"/>, to compare with the <paramref name="right"/> one.</param>
-    /// <param name="right">Other <see cref="AssetInfo"/>, to compare with the <paramref name="left"/> one.</param>
-    /// <returns>Whether <paramref name="left"/> and <paramref name="right"/> <see cref="AssetInfo"/> are equal.</returns>
-    public static bool operator ==(AssetInfo left, AssetInfo right) => left.Equals(right);
-
-    /// <summary>
-    /// Indicates whether two <see cref="AssetInfo"/> are not equal.
-    /// </summary>
-    /// <param name="left">One <see cref="AssetInfo"/>, to compare with the <paramref name="right"/> one.</param>
-    /// <param name="right">Other <see cref="AssetInfo"/>, to compare with the <paramref name="left"/> one.</param>
-    /// <returns>Whether <paramref name="left"/> and <paramref name="right"/> <see cref="AssetInfo"/> are not equal.</returns>
-    public static bool operator !=(AssetInfo left, AssetInfo right) => !left.Equals(right);
 }

@@ -192,8 +192,9 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// </summary>
     public void LoadAsset(string filePath)
     {
-        using AssetStream? assetStream = LoadAssetStream(filePath);
-        LoadAssetFromAssetStream(FilePathToLoaderPath(filePath), assetStream).Wait();
+        filePath = filePath.Replace('\\', '/');
+        AssetInfo assetInfo = GetAssetInfo(filePath);
+        LoadAssetFromAssetInfo(assetInfo).Wait();
     }
 
     public async Task ReloadAssetAsync(string path)
@@ -208,33 +209,34 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// <returns>Async task.</returns>
     public async Task LoadAssetAsync(string filePath)
     {
-        using AssetStream? assetStream = await LoadAssetStreamAsync(filePath);
-        await LoadAssetFromAssetStream(FilePathToLoaderPath(filePath), assetStream);
+        filePath = filePath.Replace('\\', '/');
+        AssetInfo assetInfo = GetAssetInfo(filePath);
+        await LoadAssetFromAssetInfo(assetInfo);
     }
 
 
-    private async Task<bool> LoadAssetFromAssetStream(string path, AssetStream? assetStream)
+    private async Task<bool> LoadAssetFromAssetInfo(AssetInfo assetInfo)
     {
-        if (assetStream is null) //When asset was deleted/renamed?
+        if (assetInfo.FilePath is null) //When asset was deleted/renamed?
         {
-            Assets.Logger.Debug("{This}: Unloaded asset at {Path}.", this, path);
-            RemoveFromCache(path);
+            Assets.Logger.Debug("{This}: Unloaded asset at {Path}.", this, assetInfo.Path);
+            RemoveFromCache(assetInfo.Path);
             return false;
         }
 
-        if (assetStream.Value.Type == AssetType.Ignore)
+        if (assetInfo.Type == AssetType.Ignore)
         {
-            Assets.Logger.Debug("{This}: Ignoring asset at {Path}.", this, path);
+            Assets.Logger.Debug("{This}: Ignoring asset at {Path}.", this, assetInfo.Path);
             return false;
         }
 
 
-        AssetInfo assetInfo = assetStream.Value.ToInfo(MatchPath(path).ToArray(), path);
+        assetInfo.PropertiesArray = MatchPath(assetInfo.FilePath).ToArray();
         AssetParser? parser = GetParser(assetInfo);
 
         if (parser is null)
         {
-            Assets.Logger.Warning("Could not find parser for the asset with type {Type} at path {Path}. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type, path);
+            Assets.Logger.Warning("Could not find parser for the asset with type {Type} at path {Path}. Verify that parser is specified correctly and that asset has a supported format.", assetInfo.Type, assetInfo.Path);
             return false;
         }
 
@@ -245,63 +247,16 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
             return false;
         }
 
-        LoadIntoCache(path, asset);
+        LoadIntoCache(assetInfo.Path, asset);
         return true;
     }
 
-    /// <summary>
-    /// Load stream of the asset at the specified path. Loads new asset each time.
-    /// </summary>
-    /// <param name="filePath">Path of the asset to load in this <see cref="AssetLoader"/>.</param>
-    /// <returns>New <see cref="AssetStream"/> with the <see cref="AssetStream.Stream"/> reading the asset and the type respective to the loaded asset, or null if the asset was not found.</returns>
-    protected AssetStream? LoadAssetStream(string filePath)
+    protected AssetInfo GetAssetInfo(string filePath)
     {
-        string fullPath = Path.Join(DirectoryPath, filePath);
-        fullPath = fullPath.Replace('\\', '/');
-        if (!File.Exists(fullPath))
-            return null;
-        try
-        {
-            return new(File.OpenRead(fullPath), AssetsUtils.DetectTypeByPath(filePath));
-        }
-        catch (Exception exception)
-        {
-            Assets.Logger.Error(exception, "An exception occured while trying to open a file:");
-            return null;
-        }
+        string fullPath = Path.Join(DirectoryPath, filePath).Replace('\\', '/');
+        if (!File.Exists(fullPath)) return new(null, null, FilePathToLoaderPath(filePath), AssetsUtils.DetectTypeByPath(filePath));
+        return new(fullPath, filePath, FilePathToLoaderPath(filePath), AssetsUtils.DetectTypeByPath(filePath));
     }
-
-    /// <summary>
-    /// Load stream of the asset at the specified path asynchronously. Loads new asset each time.
-    /// </summary>
-    /// <param name="path">Path of the asset to load in this <see cref="AssetLoader"/>.</param>
-    /// <returns>New <see cref="AssetStream"/> with the <see cref="AssetStream.Stream"/> reading the asset and the type respective to the loaded asset, or null if the asset was not found.</returns>
-    protected async Task<AssetStream?> LoadAssetStreamAsync(string path)
-    {
-        path = path.Replace('\\', '/');
-        string fullPath = Path.Join(DirectoryPath, path);
-        if (!File.Exists(fullPath))
-            return null;
-
-        for (int i = 0; i < 5; i++)
-        {
-            try
-            {
-                byte[] content = await File.ReadAllBytesAsync(fullPath);
-                return new(new MemoryStream(content), AssetsUtils.DetectTypeByPath(path));
-            }
-            catch (Exception exception)
-            {
-                if (i == 4)
-                    Assets.Logger.Error(exception, "An exception occured while trying to open a file (try {I}/5):", i);
-                else
-                    Assets.Logger.Warning(exception, "An exception occured while trying to open a file (try {I}/5):", i);
-                Thread.Sleep(i * 2000);
-            }
-        }
-        return null;
-    }
-
 
     /// <summary>
     /// Matches the given <paramref name="path"/> against <see cref="Matchers"/>.

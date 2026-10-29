@@ -59,7 +59,7 @@ public abstract class MonodGame : Game
     /// </summary>
     public ImGuiRenderer imGuiRenderer;
 
-    public Soloud soloud;
+    public static Soloud soloud;
 
     /// <summary>
     /// Aspect ratio of the game (X divided by Y).
@@ -81,9 +81,6 @@ public abstract class MonodGame : Game
 
         soloud = new();
         soloud.init();
-        var speech = new Speech();
-        speech.setText("Hello c sharp world!");
-        soloud.play(speech);
 
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;

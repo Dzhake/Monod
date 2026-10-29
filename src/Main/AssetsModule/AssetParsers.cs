@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Monod.AssetsModule.Utils;
 using Monod.ECS.Prefabs;
 using Monod.Graphics;
 using Monod.Localization;
@@ -8,7 +7,7 @@ using Monod.Shared.Extensions;
 using Monod.Utils.General;
 using ShadowDusk.Compiler;
 using ShadowDusk.Core;
-using System.Text;
+using SoLoud;
 
 namespace Monod.AssetsModule;
 
@@ -25,7 +24,7 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static async Task<object?> Binary(AssetInfo info, AssetManager _)
     {
-        return info.AssetStream.ToByteArrayDangerous();
+        return await File.ReadAllBytesAsync(info.FullPath);
     }
 
     /// <summary>
@@ -36,18 +35,7 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static async Task<object?> Text(AssetInfo info, AssetManager _)
     {
-        switch (Assets.ResourcePriority)
-        {
-        case ResourcePriorityType.Performance:
-            return Encoding.UTF8.GetString(info.AssetStream.ToByteArrayDangerous());
-        case ResourcePriorityType.Memory:
-            StreamReader reader = new(info.AssetStream, Encoding.UTF8);
-            string text = await reader.ReadToEndAsync();
-            reader.Dispose();
-            return text;
-        default:
-            throw new IndexOutOfRangeException();
-        }
+        return await File.ReadAllTextAsync(info.FullPath);
     }
 
     /// <summary>
@@ -58,7 +46,7 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static async Task<object?> Image(AssetInfo info, AssetManager _)
     {
-        return Texture2D.FromStream(Renderer.device, info.AssetStream, DefaultColorProcessors.PremultiplyAlpha);
+        return Texture2D.FromStream(Renderer.device, await info.GetStreamAsync(), DefaultColorProcessors.PremultiplyAlpha);
     }
 
     /// <summary>
@@ -67,9 +55,13 @@ public static class AssetParsers
     /// <param name="info">Asset info to parse.</param>
     /// <param name="_">Unused.</param>
     /// <returns>Parsed asset.</returns>
-    public static async Task<object?> Audio(AssetInfo info, AssetManager _)
+    public static async Task<object?> Audio(AssetInfo info, AssetManager assetManager)
     {
-        return SoundEffect.FromStream(info.AssetStream);
+        var wav = new Wav();
+        int result = wav.load(info.FullPath!);
+        if (result != 0)
+            Assets.Logger.Error("Failed to load Wav at path {Path} in asset manager {Manager} : {Reason}", info.Path, assetManager.ToString(), MonodGame.soloud.getErrorString(result));
+        return wav;
     }
 
     private static EffectCompiler effectCompiler = new();
@@ -84,7 +76,7 @@ public static class AssetParsers
         try
         {
             string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
-            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
+            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await (await info.GetStreamAsync()).ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
 
             if (result.IsFailure)
             {
@@ -112,7 +104,7 @@ public static class AssetParsers
     public static async Task<object?> Localization(AssetInfo info, AssetManager manager)
     {
         //TODO (localization - low priority) Locale.AddManager(manager); -- for localization-only hot reload, because we assume localization is handled by separate asset managers than normal assets, we can only reload asset managers that handle localization
-        Locale.Load(new StreamReader(info.AssetStream), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
+        Locale.Load(new StreamReader(await info.GetStreamAsync()), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
         return null;
     }
 
@@ -124,7 +116,7 @@ public static class AssetParsers
     /// <returns>Parsed asset.</returns>
     public static async Task<object?> Font(AssetInfo info, AssetManager _)
     {
-        return info.AssetStream.ToByteArrayDangerous();
+        return (await info.GetStreamAsync()).ToByteArrayDangerous();
     }
 
     private static Lock PrefabsLock = new();
@@ -134,7 +126,7 @@ public static class AssetParsers
         try
         {
             PrefabsLock.Enter();
-            if (!Json.TryDeserialize(info.AssetStream, Json.SReadableWithFields, out PrefabAsset? result, out Exception? error))
+            if (!Json.TryDeserialize(await info.GetStreamAsync(), Json.SReadableWithFields, out PrefabAsset? result, out Exception? error))
                 Assets.Logger.Error(error, "Failed to deserialize prefab at {Path} in {AssetManager}", info.Path, assetManager);
             return result;
         }
