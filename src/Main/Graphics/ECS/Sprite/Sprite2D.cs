@@ -9,6 +9,7 @@ public struct Sprite2D : IComponent
     public Color color = Color.White;
     public SpriteEffects spriteEffects;
     public bool Visible = true;
+    public float Rotation;
 
     [Ignore]
     public MTexture? Texture;
@@ -18,10 +19,11 @@ public struct Sprite2D : IComponent
     {
     }
 
-    public Sprite2D(string texturePath = "", Color? color = null, SpriteEffects spriteEffects = SpriteEffects.None)
+    public Sprite2D(string texturePath = "", Color? color = null, float rotation = 0f, SpriteEffects spriteEffects = SpriteEffects.None)
     {
         TexturePath = texturePath;
         this.color = color ?? Color.White;
         this.spriteEffects = spriteEffects;
+        Rotation = rotation;
     }
 }
