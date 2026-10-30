@@ -136,7 +136,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Soloud_create();
+    private static partial IntPtr Soloud_create();
     public Soloud()
     {
         objhandle = Soloud_create();
@@ -144,7 +144,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Soloud_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Soloud_destroy(IntPtr aObjHandle);
     ~Soloud()
     {
         Soloud_destroy(objhandle);
@@ -152,7 +152,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_initEx(IntPtr aObjHandle, SoloudInitFlags aFlags, SoloudBackend aBackend, uint aSamplerate, uint aBufferSize, uint aChannels);
+    private static partial int Soloud_initEx(IntPtr aObjHandle, SoloudInitFlags aFlags, SoloudBackend aBackend, uint aSamplerate, uint aBufferSize, uint aChannels);
     /// <summary>
     /// <para>Initializes the SoLoud object. The function has several optional parameters you can use to adjust SoLoud's behavior. The default values should work for most cases.</para>
     ///
@@ -164,78 +164,6 @@ public partial class Soloud : SoloudObject
     /// </code>
     ///
     /// <para>By default SoLoud is initializes with the roundoff clipping enabled, and the rest of the parameters set to auto. SoLoud will then pick the backend it prefers, and its default parameters.</para>
-    /// <para>Currently, you can select from these flags:</para>
-    ///
-    /// Flag
-    /// Description
-    ///
-    /// CLIP_ROUNDOFF
-    /// Use roundoff clipper. Without this flag the clipper defaults to "hard" clipping to -1/+1
-    ///
-    /// ENABLE_VISUALIZATION
-    /// Enable gathering of visualization data. Can be changed at runtime with setVisualizationEnable()
-    ///
-    /// LEFT_HANDED_3D
-    /// Use left-handed (Direct3D) 3d coordinates. Default is right-handed (OpenGL) coordinates.
-    ///
-    /// NO_FPU_REGISTER_CHANGE
-    /// Do not alter the FPU state in audio threads. By default, SoLoud uses "fast" fpu options.
-    ///
-    /// <para>Current set of back-ends is:</para>
-    ///
-    /// Backend
-    /// Description
-    ///
-    /// AUTO
-    /// Select backend automatically
-    ///
-    /// SDL1
-    /// SDL1 dynamic or static linking
-    ///
-    /// SDL2
-    /// SDL2 dynamic or static linking
-    ///
-    /// PORTAUDIO
-    /// PortAudio
-    ///
-    /// MINIAUDIO
-    /// MiniAudio
-    ///
-    /// WINMM
-    /// Windows MultiMedia
-    ///
-    /// XAUDIO2
-    /// XAudio2
-    ///
-    /// WASAPI
-    /// Windows Audio Session API
-    ///
-    /// ALSA
-    /// Advanced Linux Sound Architecture
-    ///
-    /// JACK
-    /// JACK Audio Connection Kit
-    ///
-    /// OSS
-    /// Open Sound System
-    ///
-    /// OPENAL
-    /// OpenAL (high latency)
-    ///
-    /// COREAUDIO
-    /// OSX CoreAudio
-    ///
-    /// OPENSLES
-    /// OpenSL ES
-    ///
-    /// VITA_HOMEBREW
-    /// Vita console homebrew SDK
-    ///
-    /// NOSOUND
-    /// No-sound driver
-    ///
-    /// NULLDRIVER
-    /// Null driver
     /// </summary>
     public int init(SoloudInitFlags aFlags = SoloudInitFlags.CLIP_ROUNDOFF, SoloudBackend aBackend = SoloudBackend.AUTO, uint aSamplerate = AUTO, uint aBufferSize = AUTO, uint aChannels = 2)
     {
@@ -244,7 +172,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_deinit(IntPtr aObjHandle);
+    private static partial void Soloud_deinit(IntPtr aObjHandle);
     /// <summary>
     /// <para>Shut down the SoLoud object.</para>
     ///
@@ -262,7 +190,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getVersion(IntPtr aObjHandle);
+    private static partial uint Soloud_getVersion(IntPtr aObjHandle);
     /// <summary>
     /// <para>Returns the version of the SoLoud library. Same as SOLOUD_VERSION macro. Mostly useful when using the DLL, to check the DLL's library version.</para>
     ///
@@ -278,7 +206,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Soloud_getErrorString(IntPtr aObjHandle, int aErrorCode);
+    private static partial IntPtr Soloud_getErrorString(IntPtr aObjHandle, int aErrorCode);
     /// <summary>
     /// <para>Converts SoLoud's error values to printable zero-terminated ascii strings.</para>
     ///
@@ -295,7 +223,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getBackendId(IntPtr aObjHandle);
+    private static partial uint Soloud_getBackendId(IntPtr aObjHandle);
     /// <summary>
     /// <para>Get the current backend ID. This is typically the same as the Soloud::BACKENDS enumeration, but for AUTO it will be set to whatever the auto-selected backend was, or in case of SDL2 dynamic linking, it will return SDL, as those two share the same backend.</para>
     ///
@@ -310,7 +238,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Soloud_getBackendString(IntPtr aObjHandle);
+    private static partial IntPtr Soloud_getBackendString(IntPtr aObjHandle);
     /// <summary>
     /// <para>Get a printable asciiz string naming the current back-end. May return NULL.</para>
     ///
@@ -327,7 +255,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getBackendChannels(IntPtr aObjHandle);
+    private static partial uint Soloud_getBackendChannels(IntPtr aObjHandle);
     /// <summary>
     /// <para>Get the number of channels the currently active backend plays.</para>
     ///
@@ -344,7 +272,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getBackendSamplerate(IntPtr aObjHandle);
+    private static partial uint Soloud_getBackendSamplerate(IntPtr aObjHandle);
     /// <summary>
     /// <para>Get the samplerate, in Hz, of the currently active backend. This may differ from the one requested.</para>
     ///
@@ -359,7 +287,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getBackendBufferSize(IntPtr aObjHandle);
+    private static partial uint Soloud_getBackendBufferSize(IntPtr aObjHandle);
     /// <summary>
     /// <para>Get the current backend's buffer size. May differ from the one requested. Some backends (such as PortAudio) may lie about this and use smaller buffer in reality.</para>
     ///
@@ -374,7 +302,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_setSpeakerPosition(IntPtr aObjHandle, uint aChannel, float aX, float aY, float aZ);
+    private static partial int Soloud_setSpeakerPosition(IntPtr aObjHandle, uint aChannel, float aX, float aY, float aZ);
     /// <summary>
     /// <para>Get or set a speaker position in 3d space. Used to configure spakers in multi-speaker systems.</para>
     ///
@@ -393,7 +321,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_getSpeakerPosition(IntPtr aObjHandle, uint aChannel, float[] aX, float[] aY, float[] aZ);
+    private static partial int Soloud_getSpeakerPosition(IntPtr aObjHandle, uint aChannel, float[] aX, float[] aY, float[] aZ);
     /// <summary>
     /// <para>Get or set a speaker position in 3d space. Used to configure spakers in multi-speaker systems.</para>
     ///
@@ -412,7 +340,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_playEx(IntPtr aObjHandle, IntPtr aSound, float aVolume, float aPan, int aPaused, uint aBus);
+    private static partial uint Soloud_playEx(IntPtr aObjHandle, IntPtr aSound, float aVolume, float aPan, int aPaused, uint aBus);
     /// <summary>
     /// <para>The play function can be used to start playing a sound source. The function has more than one parameter, with typical default values set to most of them.</para>
     ///
@@ -440,7 +368,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_playClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aVolume, float aPan, uint aBus);
+    private static partial uint Soloud_playClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aVolume, float aPan, uint aBus);
     /// <summary>
     /// <para>This is a variant of the play function that takes additional parameter, the time offset for the sound. While the vanilla play() tries to play sounds as soon as possible, the playClocked will delay the start of sounds so that rapidly launched sounds don't all get clumped to the start of the next outgoing sound buffer.</para>
     /// <para>Let's say we have a short sample and we want to play it repeatedly.</para>
@@ -467,7 +395,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_play3dEx(IntPtr aObjHandle, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, int aPaused, uint aBus);
+    private static partial uint Soloud_play3dEx(IntPtr aObjHandle, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, int aPaused, uint aBus);
     /// <summary>
     /// <para>play3d() is the 3d version of the play() call.</para>
     ///
@@ -500,7 +428,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_play3dClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, uint aBus);
+    private static partial uint Soloud_play3dClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, uint aBus);
     /// <summary>
     /// <para>play3dClocked() is the 3d version of the playClocked() call.</para>
     ///
@@ -533,7 +461,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_playBackgroundEx(IntPtr aObjHandle, IntPtr aSound, float aVolume, int aPaused, uint aBus);
+    private static partial uint Soloud_playBackgroundEx(IntPtr aObjHandle, IntPtr aSound, float aVolume, int aPaused, uint aBus);
     /// <summary>
     /// <para>The playBackground() function can be used to play sounds without panning, primarily meant for background music.</para>
     ///
@@ -557,7 +485,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_seek(IntPtr aObjHandle, uint aVoiceHandle, double aSeconds);
+    private static partial int Soloud_seek(IntPtr aObjHandle, uint aVoiceHandle, double aSeconds);
     /// <summary>
     /// <para>You can seek to a specific time in the sound with the seek function. Note that the seek operation may be rather heavy, and some audio sources will not support seeking backwards at all.</para>
     ///
@@ -574,7 +502,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_stop(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial void Soloud_stop(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>The stop function can be used to stop a sound.</para>
     ///
@@ -589,7 +517,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_stopAll(IntPtr aObjHandle);
+    private static partial void Soloud_stopAll(IntPtr aObjHandle);
     /// <summary>
     /// <para>The stop function can be used to stop all sounds. Note that this will also stop the protected sounds.</para>
     ///
@@ -604,7 +532,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_stopAudioSource(IntPtr aObjHandle, IntPtr aSound);
+    private static partial void Soloud_stopAudioSource(IntPtr aObjHandle, IntPtr aSound);
     /// <summary>
     /// <para>The stop function can be used to stop all sounds that were started through a certain sound source. Will also stop protected sounds.</para>
     ///
@@ -619,7 +547,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_countAudioSource(IntPtr aObjHandle, IntPtr aSound);
+    private static partial int Soloud_countAudioSource(IntPtr aObjHandle, IntPtr aSound);
     /// <summary>
     /// <para>Returns the number of concurrent soudns that are playing a specific audio source.</para>
     ///
@@ -634,7 +562,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId, float aValue);
+    private static partial void Soloud_setFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId, float aValue);
     /// <summary>
     /// <para>Sets a parameter for a live instance of a filter. The filter must support changing of live parameters; otherwise this call does nothing.</para>
     ///
@@ -650,7 +578,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId);
+    private static partial float Soloud_getFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId);
     /// <summary>
     /// <para>Gets a parameter from a live instance of a filter. The filter must support changing of live parameters; otherwise this call returns zero.</para>
     ///
@@ -666,7 +594,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_fadeFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId, float aTo, double aTime);
+    private static partial void Soloud_fadeFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId, float aTo, double aTime);
     /// <summary>
     /// <para>Fades a parameter on a live instance of a filter. The filter must support changing of live parameters; otherwise this call does nothing.</para>
     ///
@@ -682,7 +610,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_oscillateFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId, float aFrom, float aTo, double aTime);
+    private static partial void Soloud_oscillateFilterParameter(IntPtr aObjHandle, uint aVoiceHandle, uint aFilterId, uint aAttributeId, float aFrom, float aTo, double aTime);
     /// <summary>
     /// <para>Oscillates a parameter on a live instance of a filter. The filter must support changing of live parameters; otherwise this call does nothing.</para>
     ///
@@ -698,7 +626,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Soloud_getStreamTime(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial double Soloud_getStreamTime(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>The getStreamTime function can be used to get the current play position, in seconds.</para>
     ///
@@ -723,7 +651,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Soloud_getStreamPosition(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial double Soloud_getStreamPosition(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>Gets the stream position of a specific voice handle.</para>
     ///
@@ -738,7 +666,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_getPause(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial int Soloud_getPause(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>The setPause function can be used to pause, or unpause, a sound.</para>
     ///
@@ -757,7 +685,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getVolume(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial float Soloud_getVolume(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's current volume setting.</para>
     ///
@@ -776,7 +704,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getOverallVolume(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial float Soloud_getOverallVolume(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>For 3d sounds, returns the current volume based on the audio sources' set volume and the calculated 3d volume.</para>
     ///
@@ -792,7 +720,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getPan(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial float Soloud_getPan(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's current pan setting.</para>
     ///
@@ -812,7 +740,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getSamplerate(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial float Soloud_getSamplerate(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's base sample rate.</para>
     ///
@@ -832,7 +760,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_getProtectVoice(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial int Soloud_getProtectVoice(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's protection state.</para>
     ///
@@ -852,7 +780,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getActiveVoiceCount(IntPtr aObjHandle);
+    private static partial uint Soloud_getActiveVoiceCount(IntPtr aObjHandle);
     /// <summary>
     /// <para>Returns the number of concurrent sounds that are playing at the moment.</para>
     ///
@@ -867,7 +795,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getVoiceCount(IntPtr aObjHandle);
+    private static partial uint Soloud_getVoiceCount(IntPtr aObjHandle);
     /// <summary>
     /// <para>Returns the number of voices the application has told SoLoud to play.</para>
     ///
@@ -882,7 +810,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_isValidVoiceHandle(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial int Soloud_isValidVoiceHandle(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>The isValidVoiceHandle function can be used to check if a handle is still valid.</para>
     ///
@@ -899,7 +827,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial float Soloud_getRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's relative play speed.</para>
     ///
@@ -920,7 +848,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getPostClipScaler(IntPtr aObjHandle);
+    private static partial float Soloud_getPostClipScaler(IntPtr aObjHandle);
     /// <summary>
     /// <para>These functions can be used to get and set the post-clip scaler. The scaler is applied after clipping. Sometimes lowering the post-clip result sound volume may be beneficial. For instance, recording video with some video capture software results in distorted sound if the volume is too high.</para>
     ///
@@ -938,7 +866,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getGlobalVolume(IntPtr aObjHandle);
+    private static partial float Soloud_getGlobalVolume(IntPtr aObjHandle);
     /// <summary>
     /// <para>These functions can be used to get and set the global volume. The volume is applied before clipping. Lowering the global volume is one way to combat clipping artifacts.</para>
     ///
@@ -956,7 +884,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getMaxActiveVoiceCount(IntPtr aObjHandle);
+    private static partial uint Soloud_getMaxActiveVoiceCount(IntPtr aObjHandle);
     /// <summary>
     /// <para>Get or set the current maximum active voice count. If voice count is higher than the maximum active voice count, SoLoud will pick the ones with the highest volume to actually play.</para>
     ///
@@ -973,7 +901,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_getLooping(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial int Soloud_getLooping(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>Get or set the looping behavior of a live sound.</para>
     ///
@@ -989,7 +917,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Soloud_getLoopPoint(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial double Soloud_getLoopPoint(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -1007,7 +935,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setLoopPoint(IntPtr aObjHandle, uint aVoiceHandle, double aLoopPoint);
+    private static partial void Soloud_setLoopPoint(IntPtr aObjHandle, uint aVoiceHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -1025,7 +953,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setLooping(IntPtr aObjHandle, uint aVoiceHandle, int aLooping);
+    private static partial void Soloud_setLooping(IntPtr aObjHandle, uint aVoiceHandle, int aLooping);
     /// <summary>
     /// <para>Get or set the looping behavior of a live sound.</para>
     ///
@@ -1041,7 +969,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_setMaxActiveVoiceCount(IntPtr aObjHandle, uint aVoiceCount);
+    private static partial int Soloud_setMaxActiveVoiceCount(IntPtr aObjHandle, uint aVoiceCount);
     /// <summary>
     /// <para>Get or set the current maximum active voice count. If voice count is higher than the maximum active voice count, SoLoud will pick the ones with the highest volume to actually play.</para>
     ///
@@ -1058,7 +986,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setInaudibleBehavior(IntPtr aObjHandle, uint aVoiceHandle, int aMustTick, int aKill);
+    private static partial void Soloud_setInaudibleBehavior(IntPtr aObjHandle, uint aVoiceHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of a live sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -1074,7 +1002,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setGlobalVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Soloud_setGlobalVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>These functions can be used to get and set the global volume. The volume is applied before clipping. Lowering the global volume is one way to combat clipping artifacts.</para>
     ///
@@ -1092,7 +1020,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setPostClipScaler(IntPtr aObjHandle, float aScaler);
+    private static partial void Soloud_setPostClipScaler(IntPtr aObjHandle, float aScaler);
     /// <summary>
     /// <para>These functions can be used to get and set the post-clip scaler. The scaler is applied after clipping. Sometimes lowering the post-clip result sound volume may be beneficial. For instance, recording video with some video capture software results in distorted sound if the volume is too high.</para>
     ///
@@ -1110,7 +1038,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setPause(IntPtr aObjHandle, uint aVoiceHandle, int aPause);
+    private static partial void Soloud_setPause(IntPtr aObjHandle, uint aVoiceHandle, int aPause);
     /// <summary>
     /// <para>The setPause function can be used to pause, or unpause, a sound.</para>
     ///
@@ -1129,7 +1057,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setPauseAll(IntPtr aObjHandle, int aPause);
+    private static partial void Soloud_setPauseAll(IntPtr aObjHandle, int aPause);
     /// <summary>
     /// <para>The setPauseAll function can be used to pause, or unpause, all sounds.</para>
     ///
@@ -1146,7 +1074,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_setRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle, float aSpeed);
+    private static partial int Soloud_setRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle, float aSpeed);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's relative play speed.</para>
     ///
@@ -1167,7 +1095,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setProtectVoice(IntPtr aObjHandle, uint aVoiceHandle, int aProtect);
+    private static partial void Soloud_setProtectVoice(IntPtr aObjHandle, uint aVoiceHandle, int aProtect);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's protection state.</para>
     ///
@@ -1187,7 +1115,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setSamplerate(IntPtr aObjHandle, uint aVoiceHandle, float aSamplerate);
+    private static partial void Soloud_setSamplerate(IntPtr aObjHandle, uint aVoiceHandle, float aSamplerate);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's base sample rate.</para>
     ///
@@ -1207,7 +1135,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setPan(IntPtr aObjHandle, uint aVoiceHandle, float aPan);
+    private static partial void Soloud_setPan(IntPtr aObjHandle, uint aVoiceHandle, float aPan);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's current pan setting.</para>
     ///
@@ -1227,7 +1155,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setPanAbsoluteEx(IntPtr aObjHandle, uint aVoiceHandle, float aLVolume, float aRVolume, float aLBVolume, float aRBVolume, float aCVolume, float aSVolume);
+    private static partial void Soloud_setPanAbsoluteEx(IntPtr aObjHandle, uint aVoiceHandle, float aLVolume, float aRVolume, float aLBVolume, float aRBVolume, float aCVolume, float aSVolume);
     /// <summary>
     /// <para>These function can be used to set the left/right volumes directly.</para>
     ///
@@ -1245,7 +1173,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setVolume(IntPtr aObjHandle, uint aVoiceHandle, float aVolume);
+    private static partial void Soloud_setVolume(IntPtr aObjHandle, uint aVoiceHandle, float aVolume);
     /// <summary>
     /// <para>These functions can be used to get and set a sound's current volume setting.</para>
     ///
@@ -1264,9 +1192,9 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setDelaySamples(IntPtr aObjHandle, uint aVoiceHandle, uint aSamples);
+    private static partial void Soloud_setDelaySamples(IntPtr aObjHandle, uint aVoiceHandle, uint aSamples);
     /// <summary>
-    /// <para>Sets number of samples to delay before starting to play a sound. This is used internally by the playClocked() function. In the unlikely event that you may want to use it manually, it's available in the public API.</para>
+    /// <para>Sets number of samples to delay before starting to play a sound. This is used privately by the playClocked() function. In the unlikely event that you may want to use it manually, it's available in the public API.</para>
     ///
     /// <code>
     /// h = soloud.play(snd, 1, 0, 1); // start paused
@@ -1283,7 +1211,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_fadeVolume(IntPtr aObjHandle, uint aVoiceHandle, float aTo, double aTime);
+    private static partial void Soloud_fadeVolume(IntPtr aObjHandle, uint aVoiceHandle, float aTo, double aTime);
     /// <summary>
     /// <para>Smoothly change a channel's volume over specified time.</para>
     ///
@@ -1300,7 +1228,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_fadePan(IntPtr aObjHandle, uint aVoiceHandle, float aTo, double aTime);
+    private static partial void Soloud_fadePan(IntPtr aObjHandle, uint aVoiceHandle, float aTo, double aTime);
     /// <summary>
     /// <para>Smoothly change a channel's pan setting over specified time.</para>
     ///
@@ -1318,7 +1246,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_fadeRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle, float aTo, double aTime);
+    private static partial void Soloud_fadeRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle, float aTo, double aTime);
     /// <summary>
     /// <para>Smoothly change a channel's relative play speed over specified time.</para>
     ///
@@ -1335,7 +1263,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_fadeGlobalVolume(IntPtr aObjHandle, float aTo, double aTime);
+    private static partial void Soloud_fadeGlobalVolume(IntPtr aObjHandle, float aTo, double aTime);
     /// <summary>
     /// <para>Smoothly change the global volume over specified time.</para>
     ///
@@ -1352,7 +1280,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_schedulePause(IntPtr aObjHandle, uint aVoiceHandle, double aTime);
+    private static partial void Soloud_schedulePause(IntPtr aObjHandle, uint aVoiceHandle, double aTime);
     /// <summary>
     /// <para>After specified time, pause the channel</para>
     ///
@@ -1370,7 +1298,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_scheduleStop(IntPtr aObjHandle, uint aVoiceHandle, double aTime);
+    private static partial void Soloud_scheduleStop(IntPtr aObjHandle, uint aVoiceHandle, double aTime);
     /// <summary>
     /// <para>After specified time, stop the channel</para>
     ///
@@ -1388,7 +1316,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_oscillateVolume(IntPtr aObjHandle, uint aVoiceHandle, float aFrom, float aTo, double aTime);
+    private static partial void Soloud_oscillateVolume(IntPtr aObjHandle, uint aVoiceHandle, float aFrom, float aTo, double aTime);
     /// <summary>
     /// <para>Set fader to oscillate the volume at specified frequency.</para>
     ///
@@ -1405,7 +1333,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_oscillatePan(IntPtr aObjHandle, uint aVoiceHandle, float aFrom, float aTo, double aTime);
+    private static partial void Soloud_oscillatePan(IntPtr aObjHandle, uint aVoiceHandle, float aFrom, float aTo, double aTime);
     /// <summary>
     /// <para>Set fader to oscillate the panning at specified frequency.</para>
     ///
@@ -1422,7 +1350,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_oscillateRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle, float aFrom, float aTo, double aTime);
+    private static partial void Soloud_oscillateRelativePlaySpeed(IntPtr aObjHandle, uint aVoiceHandle, float aFrom, float aTo, double aTime);
     /// <summary>
     /// <para>Set fader to oscillate the relative play speed at specified frequency.</para>
     ///
@@ -1439,7 +1367,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_oscillateGlobalVolume(IntPtr aObjHandle, float aFrom, float aTo, double aTime);
+    private static partial void Soloud_oscillateGlobalVolume(IntPtr aObjHandle, float aFrom, float aTo, double aTime);
     /// <summary>
     /// <para>Set fader to oscillate the global volume at specified frequency.</para>
     ///
@@ -1456,7 +1384,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setGlobalFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Soloud_setGlobalFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>Sets, or clears, the global filter.</para>
     ///
@@ -1473,7 +1401,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_setVisualizationEnable(IntPtr aObjHandle, int aEnable);
+    private static partial void Soloud_setVisualizationEnable(IntPtr aObjHandle, int aEnable);
     public void setVisualizationEnable(int aEnable)
     {
         Soloud_setVisualizationEnable(objhandle, aEnable);
@@ -1481,7 +1409,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Soloud_calcFFT(IntPtr aObjHandle);
+    private static partial IntPtr Soloud_calcFFT(IntPtr aObjHandle);
     /// <summary>
     /// <para>Calculates FFT of the currently playing sound (post-clipping) and returns a pointer to the result.</para>
     ///
@@ -1517,7 +1445,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Soloud_getWave(IntPtr aObjHandle);
+    private static partial IntPtr Soloud_getWave(IntPtr aObjHandle);
     /// <summary>
     /// <para>Gets 256 samples of the currently playing sound (post-clipping) and returns a pointer to the result.</para>
     ///
@@ -1551,7 +1479,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getApproximateVolume(IntPtr aObjHandle, uint aChannel);
+    private static partial float Soloud_getApproximateVolume(IntPtr aObjHandle, uint aChannel);
     /// <summary>
     /// <para>Gets the approximate volume for output per output channel (i.e, per speaker). Returns zero for invalid parameters.</para>
     ///
@@ -1570,7 +1498,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_getLoopCount(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial uint Soloud_getLoopCount(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>Some sound sources that support looping also keep count of the loop count. This can be useful at least to detect when some sound loops.</para>
     ///
@@ -1590,7 +1518,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_getInfo(IntPtr aObjHandle, uint aVoiceHandle, uint aInfoKey);
+    private static partial float Soloud_getInfo(IntPtr aObjHandle, uint aVoiceHandle, uint aInfoKey);
     /// <summary>
     /// <para>Some sound sources let you get real-time information from the active voice.</para>
     ///
@@ -1607,7 +1535,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Soloud_createVoiceGroup(IntPtr aObjHandle);
+    private static partial uint Soloud_createVoiceGroup(IntPtr aObjHandle);
     /// <summary>
     /// <para>Used to create a new voice group. Returns 0 if not successful (either out of memory or out of voice groups).</para>
     ///
@@ -1623,7 +1551,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_destroyVoiceGroup(IntPtr aObjHandle, uint aVoiceGroupHandle);
+    private static partial int Soloud_destroyVoiceGroup(IntPtr aObjHandle, uint aVoiceGroupHandle);
     /// <summary>
     /// <para>Deallocates the voice group. Does not stop the voices attached to the voice group.</para>
     ///
@@ -1638,7 +1566,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_addVoiceToGroup(IntPtr aObjHandle, uint aVoiceGroupHandle, uint aVoiceHandle);
+    private static partial int Soloud_addVoiceToGroup(IntPtr aObjHandle, uint aVoiceGroupHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>Adds voice handle to the voice group. The voice handles can still be used separate from the group.</para>
     ///
@@ -1657,7 +1585,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_isVoiceGroup(IntPtr aObjHandle, uint aVoiceGroupHandle);
+    private static partial int Soloud_isVoiceGroup(IntPtr aObjHandle, uint aVoiceGroupHandle);
     /// <summary>
     /// <para>Checks if the handle is a valid voice group. Does not care if the voice group is empty.</para>
     ///
@@ -1674,7 +1602,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_isVoiceGroupEmpty(IntPtr aObjHandle, uint aVoiceGroupHandle);
+    private static partial int Soloud_isVoiceGroupEmpty(IntPtr aObjHandle, uint aVoiceGroupHandle);
     /// <summary>
     /// <para>Checks whether a voice group is empty. SoLoud automatically trims the voice groups of voices that have ended, so the group may be empty even though you've added valid voice handles to it.</para>
     ///
@@ -1692,7 +1620,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_update3dAudio(IntPtr aObjHandle);
+    private static partial void Soloud_update3dAudio(IntPtr aObjHandle);
     /// <summary>
     /// <para>Update the 3d parameters for the 3d voices. No positional effect occurs unless this function is called periodically.</para>
     ///
@@ -1708,7 +1636,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Soloud_set3dSoundSpeed(IntPtr aObjHandle, float aSpeed);
+    private static partial int Soloud_set3dSoundSpeed(IntPtr aObjHandle, float aSpeed);
     /// <summary>
     /// <para>You can set and get the current value of the speed of sound width the get3dSoundSpeed() and set3dSoundSpeed() functions. The speed of sound is used to calculate doppler effects in addition to the distance delay.</para>
     /// <para>Since SoLoud has no knowledge of the scale of your coordinates, you may need to adjust the speed of sound for these effects to work correctly. The default value is 343, which assumes that your world coordinates are in meters (where 1 unit is 1 meter), and that the environment is dry air at around 20 degrees Celsius.</para>
@@ -1725,7 +1653,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Soloud_get3dSoundSpeed(IntPtr aObjHandle);
+    private static partial float Soloud_get3dSoundSpeed(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can set and get the current value of the speed of sound width the get3dSoundSpeed() and set3dSoundSpeed() functions. The speed of sound is used to calculate doppler effects in addition to the distance delay.</para>
     /// <para>Since SoLoud has no knowledge of the scale of your coordinates, you may need to adjust the speed of sound for these effects to work correctly. The default value is 343, which assumes that your world coordinates are in meters (where 1 unit is 1 meter), and that the environment is dry air at around 20 degrees Celsius.</para>
@@ -1742,7 +1670,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dListenerParametersEx(IntPtr aObjHandle, float aPosX, float aPosY, float aPosZ, float aAtX, float aAtY, float aAtZ, float aUpX, float aUpY, float aUpZ, float aVelocityX, float aVelocityY, float aVelocityZ);
+    private static partial void Soloud_set3dListenerParametersEx(IntPtr aObjHandle, float aPosX, float aPosY, float aPosZ, float aAtX, float aAtY, float aAtZ, float aUpX, float aUpY, float aUpZ, float aVelocityX, float aVelocityY, float aVelocityZ);
     /// <summary>
     /// <para>You can set the position, at-vector, up-vector and velocity parameters of the 3d audio listener with one call using the set3dListenerParameters.</para>
     ///
@@ -1770,7 +1698,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dListenerPosition(IntPtr aObjHandle, float aPosX, float aPosY, float aPosZ);
+    private static partial void Soloud_set3dListenerPosition(IntPtr aObjHandle, float aPosX, float aPosY, float aPosZ);
     /// <summary>
     /// <para>You can set the position parameter of the 3d audio listener via set3dListenerPosition()</para>
     ///
@@ -1789,7 +1717,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dListenerAt(IntPtr aObjHandle, float aAtX, float aAtY, float aAtZ);
+    private static partial void Soloud_set3dListenerAt(IntPtr aObjHandle, float aAtX, float aAtY, float aAtZ);
     /// <summary>
     /// <para>You can set the "at" vector parameter of the 3d audio listener via set3dListenerAt()</para>
     ///
@@ -1809,7 +1737,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dListenerUp(IntPtr aObjHandle, float aUpX, float aUpY, float aUpZ);
+    private static partial void Soloud_set3dListenerUp(IntPtr aObjHandle, float aUpX, float aUpY, float aUpZ);
     /// <summary>
     /// <para>You can set the "up" vector parameter of the 3d audio listener via set3dListenerUp()</para>
     ///
@@ -1829,7 +1757,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dListenerVelocity(IntPtr aObjHandle, float aVelocityX, float aVelocityY, float aVelocityZ);
+    private static partial void Soloud_set3dListenerVelocity(IntPtr aObjHandle, float aVelocityX, float aVelocityY, float aVelocityZ);
     /// <summary>
     /// <para>You can set the listener's velocity vector parameter via set3dListenerVelocity()</para>
     ///
@@ -1848,7 +1776,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dSourceParametersEx(IntPtr aObjHandle, uint aVoiceHandle, float aPosX, float aPosY, float aPosZ, float aVelocityX, float aVelocityY, float aVelocityZ);
+    private static partial void Soloud_set3dSourceParametersEx(IntPtr aObjHandle, uint aVoiceHandle, float aPosX, float aPosY, float aPosZ, float aVelocityX, float aVelocityY, float aVelocityZ);
     /// <summary>
     /// <para>You can set the position and velocity parameters of a live 3d audio source with one call using the set3dSourceParameters().</para>
     ///
@@ -1872,7 +1800,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dSourcePosition(IntPtr aObjHandle, uint aVoiceHandle, float aPosX, float aPosY, float aPosZ);
+    private static partial void Soloud_set3dSourcePosition(IntPtr aObjHandle, uint aVoiceHandle, float aPosX, float aPosY, float aPosZ);
     /// <summary>
     /// <para>You can set the position parameters of a live 3d audio source with the set3dSourcePosition() function.</para>
     ///
@@ -1892,7 +1820,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dSourceVelocity(IntPtr aObjHandle, uint aVoiceHandle, float aVelocityX, float aVelocityY, float aVelocityZ);
+    private static partial void Soloud_set3dSourceVelocity(IntPtr aObjHandle, uint aVoiceHandle, float aVelocityX, float aVelocityY, float aVelocityZ);
     /// <summary>
     /// <para>You can set the velocity parameters of a live 3d audio source with the set3dSourceVelocity() function.</para>
     ///
@@ -1912,7 +1840,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dSourceMinMaxDistance(IntPtr aObjHandle, uint aVoiceHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Soloud_set3dSourceMinMaxDistance(IntPtr aObjHandle, uint aVoiceHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>You can set the minimum and maximum distance parameters of a live 3d audio source with set3dSourceMinMaxDistance().</para>
     ///
@@ -1931,7 +1859,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dSourceAttenuation(IntPtr aObjHandle, uint aVoiceHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Soloud_set3dSourceAttenuation(IntPtr aObjHandle, uint aVoiceHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>You can change the attenuation model and rolloff factor parameters of a live 3d audio source with set3dSourceAttenuation().</para>
     ///
@@ -1951,7 +1879,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_set3dSourceDopplerFactor(IntPtr aObjHandle, uint aVoiceHandle, float aDopplerFactor);
+    private static partial void Soloud_set3dSourceDopplerFactor(IntPtr aObjHandle, uint aVoiceHandle, float aDopplerFactor);
     /// <summary>
     /// <para>You can change the doppler factor of a live 3d audio source with set3dSourceDopplerFactor().</para>
     ///
@@ -1969,7 +1897,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_mix(IntPtr aObjHandle, float[] aBuffer, uint aSamples);
+    private static partial void Soloud_mix(IntPtr aObjHandle, float[] aBuffer, uint aSamples);
     /// <summary>
     /// <para>The back-end can call the mix function to request a number of stereo samples from SoLoud. The samples will be in float format, and the back-end is responsible for converting them to the desired output format.</para>
     ///
@@ -1987,7 +1915,7 @@ public partial class Soloud : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Soloud_mixSigned16(IntPtr aObjHandle, IntPtr aBuffer, uint aSamples);
+    private static partial void Soloud_mixSigned16(IntPtr aObjHandle, IntPtr aBuffer, uint aSamples);
     /// <summary>
     /// <para>Since so many back-ends prefer 16 bit signed data instead of float data, SoLoud also provides a mix call that outputs signed 16 bit data.</para>
     ///
@@ -2020,7 +1948,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr BassboostFilter_create();
+    private static partial IntPtr BassboostFilter_create();
     public BassboostFilter()
     {
         objhandle = BassboostFilter_create();
@@ -2028,7 +1956,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr BassboostFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr BassboostFilter_destroy(IntPtr aObjHandle);
     ~BassboostFilter()
     {
         BassboostFilter_destroy(objhandle);
@@ -2036,7 +1964,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int BassboostFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int BassboostFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return BassboostFilter_getParamCount(objhandle);
@@ -2044,7 +1972,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr BassboostFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr BassboostFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = BassboostFilter_getParamName(objhandle, aParamIndex);
@@ -2053,7 +1981,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint BassboostFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint BassboostFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return BassboostFilter_getParamType(objhandle, aParamIndex);
@@ -2061,7 +1989,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float BassboostFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float BassboostFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return BassboostFilter_getParamMax(objhandle, aParamIndex);
@@ -2069,7 +1997,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float BassboostFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float BassboostFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return BassboostFilter_getParamMin(objhandle, aParamIndex);
@@ -2077,7 +2005,7 @@ public partial class BassboostFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int BassboostFilter_setParams(IntPtr aObjHandle, float aBoost);
+    private static partial int BassboostFilter_setParams(IntPtr aObjHandle, float aBoost);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -2153,7 +2081,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr BiquadResonantFilter_create();
+    private static partial IntPtr BiquadResonantFilter_create();
     public BiquadResonantFilter()
     {
         objhandle = BiquadResonantFilter_create();
@@ -2161,7 +2089,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr BiquadResonantFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr BiquadResonantFilter_destroy(IntPtr aObjHandle);
     ~BiquadResonantFilter()
     {
         BiquadResonantFilter_destroy(objhandle);
@@ -2169,7 +2097,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int BiquadResonantFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int BiquadResonantFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return BiquadResonantFilter_getParamCount(objhandle);
@@ -2177,7 +2105,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr BiquadResonantFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr BiquadResonantFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = BiquadResonantFilter_getParamName(objhandle, aParamIndex);
@@ -2186,7 +2114,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint BiquadResonantFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint BiquadResonantFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return BiquadResonantFilter_getParamType(objhandle, aParamIndex);
@@ -2194,7 +2122,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float BiquadResonantFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float BiquadResonantFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return BiquadResonantFilter_getParamMax(objhandle, aParamIndex);
@@ -2202,7 +2130,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float BiquadResonantFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float BiquadResonantFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return BiquadResonantFilter_getParamMin(objhandle, aParamIndex);
@@ -2210,7 +2138,7 @@ public partial class BiquadResonantFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int BiquadResonantFilter_setParams(IntPtr aObjHandle, int aType, float aFrequency, float aResonance);
+    private static partial int BiquadResonantFilter_setParams(IntPtr aObjHandle, int aType, float aFrequency, float aResonance);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -2249,7 +2177,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Bus_create();
+    private static partial IntPtr Bus_create();
     public Bus()
     {
         objhandle = Bus_create();
@@ -2257,7 +2185,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Bus_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Bus_destroy(IntPtr aObjHandle);
     ~Bus()
     {
         Bus_destroy(objhandle);
@@ -2265,7 +2193,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Bus_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to busses.</para>
     ///
@@ -2280,7 +2208,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Bus_playEx(IntPtr aObjHandle, IntPtr aSound, float aVolume, float aPan, int aPaused);
+    private static partial uint Bus_playEx(IntPtr aObjHandle, IntPtr aSound, float aVolume, float aPan, int aPaused);
     /// <summary>
     /// <para>Equivalent of soloud.play(), but plays the sound source through the bus instead of at "global" scope.</para>
     /// </summary>
@@ -2291,7 +2219,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Bus_playClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aVolume, float aPan);
+    private static partial uint Bus_playClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aVolume, float aPan);
     /// <summary>
     /// <para>Equivalent of soloud.playClocked(), but plays the sound source through the bus instead of at "global" scope.</para>
     /// </summary>
@@ -2302,7 +2230,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Bus_play3dEx(IntPtr aObjHandle, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, int aPaused);
+    private static partial uint Bus_play3dEx(IntPtr aObjHandle, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume, int aPaused);
     /// <summary>
     /// <para>Equivalent of soloud.play3d(), but plays the sound source through the bus instead of at "global" scope.</para>
     /// </summary>
@@ -2313,7 +2241,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Bus_play3dClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume);
+    private static partial uint Bus_play3dClockedEx(IntPtr aObjHandle, double aSoundTime, IntPtr aSound, float aPosX, float aPosY, float aPosZ, float aVelX, float aVelY, float aVelZ, float aVolume);
     /// <summary>
     /// <para>Equivalent of soloud.play3dClocked(), but plays the sound sounce through the bus instead of at "global" scope.</para>
     /// </summary>
@@ -2324,7 +2252,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Bus_setChannels(IntPtr aObjHandle, uint aChannels);
+    private static partial int Bus_setChannels(IntPtr aObjHandle, uint aChannels);
     /// <summary>
     /// <para>Set the number of channels this bus should handle. Defaults to 2 (stereo).</para>
     ///
@@ -2339,7 +2267,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_setVisualizationEnable(IntPtr aObjHandle, int aEnable);
+    private static partial void Bus_setVisualizationEnable(IntPtr aObjHandle, int aEnable);
     /// <summary>
     /// <para>Enable (or disable) gathering of visualization wave data from this bus.</para>
     /// </summary>
@@ -2350,7 +2278,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_annexSound(IntPtr aObjHandle, uint aVoiceHandle);
+    private static partial void Bus_annexSound(IntPtr aObjHandle, uint aVoiceHandle);
     /// <summary>
     /// <para>Move live audio stream under this bus. This can be useful if you have some heavy filtering under one bus and want to move playing sounds in and out of the bus.</para>
     ///
@@ -2365,7 +2293,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Bus_calcFFT(IntPtr aObjHandle);
+    private static partial IntPtr Bus_calcFFT(IntPtr aObjHandle);
     /// <summary>
     /// <para>Calculates FFT of the sound currently playing through this bus, and returns a pointer to the result.</para>
     ///
@@ -2401,7 +2329,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Bus_getWave(IntPtr aObjHandle);
+    private static partial IntPtr Bus_getWave(IntPtr aObjHandle);
     /// <summary>
     /// <para>Gets 256 samples of the sound currently playing through this bus, and returns a pointer to the result.</para>
     ///
@@ -2435,7 +2363,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float Bus_getApproximateVolume(IntPtr aObjHandle, uint aChannel);
+    private static partial float Bus_getApproximateVolume(IntPtr aObjHandle, uint aChannel);
     /// <summary>
     /// <para>Gets the approximate volume for output per output channel (i.e, per speaker). Returns zero for invalid parameters.</para>
     ///
@@ -2454,7 +2382,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Bus_getActiveVoiceCount(IntPtr aObjHandle);
+    private static partial uint Bus_getActiveVoiceCount(IntPtr aObjHandle);
     /// <summary>
     /// <para>Returns the number of concurrent sounds that are playing through this bus at the moment.</para>
     ///
@@ -2469,7 +2397,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Bus_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the bus.</para>
     ///
@@ -2484,7 +2412,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Bus_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Trying to change the looping state of a bus has no effect.</para>
     /// </summary>
@@ -2495,7 +2423,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Bus_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -2514,7 +2442,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Bus_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -2549,7 +2477,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Bus_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -2566,7 +2494,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Bus_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -2583,7 +2511,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Bus_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -2601,7 +2529,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Bus_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -2620,7 +2548,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Bus_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -2635,7 +2563,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Bus_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -2651,7 +2579,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Bus_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>Trying to change the looping state of a bus has no effect.</para>
     /// </summary>
@@ -2662,7 +2590,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Bus_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Bus_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>Trying to change the looping state of a bus has no effect.</para>
     /// </summary>
@@ -2673,7 +2601,7 @@ public partial class Bus : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Bus_stop(IntPtr aObjHandle);
+    private static partial void Bus_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     /// </summary>
@@ -2701,7 +2629,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr DCRemovalFilter_create();
+    private static partial IntPtr DCRemovalFilter_create();
     public DCRemovalFilter()
     {
         objhandle = DCRemovalFilter_create();
@@ -2709,7 +2637,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr DCRemovalFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr DCRemovalFilter_destroy(IntPtr aObjHandle);
     ~DCRemovalFilter()
     {
         DCRemovalFilter_destroy(objhandle);
@@ -2717,7 +2645,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int DCRemovalFilter_setParamsEx(IntPtr aObjHandle, float aLength);
+    private static partial int DCRemovalFilter_setParamsEx(IntPtr aObjHandle, float aLength);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -2734,7 +2662,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int DCRemovalFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int DCRemovalFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return DCRemovalFilter_getParamCount(objhandle);
@@ -2742,7 +2670,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr DCRemovalFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr DCRemovalFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = DCRemovalFilter_getParamName(objhandle, aParamIndex);
@@ -2751,7 +2679,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint DCRemovalFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint DCRemovalFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return DCRemovalFilter_getParamType(objhandle, aParamIndex);
@@ -2759,7 +2687,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float DCRemovalFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float DCRemovalFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return DCRemovalFilter_getParamMax(objhandle, aParamIndex);
@@ -2767,7 +2695,7 @@ public partial class DCRemovalFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float DCRemovalFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float DCRemovalFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return DCRemovalFilter_getParamMin(objhandle, aParamIndex);
@@ -2795,7 +2723,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr EchoFilter_create();
+    private static partial IntPtr EchoFilter_create();
     public EchoFilter()
     {
         objhandle = EchoFilter_create();
@@ -2803,7 +2731,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr EchoFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr EchoFilter_destroy(IntPtr aObjHandle);
     ~EchoFilter()
     {
         EchoFilter_destroy(objhandle);
@@ -2811,7 +2739,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int EchoFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int EchoFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return EchoFilter_getParamCount(objhandle);
@@ -2819,7 +2747,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr EchoFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr EchoFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = EchoFilter_getParamName(objhandle, aParamIndex);
@@ -2828,7 +2756,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint EchoFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint EchoFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return EchoFilter_getParamType(objhandle, aParamIndex);
@@ -2836,7 +2764,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float EchoFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float EchoFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return EchoFilter_getParamMax(objhandle, aParamIndex);
@@ -2844,7 +2772,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float EchoFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float EchoFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return EchoFilter_getParamMin(objhandle, aParamIndex);
@@ -2852,7 +2780,7 @@ public partial class EchoFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int EchoFilter_setParamsEx(IntPtr aObjHandle, float aDelay, float aDecay, float aFilter);
+    private static partial int EchoFilter_setParamsEx(IntPtr aObjHandle, float aDelay, float aDecay, float aFilter);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -2877,7 +2805,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FFTFilter_create();
+    private static partial IntPtr FFTFilter_create();
     public FFTFilter()
     {
         objhandle = FFTFilter_create();
@@ -2885,7 +2813,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FFTFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr FFTFilter_destroy(IntPtr aObjHandle);
     ~FFTFilter()
     {
         FFTFilter_destroy(objhandle);
@@ -2893,7 +2821,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int FFTFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int FFTFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return FFTFilter_getParamCount(objhandle);
@@ -2901,7 +2829,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FFTFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr FFTFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = FFTFilter_getParamName(objhandle, aParamIndex);
@@ -2910,7 +2838,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint FFTFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint FFTFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return FFTFilter_getParamType(objhandle, aParamIndex);
@@ -2918,7 +2846,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float FFTFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float FFTFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return FFTFilter_getParamMax(objhandle, aParamIndex);
@@ -2926,7 +2854,7 @@ public partial class FFTFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float FFTFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float FFTFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return FFTFilter_getParamMin(objhandle, aParamIndex);
@@ -2977,7 +2905,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FlangerFilter_create();
+    private static partial IntPtr FlangerFilter_create();
     public FlangerFilter()
     {
         objhandle = FlangerFilter_create();
@@ -2985,7 +2913,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FlangerFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr FlangerFilter_destroy(IntPtr aObjHandle);
     ~FlangerFilter()
     {
         FlangerFilter_destroy(objhandle);
@@ -2993,7 +2921,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int FlangerFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int FlangerFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return FlangerFilter_getParamCount(objhandle);
@@ -3001,7 +2929,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FlangerFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr FlangerFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = FlangerFilter_getParamName(objhandle, aParamIndex);
@@ -3010,7 +2938,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint FlangerFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint FlangerFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return FlangerFilter_getParamType(objhandle, aParamIndex);
@@ -3018,7 +2946,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float FlangerFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float FlangerFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return FlangerFilter_getParamMax(objhandle, aParamIndex);
@@ -3026,7 +2954,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float FlangerFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float FlangerFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return FlangerFilter_getParamMin(objhandle, aParamIndex);
@@ -3034,7 +2962,7 @@ public partial class FlangerFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int FlangerFilter_setParams(IntPtr aObjHandle, float aDelay, float aFreq);
+    private static partial int FlangerFilter_setParams(IntPtr aObjHandle, float aDelay, float aFreq);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -3064,7 +2992,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FreeverbFilter_create();
+    private static partial IntPtr FreeverbFilter_create();
     public FreeverbFilter()
     {
         objhandle = FreeverbFilter_create();
@@ -3072,7 +3000,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FreeverbFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr FreeverbFilter_destroy(IntPtr aObjHandle);
     ~FreeverbFilter()
     {
         FreeverbFilter_destroy(objhandle);
@@ -3080,7 +3008,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int FreeverbFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int FreeverbFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return FreeverbFilter_getParamCount(objhandle);
@@ -3088,7 +3016,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr FreeverbFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr FreeverbFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = FreeverbFilter_getParamName(objhandle, aParamIndex);
@@ -3097,7 +3025,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint FreeverbFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint FreeverbFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return FreeverbFilter_getParamType(objhandle, aParamIndex);
@@ -3105,7 +3033,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float FreeverbFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float FreeverbFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return FreeverbFilter_getParamMax(objhandle, aParamIndex);
@@ -3113,7 +3041,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float FreeverbFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float FreeverbFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return FreeverbFilter_getParamMin(objhandle, aParamIndex);
@@ -3121,7 +3049,7 @@ public partial class FreeverbFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int FreeverbFilter_setParams(IntPtr aObjHandle, float aMode, float aRoomSize, float aDamp, float aWidth);
+    private static partial int FreeverbFilter_setParams(IntPtr aObjHandle, float aMode, float aRoomSize, float aDamp, float aWidth);
     /// <summary>
     /// <para>Set parameters of the filter. Does not affect "live" filters.</para>
     ///
@@ -3183,7 +3111,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr LofiFilter_create();
+    private static partial IntPtr LofiFilter_create();
     public LofiFilter()
     {
         objhandle = LofiFilter_create();
@@ -3191,7 +3119,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr LofiFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr LofiFilter_destroy(IntPtr aObjHandle);
     ~LofiFilter()
     {
         LofiFilter_destroy(objhandle);
@@ -3199,7 +3127,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int LofiFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int LofiFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return LofiFilter_getParamCount(objhandle);
@@ -3207,7 +3135,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr LofiFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr LofiFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = LofiFilter_getParamName(objhandle, aParamIndex);
@@ -3216,7 +3144,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint LofiFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint LofiFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return LofiFilter_getParamType(objhandle, aParamIndex);
@@ -3224,7 +3152,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float LofiFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float LofiFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return LofiFilter_getParamMax(objhandle, aParamIndex);
@@ -3232,7 +3160,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float LofiFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float LofiFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return LofiFilter_getParamMin(objhandle, aParamIndex);
@@ -3240,7 +3168,7 @@ public partial class LofiFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int LofiFilter_setParams(IntPtr aObjHandle, float aSampleRate, float aBitdepth);
+    private static partial int LofiFilter_setParams(IntPtr aObjHandle, float aSampleRate, float aBitdepth);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -3267,7 +3195,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Monotone_create();
+    private static partial IntPtr Monotone_create();
     public Monotone()
     {
         objhandle = Monotone_create();
@@ -3275,7 +3203,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Monotone_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Monotone_destroy(IntPtr aObjHandle);
     ~Monotone()
     {
         Monotone_destroy(objhandle);
@@ -3283,7 +3211,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Monotone_setParamsEx(IntPtr aObjHandle, int aHardwareChannels, int aWaveform);
+    private static partial int Monotone_setParamsEx(IntPtr aObjHandle, int aHardwareChannels, int aWaveform);
     /// <summary>
     /// <para>The setParams() function can be used to adjust the way SoLoud plays the MONOTONE file.</para>
     ///
@@ -3331,7 +3259,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Monotone_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int Monotone_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>You tell monotone to load a file with the load function:</para>
     ///
@@ -3353,7 +3281,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Monotone_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
+    private static partial int Monotone_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>Alternate way of loading the file is to read from a memory buffer.</para>
     ///
@@ -3371,7 +3299,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Monotone_loadFile(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int Monotone_loadFile(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFile() can be used to load audio from a SoLoud::File object. This is useful for integrating with virtual filesystems / packfiles, such as PhysFS.</para>
     /// </summary>
@@ -3382,7 +3310,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Monotone_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -3398,7 +3326,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Monotone_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a monotone sound does not currently have any effect. All music is set to loop by default.</para>
     /// </summary>
@@ -3409,7 +3337,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Monotone_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -3428,7 +3356,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Monotone_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -3463,7 +3391,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Monotone_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -3480,7 +3408,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Monotone_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -3497,7 +3425,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Monotone_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -3515,7 +3443,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Monotone_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -3534,7 +3462,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Monotone_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -3549,7 +3477,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Monotone_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -3565,7 +3493,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Monotone_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -3583,7 +3511,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Monotone_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Monotone_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -3601,7 +3529,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Monotone_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to monotone audio sources.</para>
     ///
@@ -3616,7 +3544,7 @@ public partial class Monotone : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Monotone_stop(IntPtr aObjHandle);
+    private static partial void Monotone_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a monotone sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -3642,7 +3570,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Noise_create();
+    private static partial IntPtr Noise_create();
     public Noise()
     {
         objhandle = Noise_create();
@@ -3650,7 +3578,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Noise_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Noise_destroy(IntPtr aObjHandle);
     ~Noise()
     {
         Noise_destroy(objhandle);
@@ -3658,7 +3586,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setOctaveScale(IntPtr aObjHandle, float aOct0, float aOct1, float aOct2, float aOct3, float aOct4, float aOct5, float aOct6, float aOct7, float aOct8, float aOct9);
+    private static partial void Noise_setOctaveScale(IntPtr aObjHandle, float aOct0, float aOct1, float aOct2, float aOct3, float aOct4, float aOct5, float aOct6, float aOct7, float aOct8, float aOct9);
     /// <summary>
     /// <para>Instead of selecting the noise type, you can also define the octave weights manually. The noise genrator has 10 octaves; the first one generates new value for every sample, the second for every second sample, the third for every 4 samples, 8, 16, 32, and so on.</para>
     ///
@@ -3675,7 +3603,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setType(IntPtr aObjHandle, int aType);
+    private static partial void Noise_setType(IntPtr aObjHandle, int aType);
     /// <summary>
     /// <para>The type of the desired noise can be set before playing.</para>
     ///
@@ -3707,7 +3635,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Noise_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -3723,7 +3651,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Noise_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a noise sound does not have any effect.</para>
     /// </summary>
@@ -3734,7 +3662,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Noise_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -3753,7 +3681,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Noise_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -3788,7 +3716,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Noise_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -3805,7 +3733,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Noise_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -3822,7 +3750,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Noise_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -3840,7 +3768,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Noise_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -3859,7 +3787,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Noise_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -3874,7 +3802,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Noise_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -3890,7 +3818,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Noise_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>Adjusting the looping of a noise sound does not have any effect.</para>
     /// </summary>
@@ -3901,7 +3829,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Noise_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Noise_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>Adjusting the looping of a noise sound does not have any effect.</para>
     /// </summary>
@@ -3912,7 +3840,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Noise_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to monotone audio sources.</para>
     ///
@@ -3927,7 +3855,7 @@ public partial class Noise : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Noise_stop(IntPtr aObjHandle);
+    private static partial void Noise_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a noise sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -3952,7 +3880,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Openmpt_create();
+    private static partial IntPtr Openmpt_create();
     public Openmpt()
     {
         objhandle = Openmpt_create();
@@ -3960,7 +3888,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Openmpt_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Openmpt_destroy(IntPtr aObjHandle);
     ~Openmpt()
     {
         Openmpt_destroy(objhandle);
@@ -3968,7 +3896,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Openmpt_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int Openmpt_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>You tell Openmpt to load a file with the load function:</para>
     ///
@@ -3990,7 +3918,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Openmpt_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
+    private static partial int Openmpt_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>Alternate way of loading the file is to read from a memory buffer.</para>
     ///
@@ -4008,7 +3936,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Openmpt_loadFile(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int Openmpt_loadFile(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFile() can be used to load audio from a SoLoud::File object. This is useful for integrating with virtual filesystems / packfiles, such as PhysFS.</para>
     /// </summary>
@@ -4019,7 +3947,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Openmpt_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -4034,7 +3962,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Openmpt_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a Openmpt sound does not currently have any effect. All music is set to loop by default.</para>
     /// </summary>
@@ -4045,7 +3973,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Openmpt_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -4064,7 +3992,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Openmpt_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -4099,7 +4027,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Openmpt_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -4116,7 +4044,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Openmpt_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -4133,7 +4061,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Openmpt_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -4151,7 +4079,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Openmpt_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -4170,7 +4098,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Openmpt_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -4185,7 +4113,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Openmpt_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -4201,7 +4129,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Openmpt_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -4221,7 +4149,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Openmpt_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Openmpt_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -4241,7 +4169,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Openmpt_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to Openmpt audio sources.</para>
     ///
@@ -4256,7 +4184,7 @@ public partial class Openmpt : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Openmpt_stop(IntPtr aObjHandle);
+    private static partial void Openmpt_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a Openmpt sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -4280,7 +4208,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Queue_create();
+    private static partial IntPtr Queue_create();
     public Queue()
     {
         objhandle = Queue_create();
@@ -4288,7 +4216,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Queue_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Queue_destroy(IntPtr aObjHandle);
     ~Queue()
     {
         Queue_destroy(objhandle);
@@ -4296,7 +4224,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Queue_play(IntPtr aObjHandle, IntPtr aSound);
+    private static partial int Queue_play(IntPtr aObjHandle, IntPtr aSound);
     /// <summary>
     /// <para>Queues an audio source for playback.</para>
     ///
@@ -4311,7 +4239,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint Queue_getQueueCount(IntPtr aObjHandle);
+    private static partial uint Queue_getQueueCount(IntPtr aObjHandle);
     /// <summary>
     /// <para>Returns the number of audio sources remaining in queue.</para>
     ///
@@ -4328,7 +4256,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Queue_isCurrentlyPlaying(IntPtr aObjHandle, IntPtr aSound);
+    private static partial int Queue_isCurrentlyPlaying(IntPtr aObjHandle, IntPtr aSound);
     /// <summary>
     /// <para>Check if the audio source is currently playing in queue.</para>
     ///
@@ -4344,7 +4272,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Queue_setParamsFromAudioSource(IntPtr aObjHandle, IntPtr aSound);
+    private static partial int Queue_setParamsFromAudioSource(IntPtr aObjHandle, IntPtr aSound);
     /// <summary>
     /// <para>Get audio playback parameters from an audio source, instead of specifying them explicitly.</para>
     ///
@@ -4359,7 +4287,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Queue_setParamsEx(IntPtr aObjHandle, float aSamplerate, uint aChannels);
+    private static partial int Queue_setParamsEx(IntPtr aObjHandle, float aSamplerate, uint aChannels);
     /// <summary>
     /// <para>Set audio parameters. Use this or the setParamsFromAudioSource() before using the queue.</para>
     ///
@@ -4375,7 +4303,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Queue_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the queue.</para>
     ///
@@ -4390,7 +4318,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Queue_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Trying to change the looping state of a queue has no effect.</para>
     /// </summary>
@@ -4401,7 +4329,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Queue_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -4420,7 +4348,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Queue_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -4455,7 +4383,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Queue_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -4472,7 +4400,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Queue_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -4489,7 +4417,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Queue_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -4507,7 +4435,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Queue_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -4526,7 +4454,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Queue_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -4541,7 +4469,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Queue_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -4557,7 +4485,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Queue_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>Trying to change the looping state of a queue has no effect.</para>
     /// </summary>
@@ -4568,7 +4496,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Queue_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Queue_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>Trying to change the looping state of a queue has no effect.</para>
     /// </summary>
@@ -4579,7 +4507,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Queue_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to queues.</para>
     ///
@@ -4594,7 +4522,7 @@ public partial class Queue : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Queue_stop(IntPtr aObjHandle);
+    private static partial void Queue_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     /// </summary>
@@ -4615,7 +4543,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr RobotizeFilter_create();
+    private static partial IntPtr RobotizeFilter_create();
     public RobotizeFilter()
     {
         objhandle = RobotizeFilter_create();
@@ -4623,7 +4551,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr RobotizeFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr RobotizeFilter_destroy(IntPtr aObjHandle);
     ~RobotizeFilter()
     {
         RobotizeFilter_destroy(objhandle);
@@ -4631,7 +4559,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int RobotizeFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int RobotizeFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return RobotizeFilter_getParamCount(objhandle);
@@ -4639,7 +4567,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr RobotizeFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr RobotizeFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = RobotizeFilter_getParamName(objhandle, aParamIndex);
@@ -4648,7 +4576,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint RobotizeFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint RobotizeFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return RobotizeFilter_getParamType(objhandle, aParamIndex);
@@ -4656,7 +4584,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float RobotizeFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float RobotizeFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return RobotizeFilter_getParamMax(objhandle, aParamIndex);
@@ -4664,7 +4592,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float RobotizeFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float RobotizeFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return RobotizeFilter_getParamMin(objhandle, aParamIndex);
@@ -4672,7 +4600,7 @@ public partial class RobotizeFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void RobotizeFilter_setParams(IntPtr aObjHandle, float aFreq, int aWaveform);
+    private static partial void RobotizeFilter_setParams(IntPtr aObjHandle, float aFreq, int aWaveform);
     /// <summary>
     /// <para>Set the parameters for the filter. Does not affect "live" sounds.</para>
     ///
@@ -4736,7 +4664,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Sfxr_create();
+    private static partial IntPtr Sfxr_create();
     public Sfxr()
     {
         objhandle = Sfxr_create();
@@ -4744,7 +4672,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Sfxr_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Sfxr_destroy(IntPtr aObjHandle);
     ~Sfxr()
     {
         Sfxr_destroy(objhandle);
@@ -4752,7 +4680,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_resetParams(IntPtr aObjHandle);
+    private static partial void Sfxr_resetParams(IntPtr aObjHandle);
     /// <summary>
     /// <para>This function resets all of the Sfxr parameters to a "sensible" default. Used by loadPreset(), which then only adjusts a few parameters over the defaults.</para>
     /// </summary>
@@ -4763,7 +4691,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Sfxr_loadParams(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int Sfxr_loadParams(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>Effect parameters can also be loaded from a configuration file saved from the sfxr tool.</para>
     ///
@@ -4785,7 +4713,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Sfxr_loadParamsMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
+    private static partial int Sfxr_loadParamsMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>Alternate way of loading the parameters is to read from a memory buffer.</para>
     ///
@@ -4803,7 +4731,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Sfxr_loadParamsFile(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int Sfxr_loadParamsFile(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFile() can be used to load parameters from a SoLoud::File object. This is useful for integrating with virtual filesystems / packfiles, such as PhysFS.</para>
     /// </summary>
@@ -4814,7 +4742,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Sfxr_loadPreset(IntPtr aObjHandle, int aPresetNo, int aRandSeed);
+    private static partial int Sfxr_loadPreset(IntPtr aObjHandle, int aPresetNo, int aRandSeed);
     /// <summary>
     /// <para>You can simply tell Sfxr to use one of the presets (COIN, LASER, EXPLOSION, POWERUP, HURT, JUMP, BLIP). Each of the presets has several random components, so you can get virtually unlimited variations of each. (Not all variants sound good, though).</para>
     ///
@@ -4836,7 +4764,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Sfxr_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -4851,7 +4779,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Sfxr_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a sfxr sound does not currently have any effect. The sounds do not loop.</para>
     /// </summary>
@@ -4862,7 +4790,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Sfxr_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -4881,7 +4809,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Sfxr_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -4916,7 +4844,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Sfxr_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -4933,7 +4861,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Sfxr_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -4950,7 +4878,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Sfxr_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -4968,7 +4896,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Sfxr_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -4987,7 +4915,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Sfxr_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -5002,7 +4930,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Sfxr_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -5018,7 +4946,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Sfxr_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -5036,7 +4964,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Sfxr_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Sfxr_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -5054,7 +4982,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Sfxr_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to Sfxr audio sources.</para>
     ///
@@ -5069,7 +4997,7 @@ public partial class Sfxr : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Sfxr_stop(IntPtr aObjHandle);
+    private static partial void Sfxr_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a Sfxr sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -5086,7 +5014,7 @@ public partial class Sfxr : SoloudObject
 /// <summary>
 /// <para>The SoLoud::Speech class implements a simple Klatt-style formant speech synthesizer. It's barely legible, not really human-like, but it's free, and it's here.</para>
 /// <para>Adjusting the speech synthesizer's output with audio filters should allow for various voices, which, along with subtitles, will let you add voice to your games cheaply.</para>
-/// <para>For more serious use, feel free to study the source code and play with the various internal parameters, as well as apply various filters to the sound.</para>
+/// <para>For more serious use, feel free to study the source code and play with the various private parameters, as well as apply various filters to the sound.</para>
 /// <para>For legal notes, please see the license page.</para>
 /// </summary>
 public partial class Speech : SoloudObject
@@ -5101,7 +5029,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Speech_create();
+    private static partial IntPtr Speech_create();
     public Speech()
     {
         objhandle = Speech_create();
@@ -5109,7 +5037,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Speech_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Speech_destroy(IntPtr aObjHandle);
     ~Speech()
     {
         Speech_destroy(objhandle);
@@ -5117,7 +5045,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Speech_setText(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aText);
+    private static partial int Speech_setText(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aText);
     /// <summary>
     /// <para>The setText function can be used to set the text to be spoken.</para>
     ///
@@ -5136,7 +5064,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Speech_setParamsEx(IntPtr aObjHandle, uint aBaseFrequency, float aBaseSpeed, float aBaseDeclination, int aBaseWaveform);
+    private static partial int Speech_setParamsEx(IntPtr aObjHandle, uint aBaseFrequency, float aBaseSpeed, float aBaseDeclination, int aBaseWaveform);
     /// <summary>
     /// <para>The speech's voice can be adjusted by changing the parameters;</para>
     ///
@@ -5156,7 +5084,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Speech_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -5171,7 +5099,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Speech_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>This function can be used to set the speech to loop.</para>
     ///
@@ -5188,7 +5116,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Speech_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -5207,7 +5135,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Speech_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -5242,7 +5170,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Speech_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -5259,7 +5187,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Speech_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -5276,7 +5204,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Speech_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -5294,7 +5222,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Speech_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -5313,7 +5241,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Speech_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -5328,7 +5256,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Speech_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -5344,7 +5272,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Speech_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -5362,7 +5290,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Speech_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Speech_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -5380,7 +5308,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Speech_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to speech audio sources.</para>
     ///
@@ -5395,7 +5323,7 @@ public partial class Speech : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Speech_stop(IntPtr aObjHandle);
+    private static partial void Speech_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a speech sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -5420,7 +5348,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr TedSid_create();
+    private static partial IntPtr TedSid_create();
     public TedSid()
     {
         objhandle = TedSid_create();
@@ -5428,7 +5356,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr TedSid_destroy(IntPtr aObjHandle);
+    private static partial IntPtr TedSid_destroy(IntPtr aObjHandle);
     ~TedSid()
     {
         TedSid_destroy(objhandle);
@@ -5436,7 +5364,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int TedSid_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int TedSid_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>You tell TedSid to load a file with the load function:</para>
     ///
@@ -5458,7 +5386,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int TedSid_loadToMem(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int TedSid_loadToMem(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>The loadToMem() tells SoLoud to load the whole file to a memory buffer and stream it from there.</para>
     /// </summary>
@@ -5469,7 +5397,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int TedSid_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
+    private static partial int TedSid_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>Alternate way of loading the file is to read from a memory buffer.</para>
     ///
@@ -5487,7 +5415,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int TedSid_loadFileToMem(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int TedSid_loadFileToMem(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFileToMem() function performs the memory loading of loadToMem() using SoLoud::File objects, same way as loadFile() does.</para>
     /// </summary>
@@ -5498,7 +5426,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int TedSid_loadFile(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int TedSid_loadFile(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFile() can be used to load audio from a SoLoud::File object. This is useful for integrating with virtual filesystems / packfiles, such as PhysFS.</para>
     /// </summary>
@@ -5509,7 +5437,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void TedSid_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -5524,7 +5452,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void TedSid_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a TedSid sound does not currently have any effect. All music is set to loop by default.</para>
     /// </summary>
@@ -5535,7 +5463,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void TedSid_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -5554,7 +5482,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void TedSid_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -5589,7 +5517,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void TedSid_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -5606,7 +5534,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void TedSid_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -5623,7 +5551,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void TedSid_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -5641,7 +5569,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void TedSid_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -5660,7 +5588,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void TedSid_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -5675,7 +5603,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void TedSid_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -5691,7 +5619,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void TedSid_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -5709,7 +5637,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double TedSid_getLoopPoint(IntPtr aObjHandle);
+    private static partial double TedSid_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -5727,7 +5655,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void TedSid_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to monotone audio sources.</para>
     ///
@@ -5742,7 +5670,7 @@ public partial class TedSid : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void TedSid_stop(IntPtr aObjHandle);
+    private static partial void TedSid_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a monotone sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -5772,7 +5700,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Vic_create();
+    private static partial IntPtr Vic_create();
     public Vic()
     {
         objhandle = Vic_create();
@@ -5780,7 +5708,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Vic_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Vic_destroy(IntPtr aObjHandle);
     ~Vic()
     {
         Vic_destroy(objhandle);
@@ -5788,7 +5716,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setModel(IntPtr aObjHandle, int model);
+    private static partial void Vic_setModel(IntPtr aObjHandle, int model);
     /// <summary>
     /// <para>The model of machine, between PAL and NTSC, can be set and queried. PAL is the default.</para>
     ///
@@ -5804,7 +5732,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Vic_getModel(IntPtr aObjHandle);
+    private static partial int Vic_getModel(IntPtr aObjHandle);
     /// <summary>
     /// <para>The model of machine, between PAL and NTSC, can be set and queried. PAL is the default.</para>
     ///
@@ -5820,7 +5748,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setRegister(IntPtr aObjHandle, int reg, byte value);
+    private static partial void Vic_setRegister(IntPtr aObjHandle, int reg, byte value);
     /// <summary>
     /// <para>Registers can be set and read. All of the four registers are 8 bits wide.</para>
     ///
@@ -5837,7 +5765,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial byte Vic_getRegister(IntPtr aObjHandle, int reg);
+    private static partial byte Vic_getRegister(IntPtr aObjHandle, int reg);
     /// <summary>
     /// <para>Registers can be set and read. All of the four registers are 8 bits wide.</para>
     ///
@@ -5854,7 +5782,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Vic_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -5870,7 +5798,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Vic_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a vic sound does not have any effect.</para>
     /// </summary>
@@ -5881,7 +5809,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Vic_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -5900,7 +5828,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Vic_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -5935,7 +5863,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Vic_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -5952,7 +5880,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Vic_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -5969,7 +5897,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Vic_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -5987,7 +5915,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Vic_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -6006,7 +5934,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Vic_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -6021,7 +5949,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Vic_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -6037,7 +5965,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Vic_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>Adjusting the looping of a vic sound does not have any effect.</para>
     /// </summary>
@@ -6048,7 +5976,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Vic_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Vic_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>Adjusting the looping of a vic sound does not have any effect.</para>
     /// </summary>
@@ -6059,7 +5987,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Vic_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to monotone audio sources.</para>
     ///
@@ -6074,7 +6002,7 @@ public partial class Vic : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vic_stop(IntPtr aObjHandle);
+    private static partial void Vic_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a vic sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -6097,7 +6025,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Vizsn_create();
+    private static partial IntPtr Vizsn_create();
     public Vizsn()
     {
         objhandle = Vizsn_create();
@@ -6105,7 +6033,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Vizsn_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Vizsn_destroy(IntPtr aObjHandle);
     ~Vizsn()
     {
         Vizsn_destroy(objhandle);
@@ -6113,7 +6041,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_setText(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aText);
+    private static partial void Vizsn_setText(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aText);
     /// <summary>
     /// <para>The words to be spoken are set with setText(). Calling this while the audio source is in use may cause undefined behavior.</para>
     ///
@@ -6129,7 +6057,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Vizsn_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -6145,7 +6073,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Vizsn_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>Adjusting the looping of a monotone sound does not currently have any effect. All music is set to loop by default.</para>
     /// </summary>
@@ -6156,7 +6084,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Vizsn_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -6175,7 +6103,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Vizsn_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -6210,7 +6138,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Vizsn_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -6227,7 +6155,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Vizsn_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -6244,7 +6172,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Vizsn_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -6262,7 +6190,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Vizsn_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -6281,7 +6209,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Vizsn_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -6296,7 +6224,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Vizsn_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -6312,7 +6240,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Vizsn_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -6330,7 +6258,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Vizsn_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Vizsn_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -6348,7 +6276,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Vizsn_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to monotone audio sources.</para>
     ///
@@ -6363,7 +6291,7 @@ public partial class Vizsn : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Vizsn_stop(IntPtr aObjHandle);
+    private static partial void Vizsn_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a monotone sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -6388,7 +6316,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Wav_create();
+    private static partial IntPtr Wav_create();
     public Wav()
     {
         objhandle = Wav_create();
@@ -6396,7 +6324,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr Wav_destroy(IntPtr aObjHandle);
+    private static partial IntPtr Wav_destroy(IntPtr aObjHandle);
     ~Wav()
     {
         Wav_destroy(objhandle);
@@ -6404,7 +6332,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Wav_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int Wav_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>The wav loader takes just one parameter, the file name:</para>
     ///
@@ -6428,7 +6356,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Wav_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
+    private static partial int Wav_loadMemEx(IntPtr aObjHandle, IntPtr aMem, uint aLength, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>Alternate way of loading samples is to read from a memory buffer.</para>
     ///
@@ -6453,7 +6381,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Wav_loadFile(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int Wav_loadFile(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFile() can be used to load audio from a SoLoud::File object. This is useful for integrating with virtual filesystems / packfiles, such as PhysFS.</para>
     /// </summary>
@@ -6464,7 +6392,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Wav_loadRawWave8Ex(IntPtr aObjHandle, IntPtr aMem, uint aLength, float aSamplerate, uint aChannels);
+    private static partial int Wav_loadRawWave8Ex(IntPtr aObjHandle, IntPtr aMem, uint aLength, float aSamplerate, uint aChannels);
     /// <summary>
     /// <para>It is also possible to turn an array of raw wave data into a SoLoud Wav object using the loadRawWave family of functions. These functions differ primarily by the format of wave data they load - floats, unsigned 8 bit and signed 16 bit samples.</para>
     ///
@@ -6494,7 +6422,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Wav_loadRawWave16Ex(IntPtr aObjHandle, IntPtr aMem, uint aLength, float aSamplerate, uint aChannels);
+    private static partial int Wav_loadRawWave16Ex(IntPtr aObjHandle, IntPtr aMem, uint aLength, float aSamplerate, uint aChannels);
     /// <summary>
     /// <para>It is also possible to turn an array of raw wave data into a SoLoud Wav object using the loadRawWave family of functions. These functions differ primarily by the format of wave data they load - floats, unsigned 8 bit and signed 16 bit samples.</para>
     ///
@@ -6524,7 +6452,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int Wav_loadRawWaveEx(IntPtr aObjHandle, float[] aMem, uint aLength, float aSamplerate, uint aChannels, int aCopy, int aTakeOwnership);
+    private static partial int Wav_loadRawWaveEx(IntPtr aObjHandle, float[] aMem, uint aLength, float aSamplerate, uint aChannels, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>It is also possible to turn an array of raw wave data into a SoLoud Wav object using the loadRawWave family of functions. These functions differ primarily by the format of wave data they load - floats, unsigned 8 bit and signed 16 bit samples.</para>
     ///
@@ -6554,7 +6482,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Wav_getLength(IntPtr aObjHandle);
+    private static partial double Wav_getLength(IntPtr aObjHandle);
     /// <summary>
     /// <para>The length, in seconds, of this wave can be queried with this function.</para>
     ///
@@ -6569,7 +6497,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void Wav_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -6584,7 +6512,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void Wav_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>This function can be used to set the wave to loop.</para>
     ///
@@ -6601,7 +6529,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void Wav_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -6620,7 +6548,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void Wav_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -6655,7 +6583,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void Wav_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -6672,7 +6600,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void Wav_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -6689,7 +6617,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void Wav_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -6707,7 +6635,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void Wav_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -6726,7 +6654,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void Wav_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -6741,7 +6669,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void Wav_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -6757,7 +6685,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void Wav_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -6775,7 +6703,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double Wav_getLoopPoint(IntPtr aObjHandle);
+    private static partial double Wav_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -6793,7 +6721,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void Wav_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to wave audio sources.</para>
     ///
@@ -6808,7 +6736,7 @@ public partial class Wav : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void Wav_stop(IntPtr aObjHandle);
+    private static partial void Wav_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a wave sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
@@ -6840,7 +6768,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr WaveShaperFilter_create();
+    private static partial IntPtr WaveShaperFilter_create();
     public WaveShaperFilter()
     {
         objhandle = WaveShaperFilter_create();
@@ -6848,7 +6776,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr WaveShaperFilter_destroy(IntPtr aObjHandle);
+    private static partial IntPtr WaveShaperFilter_destroy(IntPtr aObjHandle);
     ~WaveShaperFilter()
     {
         WaveShaperFilter_destroy(objhandle);
@@ -6856,7 +6784,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WaveShaperFilter_setParams(IntPtr aObjHandle, float aAmount);
+    private static partial int WaveShaperFilter_setParams(IntPtr aObjHandle, float aAmount);
     /// <summary>
     /// <para>Set the parameters of the filter.</para>
     ///
@@ -6882,7 +6810,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WaveShaperFilter_getParamCount(IntPtr aObjHandle);
+    private static partial int WaveShaperFilter_getParamCount(IntPtr aObjHandle);
     public int getParamCount()
     {
         return WaveShaperFilter_getParamCount(objhandle);
@@ -6890,7 +6818,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr WaveShaperFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
+    private static partial IntPtr WaveShaperFilter_getParamName(IntPtr aObjHandle, uint aParamIndex);
     public string getParamName(uint aParamIndex)
     {
         IntPtr p = WaveShaperFilter_getParamName(objhandle, aParamIndex);
@@ -6899,7 +6827,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial uint WaveShaperFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
+    private static partial uint WaveShaperFilter_getParamType(IntPtr aObjHandle, uint aParamIndex);
     public uint getParamType(uint aParamIndex)
     {
         return WaveShaperFilter_getParamType(objhandle, aParamIndex);
@@ -6907,7 +6835,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float WaveShaperFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float WaveShaperFilter_getParamMax(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMax(uint aParamIndex)
     {
         return WaveShaperFilter_getParamMax(objhandle, aParamIndex);
@@ -6915,7 +6843,7 @@ public partial class WaveShaperFilter : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial float WaveShaperFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
+    private static partial float WaveShaperFilter_getParamMin(IntPtr aObjHandle, uint aParamIndex);
     public float getParamMin(uint aParamIndex)
     {
         return WaveShaperFilter_getParamMin(objhandle, aParamIndex);
@@ -6932,7 +6860,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr WavStream_create();
+    private static partial IntPtr WavStream_create();
     public WavStream()
     {
         objhandle = WavStream_create();
@@ -6940,7 +6868,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial IntPtr WavStream_destroy(IntPtr aObjHandle);
+    private static partial IntPtr WavStream_destroy(IntPtr aObjHandle);
     ~WavStream()
     {
         WavStream_destroy(objhandle);
@@ -6948,7 +6876,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WavStream_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int WavStream_load(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>The wav loader takes just one parameter, the file name:</para>
     ///
@@ -6972,7 +6900,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WavStream_loadMemEx(IntPtr aObjHandle, IntPtr aData, uint aDataLen, int aCopy, int aTakeOwnership);
+    private static partial int WavStream_loadMemEx(IntPtr aObjHandle, IntPtr aData, uint aDataLen, int aCopy, int aTakeOwnership);
     /// <summary>
     /// <para>Alternate way of loading samples is to read from a memory buffer.</para>
     ///
@@ -6997,7 +6925,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WavStream_loadToMem(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
+    private static partial int WavStream_loadToMem(IntPtr aObjHandle, [MarshalAs(UnmanagedType.LPStr)] string aFilename);
     /// <summary>
     /// <para>The loadToMem() tells SoLoud to load the whole file to a memory buffer and stream it from there. This is similar as to using the Wav object, except that the data is not decoded to raw samples on load.</para>
     /// <para>This can be useful if you expect the media the data resides on to be slow or busy, but don't want to spend the memory for the completely decoded audio data.</para>
@@ -7009,7 +6937,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WavStream_loadFile(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int WavStream_loadFile(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFile() can be used to load audio from a SoLoud::File object. This is useful for integrating with virtual filesystems / packfiles, such as PhysFS.</para>
     /// </summary>
@@ -7020,7 +6948,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial int WavStream_loadFileToMem(IntPtr aObjHandle, IntPtr aFile);
+    private static partial int WavStream_loadFileToMem(IntPtr aObjHandle, IntPtr aFile);
     /// <summary>
     /// <para>The loadFileToMem() function performs the memory loading of loadToMem() using SoLoud::File objects, same way as loadFile() does.</para>
     /// </summary>
@@ -7031,7 +6959,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double WavStream_getLength(IntPtr aObjHandle);
+    private static partial double WavStream_getLength(IntPtr aObjHandle);
     /// <summary>
     /// <para>The length, in seconds, of this wav stream can be queried with this function.</para>
     ///
@@ -7046,7 +6974,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_setVolume(IntPtr aObjHandle, float aVolume);
+    private static partial void WavStream_setVolume(IntPtr aObjHandle, float aVolume);
     /// <summary>
     /// <para>Set the default volume of the instances created from this audio source.</para>
     ///
@@ -7061,7 +6989,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_setLooping(IntPtr aObjHandle, int aLoop);
+    private static partial void WavStream_setLooping(IntPtr aObjHandle, int aLoop);
     /// <summary>
     /// <para>This function can be used to set the wav stream to loop.</para>
     ///
@@ -7078,7 +7006,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
+    private static partial void WavStream_set3dMinMaxDistance(IntPtr aObjHandle, float aMinDistance, float aMaxDistance);
     /// <summary>
     /// <para>Set the minimum and maximum distances for the audio source with set3dMinMaxDistance()</para>
     ///
@@ -7097,7 +7025,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
+    private static partial void WavStream_set3dAttenuation(IntPtr aObjHandle, uint aAttenuationModel, float aAttenuationRolloffFactor);
     /// <summary>
     /// <para>Set the attenuation model and rolloff factor with set3dAttenuation()</para>
     ///
@@ -7132,7 +7060,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
+    private static partial void WavStream_set3dDopplerFactor(IntPtr aObjHandle, float aDopplerFactor);
     /// <summary>
     /// <para>Set the doppler factor with set3dDopplerFactor().</para>
     ///
@@ -7149,7 +7077,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
+    private static partial void WavStream_set3dListenerRelative(IntPtr aObjHandle, int aListenerRelative);
     /// <summary>
     /// <para>Enable or disable listener relativity for a 3d audio source. If a sound is listener-relative, the listener's coordinates are assumed to be (0,0,0) in calculations.</para>
     ///
@@ -7166,7 +7094,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
+    private static partial void WavStream_set3dDistanceDelay(IntPtr aObjHandle, int aDistanceDelay);
     /// <summary>
     /// <para>Enable or disable the distance delay effect for a 3d audio source. Since speed of sound is way slower than speed of light, in reality we might see an explosion before we hear it.</para>
     ///
@@ -7184,7 +7112,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
+    private static partial void WavStream_set3dColliderEx(IntPtr aObjHandle, IntPtr aCollider, int aUserData);
     /// <summary>
     /// <para>Set or clear the custom audio collider and collider's user data for a 3d audio source.</para>
     ///
@@ -7203,7 +7131,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
+    private static partial void WavStream_set3dAttenuator(IntPtr aObjHandle, IntPtr aAttenuator);
     /// <summary>
     /// <para>Set a custom attenuator for the instances created from this audio source. use NULL to disable.</para>
     ///
@@ -7218,7 +7146,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
+    private static partial void WavStream_setInaudibleBehavior(IntPtr aObjHandle, int aMustTick, int aKill);
     /// <summary>
     /// <para>Set the inaudible behavior of the sound. By default, if a sound is inaudible, it's paused, and will resume when it becomes audible again. With this function you can tell SoLoud to either kill the sound if it becomes inaudible, or to keep ticking the sound even if it's inaudible.</para>
     ///
@@ -7234,7 +7162,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
+    private static partial void WavStream_setLoopPoint(IntPtr aObjHandle, double aLoopPoint);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -7252,7 +7180,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial double WavStream_getLoopPoint(IntPtr aObjHandle);
+    private static partial double WavStream_getLoopPoint(IntPtr aObjHandle);
     /// <summary>
     /// <para>If looping is enabled, the loop point is, by default, the start of the stream. The loop point can be changed, and current loop point can be queried with these functions.</para>
     ///
@@ -7270,7 +7198,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
+    private static partial void WavStream_setFilter(IntPtr aObjHandle, uint aFilterId, IntPtr aFilter);
     /// <summary>
     /// <para>As with any other audio source, you can attach filters to wav stream audio sources.</para>
     ///
@@ -7285,7 +7213,7 @@ public partial class WavStream : SoloudObject
 
     [LibraryImport(SoloudDllName.DllName)]
     [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-    internal static partial void WavStream_stop(IntPtr aObjHandle);
+    private static partial void WavStream_stop(IntPtr aObjHandle);
     /// <summary>
     /// <para>You can stop all instances of a wav stream sound source with stop(). This is equivalent of calling soloud.stopAudioSource() with the sound source.</para>
     ///
