@@ -9,3 +9,6 @@ dotnet_diagnostic.IDE0028.severity = none
 dotnet_diagnostic.IDE0305.severity = none
 
 dotnet_diagnostic.CA2211.severity = none
+
+# IDE0040: Accessibility modifers unncecessary
+dotnet_diagnostic.IDE0040.severity = none
