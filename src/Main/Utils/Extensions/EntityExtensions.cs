@@ -47,16 +47,16 @@ public static class EntityExtensions
         return pos;
     }
 
-    public static Vector2 GetParentPos(this Entity entity, out float rotation)
+    public static Vector2 GetParentPos(this Entity entity, out float parentRotation)
     {
         Vector2 pos = Vector2.Zero;
-        rotation = 0;
+        parentRotation = 0;
         Entity parent = entity.Parent;
         while (!parent.IsNull)
         {
             Vector2 parentPos = parent.GetLocalPos(out float parentRot);
             pos.Rotate(parentRot);
-            rotation += parentRot;
+            parentRotation += parentRot;
             pos += parentPos;
             parent = parent.Parent;
         }
