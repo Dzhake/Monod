@@ -28,4 +28,11 @@ public static class MathM
             if (from > to) from = to;
         }
     }
+
+    public static Vector2 VectorFromRot(float rotation)
+    {
+        //at some point i understood that making 'up' the default just feels nice. So here we are, adding pi/2 to make 'up' the default instead of 'right'.
+        float angle = rotation - (MathF.PI / 2);
+        return new(MathF.Cos(angle), MathF.Sin(angle));
+    }
 }

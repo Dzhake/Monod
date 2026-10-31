@@ -7,6 +7,16 @@ namespace Monod.Utils.Enums;
 /// <summary>
 /// Extensible "enum"-like, where each value is associated with a <see cref="string"/> "name" for it. Provides methods for adding new values, and retrieving registered values by their name or names by associated values.
 /// </summary>
+/// <typeparam name="TValue">Type of the enum.</typeparam>
+/// <remarks>
+/// Usage example:
+/// <code>
+/// public record struct AssetProp(int inner)
+/// {
+///     public static ExtEnumInfo&lt;AssetProp&gt; Info = new();
+/// }
+/// </code>
+/// </remarks>
 public sealed class ExtEnumInfo<TValue> where TValue : struct
 {
     /// <summary>
@@ -25,7 +35,7 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     public IReadOnlyList<string> Names => InternalNames.AsReadOnly();
 
     /// <summary>
-    /// Maximum value of a value stored in this enum. All values less than or equal this one are guaranteed to be available, and all values above this are not.
+    /// Maximum value of a value stored in this enum. All values less than this one are guaranteed to be available, and all values above this are not.
     /// </summary>
     public int MaxValue => InternalNames.Count;
 
@@ -34,7 +44,7 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
         int size = Unsafe.SizeOf<TValue>();
         if (size != sizeof(int))
         {
-            Guard.Exception($"Tried to create ExtEnumInfo with generic type param of size {size}, but size of {sizeof(int)} is needed. Don't use ExtEnumInfo for generics of size not equal to int size.");
+            Guard.Exception($"Tried to create ExtEnumInfo with generic type param of size {size}, but size of {sizeof(int)} is needed. Don't use ExtEnumInfo for generics of size not equal to int size. Reason: otherwise it's impossible to index a list with the value.");
         }
     }
 
@@ -69,11 +79,11 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (Values.TryGetValue(name, out TValue existingValue))
+        if (Values.TryGetValue(name, out var existingValue))
             return existingValue;
 
         int count = InternalNames.Count;
-        TValue value = Unsafe.As<int, TValue>(ref count);
+        var value = Unsafe.As<int, TValue>(ref count);
         InternalNames.Add(name);
         Values[name] = value;
         return value;
@@ -88,7 +98,7 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (Values.TryGetValue(name, out TValue value))
+        if (Values.TryGetValue(name, out var value))
             return value;
 
         Guard.KeyNotFoundException(name);
@@ -116,7 +126,6 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     {
         ArgumentOutOfRangeException.ThrowIfNegative(value);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(value, InternalNames.Count);
-
         return InternalNames[value];
     }
 

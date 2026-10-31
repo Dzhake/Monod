@@ -1,5 +1,3 @@
-using System;
-
 namespace Monod.Shared.Enums;
 
 /// <summary>
@@ -8,13 +6,9 @@ namespace Monod.Shared.Enums;
 public class ExtEnum
 {
     /// <summary>
-    /// CurrentValue amount of the values in this <see cref="ExtEnum"/>.
+    /// Amount of the values in this <see cref="ExtEnum"/>.
     /// </summary>
     public int Count => count;
-
-    /// <summary>
-    /// Private backing field for <see cref="Count"/>. CurrentValue amount of the values in this <see cref="ExtEnum"/>.
-    /// </summary>
     protected int count;
 
     /// <summary>
