@@ -2,7 +2,6 @@ using Friflo.Engine.ECS.Serialize;
 using Friflo.Engine.ECS.Systems;
 using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework.Graphics;
-using MLEM.Font;
 using MLEM.Misc;
 using MLEM.Ui.Style;
 using Monod.AssetsModule;
@@ -81,6 +80,8 @@ public abstract class MonodGame : Game
 
         soloud = new();
         soloud.init();
+
+        Json.Initialize();
 
         Renderer.OnGameCreated(this);
         IsFixedTimeStep = false;
@@ -211,7 +212,7 @@ public abstract class MonodGame : Game
         GraphicsDevice.Clear(Color.Black);
         if (ModManager.InProgress)
         {
-            GenericFont? font = GlobalFonts.MenuFont;
+            var font = GlobalFonts.MenuFont;
             float width = Window.ClientBounds.Width;
             float height = Window.ClientBounds.Height;
             int finished = ModManager.FinishedTasksThisCommand;
@@ -226,7 +227,7 @@ public abstract class MonodGame : Game
 
         if (Assets.IsLoading)
         {
-            GenericFont? font = GlobalFonts.MenuFont;
+            var font = GlobalFonts.MenuFont;
             float width = Window.ClientBounds.Width;
             float height = Window.ClientBounds.Height;
 

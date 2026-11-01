@@ -68,6 +68,7 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
     /// </summary>
     /// <param name="stream"><see cref="Stream"/> that reads the asset manifest.</param>
     /// <param name="relativePath">Path of the asset manifest relative to <see cref="AssetManager"/>'s root directory. Used to prefix each match with it, making matchers use subdirectory of the manifest.</param>
+    /// <param name="loader"><see cref="AssetLoader"/> that loaded the manifest.</param>
     /// <returns>List of <see cref="MatcherInfo"/>s parsed from the specified asset manifest.</returns>
     private static List<MatcherInfo> ParseAssetManifest(Stream stream, string relativePath, AssetLoader loader)
     {
@@ -82,8 +83,10 @@ public sealed class LoadAssetManifestsCommand(AssetLoader loader) : AssetLoaderC
             foreach (JsonProperty inner in match.Value.EnumerateObject())
             {
                 AssetProp id = AssetProp.Info.GetValue(inner.Name);
-                OneOf<object, Error> parseResult = AssetProps.ParseAssetProp(inner.Value.GetRawText(), id);
-                parseResult.Switch(property => properties[id] = property, error => Assets.Logger.Error("Failed to parse asset manifest in \"{Loader}\" at path \"{RelativePath}\" for match \"{Match}\" with property name \"{PropertyName}\":  {Error}", loader, relativePath, match.Name, inner.Name, error));
+                OneOf<object, Error<string>> parseResult = AssetProps.ParseAssetProp(inner.Value.GetRawText(), id);
+                parseResult.Switch(
+                    property => properties[id] = property,
+                    error => Assets.Logger.Error("Failed to parse asset manifest in \"{Loader}\" at path \"{RelativePath}\" for match \"{Match}\" with property name \"{PropertyName}\":  {Error}", loader, relativePath, match.Name, inner.Name, error.Value));
             }
 
             result.Add(new MatcherInfo(Globbing.MatcherFromString(match.Name, relativePath), properties));

@@ -128,7 +128,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
     private void OnAssetModified(string relativePath)
     {
-        AssetFormat format = AssetsUtils.DetectFormatByExtension(Path.GetExtension(relativePath));
+        var format = AssetsUtils.DetectFormatByExtension(Path.GetExtension(relativePath));
         if (format == AssetFormat.Fx)
         {
             EffectBuilder.BuildEffect(relativePath, DirectoryPath);
@@ -193,7 +193,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     public void LoadAsset(string filePath)
     {
         filePath = filePath.Replace('\\', '/');
-        AssetInfo assetInfo = GetAssetInfo(filePath);
+        var assetInfo = GetAssetInfo(filePath);
         LoadAssetFromAssetInfo(assetInfo).Wait();
     }
 
@@ -210,7 +210,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     public async Task LoadAssetAsync(string filePath)
     {
         filePath = filePath.Replace('\\', '/');
-        AssetInfo assetInfo = GetAssetInfo(filePath);
+        var assetInfo = GetAssetInfo(filePath);
         await LoadAssetFromAssetInfo(assetInfo);
     }
 
@@ -232,7 +232,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
 
         assetInfo.PropertiesArray = MatchPath(assetInfo.FilePath).ToArray();
-        AssetParser? parser = GetParser(assetInfo);
+        var parser = GetParser(assetInfo);
 
         if (parser is null)
         {
@@ -240,7 +240,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
             return false;
         }
 
-        Task<object?> assetTask = parser(assetInfo, Manager);
+        var assetTask = parser(assetInfo, Manager);
         object? asset = await assetTask;
         if (asset is null) //failed to load (logged by parser) / loaded to somewhere else by parser
         {
@@ -267,7 +267,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     {
         List<Dictionary<AssetProp, object>> result = new();
         if (Matchers is null) return result;
-        foreach (MatcherInfo matcherInfo in Matchers)
+        foreach (var matcherInfo in Matchers)
             if (matcherInfo.PathMatcher.Match(path).HasMatches) result.Add(matcherInfo.Properties);
         return result;
     }
@@ -276,6 +276,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     {
         return [
             new MatcherInfo(Globbing.MatcherFromString("**.prefab.json"), new(){ { AssetProps.Parser, (AssetParser)AssetParsers.Prefab } }),
+            new MatcherInfo(Globbing.MatcherFromString("**.anim.json"), new(){ { AssetProps.Parser, (AssetParser)AssetParsers.Anim } }),
         ];
     }
 
@@ -330,7 +331,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// <returns><see cref="AssetParser"/> based on the specified <paramref name="assetInfo"/> or null if parser could not be determined.</returns>
     private static AssetParser? GetParser(AssetInfo assetInfo)
     {
-        AssetParser? parser = assetInfo.GetProperty<AssetParser>(AssetProps.Parser);
+        var parser = assetInfo.GetProperty<AssetParser>(AssetProps.Parser);
         if (parser is null) Assets.DefaultParsers.TryGetValue(assetInfo.Type, out parser);
         return parser;
     }

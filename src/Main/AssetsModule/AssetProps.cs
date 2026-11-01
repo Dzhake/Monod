@@ -17,7 +17,7 @@ public static class AssetProps
     /// <summary>
     /// Parsers for <see cref="AssetProp"/>. The key is property's id, the value is the parser. Parser accepts the value of the property, and returns some <see cref="object"/> based on it.
     /// </summary>
-    public static readonly Dictionary<AssetProp, Func<string, OneOf<object, string>>> AssetPropParsers = new(); //TODO somewhere add parser for        parsers   uh
+    public static readonly Dictionary<AssetProp, Func<string, OneOf<object, Error<string>>>> AssetPropParsers = new();
 
     /// <summary>
     /// Parse asset's property form the given string based on property's id/name.
@@ -25,7 +25,7 @@ public static class AssetProps
     /// <param name="property">Property of the asset from the json, as a string.</param>
     /// <param name="propertyId">Id/name of the property.</param>
     /// <returns>Parsed result.</returns>
-    public static OneOf<object, Error> ParseAssetProp(string property, AssetProp propertyId) => AssetPropParsers[propertyId](property);
+    public static OneOf<object, Error<string>> ParseAssetProp(string property, AssetProp propertyId) => AssetPropParsers[propertyId](property);
 
     /// <summary>
     /// Parser used to parse the asset from stream into the asset as an object.

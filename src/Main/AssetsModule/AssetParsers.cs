@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Monod.ECS.Prefabs;
 using Monod.Graphics;
+using Monod.Graphics.Animations;
 using Monod.Localization;
 using Monod.Shared.Extensions;
 using Monod.Utils.General;
@@ -76,11 +77,11 @@ public static class AssetParsers
         try
         {
             string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
-            Result<CompiledShader, ShaderError[]> result = await effectCompiler.CompileAsync(await (await info.GetStreamAsync()).ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
+            var result = await effectCompiler.CompileAsync(await (await info.GetStreamAsync()).ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
 
             if (result.IsFailure)
             {
-                foreach (ShaderError e in result.Error)
+                foreach (var e in result.Error)
                     Assets.Logger.Error("{File}({Line},{Column}): {Code}: {Message}", e.File, e.Line, e.Column, e.Code, e.Message);
                 return null;
             }
@@ -126,7 +127,7 @@ public static class AssetParsers
         try
         {
             PrefabsLock.Enter();
-            if (!Json.TryDeserialize(await info.GetStreamAsync(), Json.SReadableWithFields, out PrefabAsset? result, out Exception? error))
+            if (!JsonUtil.TryDeserialize(await info.GetStreamAsync(), Json.SReadableWithFields, out PrefabAsset? result, out var error))
                 Assets.Logger.Error(error, "Failed to deserialize prefab at {Path} in {AssetManager}", info.Path, assetManager);
             return result;
         }
@@ -134,5 +135,22 @@ public static class AssetParsers
         {
             PrefabsLock.Exit();
         }
+    }
+
+    public static async Task<object?> Anim(AssetInfo info, AssetManager assetManager)
+    {
+        if (!JsonUtil.TryDeserializeArrayOrSingle<Animation>(await info.GetStreamAsync(), Json.SReadableWithFields, out var result, out var exception))
+            Assets.Logger.Error(exception, "Failed to deserialize animation at {Path} in {AssetManager}", info.Path, assetManager);
+        var anims = result!.Value.Match(anim => [anim], anims => anims);
+
+        // Change all ids to "<asset manager prefix>:<id>". I'm not entirely sure whether this is a good idea, because it can lead to more confusion, but I hope this will save some time for people writing anims.
+        string? assetManagerPrefix = assetManager.Prefix;
+        if (!string.IsNullOrEmpty(assetManagerPrefix))
+        {
+            foreach (var anim in anims)
+                anim.Id = $"{assetManagerPrefix}:{anim.Id}";
+        }
+
+        return new AnimationAsset(anims);
     }
 }
