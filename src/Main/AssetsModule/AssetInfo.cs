@@ -1,5 +1,6 @@
 using Monod.AssetsModule.Exceptions;
 using Monod.AssetsModule.Utils;
+using Monod.Shared.Exceptions;
 
 namespace Monod.AssetsModule;
 
@@ -55,7 +56,7 @@ public class AssetInfo
     {
         if (PropertiesArray is null) return default;
 
-        foreach (Dictionary<AssetProp, object> properties in PropertiesArray)
+        foreach (var properties in PropertiesArray)
             if (properties.TryGetValue(id, out object? property))
             {
                 if (property is T castedProperty) return castedProperty;
@@ -67,7 +68,22 @@ public class AssetInfo
 
     public async Task<Stream> GetStreamAsync()
     {
-        return File.OpenRead(FullPath!);
+        for (int i = 0; i < 5; i++)
+        {
+            try
+            {
+                return File.OpenRead(FullPath!);
+            }
+            catch (Exception ex)
+            {
+                if (i == 4) Guard.Exception($"Failed to get an asset of stream at path {FilePath}: {ex}");
+                else Log.Warning(ex, "Failed to get an asset of stream at path {FilePath}: ", FilePath);
+                Thread.Sleep(2000);
+            }
+        }
+
+        //unreachable
+        return null!;
     }
 
     /// <inheritdoc />

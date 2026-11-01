@@ -31,7 +31,7 @@ public static class MathM
 
     public static Vector2 VectorFromRot(float rotation)
     {
-        //at some point i understood that making 'up' the default just feels nice. I hope this won't lead to more confusion later..
+        // Looks like MG.Extended's Vec->Angle conversion considers 'up' to be the default? Or something like that. Anyway, doing this makes the conversion work correctly both ways.
         float angle = rotation - (MathF.PI / 2);
         return new(MathF.Cos(angle), MathF.Sin(angle));
     }
