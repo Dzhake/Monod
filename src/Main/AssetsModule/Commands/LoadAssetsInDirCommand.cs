@@ -44,7 +44,7 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
     private async Task LoadAssetAsync(string assetPath)
     {
         await Loader.LoadAssetAsync(assetPath);
-        Interlocked.Add(ref LoadedAssets, 1);
-        if (TotalAssets == LoadedAssets) Finish();
+        int loadedAssets = Interlocked.Add(ref LoadedAssets, 1);
+        if (TotalAssets == loadedAssets) Finish();
     }
 }
