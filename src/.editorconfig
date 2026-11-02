@@ -8,6 +8,11 @@ dotnet_diagnostic.CA2211.severity = none
 dotnet_diagnostic.IDE0028.severity = none
 dotnet_diagnostic.IDE0305.severity = none
 dotnet_diagnostic.IDE0040.severity = none
+
+# Collection initialization can be simplified
+# when constructing a list:
+# new(existingList) -> [.. existingList]
+dotnet_diagnostic.IDE0306.severity = none
 dotnet_diagnostic.S1104.severity = none
 dotnet_diagnostic.S2696.severity = none
 
