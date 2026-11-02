@@ -1,11 +1,12 @@
 using Monod.Shared.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Monod.Utils.Enums;
 
 /// <summary>
-/// Extensible "enum"-like, where each value is associated with a <see cref="string"/> "name" for it. Provides methods for adding new values, and retrieving registered values by their name or names by associated values.
+/// Extensible "enum"-like, where each value is associated with a <see cref="string"/> "name" for it. Provides methods for adding new values, and retrieving registered values by their name or names by associated values. Not thread safe!
 /// </summary>
 /// <typeparam name="TValue">Type of the enum.</typeparam>
 /// <remarks>
@@ -17,7 +18,7 @@ namespace Monod.Utils.Enums;
 /// }
 /// </code>
 /// </remarks>
-public sealed class ExtEnumInfo<TValue> where TValue : struct
+public sealed class ExtEnumInfo<TValue> where TValue : unmanaged
 {
     /// <summary>
     /// List of registered names, where index is a value, and the value (object) in the list is value's name.
@@ -32,19 +33,19 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     /// <summary>
     /// Readonly list of all names stored in this enum. Useful for iterating over names/debug purposes.
     /// </summary>
-    public IReadOnlyList<string> Names => InternalNames.AsReadOnly();
+    public IReadOnlyList<string> Names { get; }
 
     /// <summary>
-    /// Maximum value of a value stored in this enum. All values less than this one are guaranteed to be available, and all values above this are not.
+    /// Amount of values stored in the enum. All values less than this one are guaranteed to be available, and all values above or equal to this one are guaranteed to not.
     /// </summary>
-    public int MaxValue => InternalNames.Count;
+    public int Count => InternalNames.Count;
 
-    private void VerifyGenericType()
+    private static void VerifyGenericType()
     {
         int size = Unsafe.SizeOf<TValue>();
         if (size != sizeof(int))
         {
-            Guard.Exception($"Tried to create ExtEnumInfo with generic type param of size {size}, but size of {sizeof(int)} is needed. Don't use ExtEnumInfo for generics of size not equal to int size. Reason: otherwise it's impossible to index a list with the value.");
+            Guard.Exception($"Tried to create ExtEnumInfo for value {typeof(TValue).FullName} with generic type param of size {size}, but size of {sizeof(int)} is needed. Don't use ExtEnumInfo for generics of size not equal to int size. Reason: otherwise it's impossible to index a list with the value.");
         }
     }
 
@@ -55,6 +56,7 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     {
         VerifyGenericType();
         InternalNames = new();
+        Names = InternalNames.AsReadOnly();
         Values = new(StringComparer.Ordinal);
     }
 
@@ -65,7 +67,8 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     public ExtEnumInfo(List<string> names)
     {
         VerifyGenericType();
-        InternalNames = names;
+        InternalNames = new(names);
+        Names = InternalNames.AsReadOnly();
         Values = new(StringComparer.Ordinal);
         for (int i = 0; i < names.Count; i++) Values.Add(names[i], Unsafe.As<int, TValue>(ref i));
     }
@@ -79,13 +82,15 @@ public sealed class ExtEnumInfo<TValue> where TValue : struct
     {
         ArgumentNullException.ThrowIfNull(name);
 
-        if (Values.TryGetValue(name, out var existingValue))
-            return existingValue;
+        ref var slot = ref CollectionsMarshal.GetValueRefOrAddDefault(Values, name, out bool exists);
+
+        if (exists)
+            return slot;
 
         int count = InternalNames.Count;
         var value = Unsafe.As<int, TValue>(ref count);
         InternalNames.Add(name);
-        Values[name] = value;
+        slot = value;
         return value;
     }
 
