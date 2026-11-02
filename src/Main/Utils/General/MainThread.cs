@@ -8,7 +8,7 @@ namespace Monod.Utils.General;
 /// </summary>
 public static class MainThread
 {
-    private static readonly IndexedList<Task> Tasks = new();
+    private static readonly IndexedList<Task?> Tasks = new();
     private static readonly List<Exception> Exceptions = new(2);
 
     /// <summary>
@@ -21,11 +21,11 @@ public static class MainThread
 
         if (Tasks.Count == 0) return;
 
-        for (var i = 0; i < Tasks.Count; i++)
+        for (int i = 0; i < Tasks.Count; i++)
         {
-            Task? task = Tasks[i];
-            if (task is null || !task.IsCompleted) continue;
-            if (task.Exception is not null) Exceptions.Add(task.Exception);
+            var task = Tasks[i];
+            if (task?.IsCompleted == false) continue;
+            if (task?.Exception is not null) Exceptions.Add(task.Exception);
             Tasks.RemoveAt(i);
         }
 
