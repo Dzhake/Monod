@@ -1,18 +1,17 @@
 using Monod.AssetsModule.Exceptions;
 using Monod.AssetsModule.Utils;
-using Monod.Shared.Exceptions;
 
 namespace Monod.AssetsModule;
 
 /// <summary>
 /// Stores info required to load an asset: an <see cref="GetStreamAsync"/> and <see cref="PropertiesArray"/> of the asset.
 /// </summary>
-public class AssetInfo
+public class AssetInfo : IDisposable
 {
     /// <summary>
     /// <see cref="Stream"/> reading the asset.
     /// </summary>
-    private readonly Stream? AssetStream;
+    public readonly Stream AssetStream;
 
     /// <summary>
     /// Type of the asset.
@@ -20,7 +19,7 @@ public class AssetInfo
     public readonly AssetType Type;
 
     /// <summary>
-    /// Properties of <see cref="MatcherInfo"/>s that asset's path matched to. Use <see cref="GetProperty"/> to get a property. Not-null 
+    /// Properties of <see cref="MatcherInfo"/>s that asset's path matched to. Use <see cref="GetProperty"/> to get a property.
     /// </summary>
     public Dictionary<AssetProp, object>[]? PropertiesArray;
 
@@ -30,17 +29,18 @@ public class AssetInfo
     public readonly string Path;
 
     /// <summary>
-    /// File path of the asset relative to the <see cref="AssetLoader.DirectoryPath"/>, or <see langword="null"/> if the file doesn't exist, never <see langword="null"/> when parsing asset.
+    /// File path of the asset relative to the <see cref="AssetLoader.DirectoryPath"/>.
     /// </summary>
-    public readonly string? FilePath;
+    public readonly string FilePath;
 
     /// <summary>
-    /// Full path to the file of the asset, or <see langword="null"/> if the file doesn't exist, never <see langword="null"/> when parsing asset.
+    /// Full path to the file of the asset. SHOULD <b>NOT</b> BE USED FOR PARSING THE ASSET! Use <see cref="AssetStream"/> instead!
     /// </summary>
-    public readonly string? FullPath;
+    public readonly string FullPath;
 
-    public AssetInfo(string? fullPath, string? filePath, string path, AssetType type)
+    public AssetInfo(Stream assetStream, string fullPath, string filePath, string path, AssetType type)
     {
+        AssetStream = assetStream;
         FullPath = fullPath;
         FilePath = filePath;
         Path = path;
@@ -51,7 +51,7 @@ public class AssetInfo
     /// Get an asset's property by property's id.
     /// </summary>
     /// <param name="id">Id of the property to get.</param>
-    /// <returns>Property if it was found and casted successfully, default(T) otherwise</returns>
+    /// <returns>Property if it was found and casted successfully, default(T) otherwise.</returns>
     public T? GetProperty<T>(AssetProp id)
     {
         if (PropertiesArray is null) return default;
@@ -66,26 +66,9 @@ public class AssetInfo
         return default;
     }
 
-    public async Task<Stream> GetStreamAsync()
+    ///<inheritdoc/>
+    public void Dispose()
     {
-        for (int i = 0; i < 5; i++)
-        {
-            try
-            {
-                return File.OpenRead(FullPath!);
-            }
-            catch (Exception ex)
-            {
-                if (i == 4) Guard.Exception($"Failed to get an asset of stream at path {FilePath}: {ex}");
-                else Log.Warning(ex, "Failed to get an asset of stream at path {FilePath}: ", FilePath);
-                Thread.Sleep(2000);
-            }
-        }
-
-        //unreachable
-        return null!;
+        AssetStream?.Dispose();
     }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(AssetStream, Type, PropertiesArray);
 }

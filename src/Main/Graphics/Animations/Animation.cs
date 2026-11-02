@@ -25,5 +25,8 @@ public class Animation
     /// </summary>
     public string PathSuffix = "";
 
+    /// <summary>
+    /// What happens when the animation ends.
+    /// </summary>
     public AnimBehaviour OnEnd = AnimBehaviour.Loop;
 }

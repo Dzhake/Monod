@@ -9,6 +9,7 @@ using Monod.Utils.General;
 using ShadowDusk.Compiler;
 using ShadowDusk.Core;
 using SoLoud;
+using System.Text;
 
 namespace Monod.AssetsModule;
 
@@ -22,7 +23,7 @@ public static class AssetParsers
     /// </summary>
     public static async Task<object?> Binary(AssetInfo info, AssetManager _)
     {
-        return await File.ReadAllBytesAsync(info.FullPath);
+        return await info.AssetStream.ToByteArrayAsync();
     }
 
     /// <summary>
@@ -30,7 +31,7 @@ public static class AssetParsers
     /// </summary>
     public static async Task<object?> Text(AssetInfo info, AssetManager _)
     {
-        return await File.ReadAllTextAsync(info.FullPath);
+        return Encoding.UTF8.GetString(await info.AssetStream.ToByteArrayAsync()); ;
     }
 
     /// <summary>
@@ -38,7 +39,7 @@ public static class AssetParsers
     /// </summary>
     public static async Task<object?> Image(AssetInfo info, AssetManager _)
     {
-        return Texture2D.FromStream(Renderer.device, await info.GetStreamAsync(), DefaultColorProcessors.PremultiplyAlpha);
+        return Texture2D.FromStream(Renderer.device, info.AssetStream, DefaultColorProcessors.PremultiplyAlpha);
     }
 
     /// <summary>
@@ -47,7 +48,13 @@ public static class AssetParsers
     public static async Task<object?> Audio(AssetInfo info, AssetManager assetManager)
     {
         var wav = new Wav();
-        int result = wav.load(info.FullPath!);
+        byte[] data = await info.AssetStream.ToByteArrayAsync();
+        int result;
+        fixed (byte* ptr = data)
+        {
+            result = wav.loadMem((IntPtr)ptr, (uint)data.Length, 1, 0);
+        }
+
         if (result != 0)
             Assets.Logger.Error("Failed to load Wav at path {Path} in asset manager {Manager} : {Reason}", info.Path, assetManager.ToString(), MonodGame.soloud.getErrorString(result));
         return wav;
@@ -56,24 +63,24 @@ public static class AssetParsers
     private static EffectCompiler effectCompiler = new();
 
     /// <summary>
-    /// Lock for <see cref="Effect"/> parser, because creating new Effect internally uses non-concurrent dictionary.
+    /// Lock for <see cref="Effect"/> parser, because creating new Effect uses non-concurrent dictionary internally (in the MonoGame's code).
     /// </summary>
     private static Lock EffectLock = new();
 
     public static async Task<object?> Effect(AssetInfo info, AssetManager assetManager)
     {
+        string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.FilePath).Replace('\\', '/');
+        var result = await effectCompiler.CompileAsync(await info.AssetStream.ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
+
+        if (result.IsFailure)
+        {
+            foreach (var e in result.Error)
+                Assets.Logger.Error("{File}({Line},{Column}): {Code}: {Message}", e.File, e.Line, e.Column, e.Code, e.Message);
+            return null;
+        }
+
         try
         {
-            string filePath = Path.Join(assetManager.Loader.DirectoryPath, info.Path).Replace('\\', '/');
-            var result = await effectCompiler.CompileAsync(await (await info.GetStreamAsync()).ReadStreamAsync(), new CompilerOptions() { SourceFileName = filePath, Target = PlatformTarget.OpenGL });
-
-            if (result.IsFailure)
-            {
-                foreach (var e in result.Error)
-                    Assets.Logger.Error("{File}({Line},{Column}): {Code}: {Message}", e.File, e.Line, e.Column, e.Code, e.Message);
-                return null;
-            }
-
             EffectLock.Enter();
             return new Effect(Renderer.device, result.Value.Data);
         }
@@ -91,7 +98,7 @@ public static class AssetParsers
     public static async Task<object?> Localization(AssetInfo info, AssetManager manager)
     {
         //TODO (localization - low priority) Locale.AddManager(manager); -- for localization-only hot reload, because we assume localization is handled by separate asset managers than normal assets, we can only reload asset managers that handle localization
-        Locale.Load(new StreamReader(await info.GetStreamAsync()), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
+        Locale.Load(new StreamReader(info.AssetStream), Path.GetFileNameWithoutExtension(info.Path) == Locale.FallbackLanguage);
         return null;
     }
 
@@ -100,7 +107,7 @@ public static class AssetParsers
     /// </summary>
     public static async Task<object?> Font(AssetInfo info, AssetManager _)
     {
-        return (await info.GetStreamAsync()).ToByteArrayDangerous();
+        return info.AssetStream.ToByteArrayDangerous();
     }
 
     private static Lock PrefabsLock = new();
@@ -110,7 +117,7 @@ public static class AssetParsers
         try
         {
             PrefabsLock.Enter();
-            if (!JsonUtil.TryDeserialize(await info.GetStreamAsync(), Json.SReadableWithFields, out PrefabAsset? result, out var error))
+            if (!JsonUtil.TryDeserialize(info.AssetStream, Json.SReadableWithFields, out PrefabAsset? result, out var error))
                 Assets.Logger.Error(error, "Failed to deserialize prefab at {Path} in {AssetManager}", info.Path, assetManager);
             return result;
         }
@@ -122,8 +129,12 @@ public static class AssetParsers
 
     public static async Task<object?> Anim(AssetInfo info, AssetManager assetManager)
     {
-        if (!JsonUtil.TryDeserializeArrayOrSingle<Animation>(await info.GetStreamAsync(), Json.SReadableWithFields, out var result, out var exception))
+        if (!JsonUtil.TryDeserializeArrayOrSingle<Animation>(info.AssetStream, Json.SReadableWithFields, out var result, out var exception))
+        {
             Assets.Logger.Error(exception, "Failed to deserialize animation at {Path} in {AssetManager}", info.Path, assetManager);
+            return null;
+        }
+
         var anims = result!.Value.Match(anim => [anim], anims => anims);
 
         // Change all ids to "<asset manager prefix>:<id>". I'm not entirely sure whether this is a good idea, because it can lead to more confusion, but I hope this will save some time for people writing anims.

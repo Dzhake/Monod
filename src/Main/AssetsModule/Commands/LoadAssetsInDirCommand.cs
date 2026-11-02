@@ -27,7 +27,7 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
     private int LoadedAssets;
 
     ///<inheritdoc/>
-    public async override Task Run()
+    public override async Task Run()
     {
         string fullDir = Path.Join(Loader.DirectoryPath, Dir);
         if (!Directory.Exists(fullDir))
@@ -35,8 +35,8 @@ public sealed class LoadAssetsInDirCommand(string dir, AssetLoader loader) : Ass
             Finish();
             return;
         }
-        var assetPaths = Loader.FilterPathsNonReplacing(Directory.GetFiles(fullDir, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(Loader.DirectoryPath, item).Replace('\\', '/'))).ToList();
-        TotalAssets += assetPaths.Count;
+        string[] assetPaths = Loader.FilterPathsNonReplacing(Directory.GetFiles(fullDir, "", SearchOption.AllDirectories).Select(item => Path.GetRelativePath(Loader.DirectoryPath, item).Replace('\\', '/')));
+        TotalAssets += assetPaths.Length;
         foreach (string assetPath in assetPaths)
             MainThread.Add(Task.Run(() => LoadAssetAsync(assetPath)));
     }

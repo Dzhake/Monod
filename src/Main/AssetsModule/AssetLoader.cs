@@ -215,9 +215,9 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     }
 
 
-    private async Task<bool> LoadAssetFromAssetInfo(AssetInfo assetInfo)
+    private async Task<bool> LoadAssetFromAssetInfo(AssetInfo? assetInfo)
     {
-        if (assetInfo.FilePath is null) //When asset was deleted/renamed?
+        if (assetInfo is null) //When asset was deleted/renamed?
         {
             Assets.Logger.Debug("{This}: Unloaded asset at {Path}.", this, assetInfo.Path);
             RemoveFromCache(assetInfo.Path);
@@ -251,11 +251,30 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
         return true;
     }
 
-    protected AssetInfo GetAssetInfo(string filePath)
+    protected AssetInfo? GetAssetInfo(string filePath)
     {
         string fullPath = Path.Join(DirectoryPath, filePath).Replace('\\', '/');
-        if (!File.Exists(fullPath)) return new(null, null, FilePathToLoaderPath(filePath), AssetsUtils.DetectTypeByPath(filePath));
-        return new(fullPath, filePath, FilePathToLoaderPath(filePath), AssetsUtils.DetectTypeByPath(filePath));
+        if (!File.Exists(fullPath)) return null;
+
+        for (int i = 0; i < 5; i++)
+        {
+            try
+            {
+                var stream = File.OpenRead(fullPath);
+                return new(stream, fullPath, filePath, FilePathToLoaderPath(filePath), AssetsUtils.DetectTypeByPath(filePath));
+            }
+            catch (Exception exception)
+            {
+                if (i < 4)
+                    Assets.Logger.Warning(exception, "Failed to load asset at '{FullPath}' (try {I}/5): ", fullPath, i);
+                else
+                    Assets.Logger.Error(exception, "Failed to load asset at '{FullPath}' (try {I}/5): ", fullPath, i);
+
+                Thread.Sleep(200 * i);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -291,7 +310,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     /// </summary>
     /// <param name="assetPaths"><see cref="IEnumerable{T}">IEnumerable&lt;string&gt;</see> of asset paths in this asset manager.</param>
     /// <returns><paramref name="assetPaths"/> filtered using <see cref="AssetManager.Filter"/> and without entries that are already in the <see cref="Cache"/>.</returns>
-    public IEnumerable<string> FilterPathsNonReplacing(IEnumerable<string> assetPaths)
+    public string[] FilterPathsNonReplacing(IEnumerable<string> assetPaths)
     {
         Func<string, bool> filter;
         if (Manager.Filter is null)
@@ -302,7 +321,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
         try
         {
             CacheLock.EnterReadLock();
-            return assetPaths.Where(filter);
+            return assetPaths.Where(filter).ToArray();
         }
         finally
         {
