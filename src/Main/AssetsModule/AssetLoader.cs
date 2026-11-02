@@ -356,44 +356,50 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     }
 
 
+    private void StoreAsset(string path, object? asset)
+    {
+        AssetCacheContext ctx = new(path, this);
+        try
+        {
+            CacheLock.EnterWriteLock();
+
+            if (Cache.TryGetValue(path, out object? oldAsset))
+            {
+                (oldAsset as IAsset)?.OnRemovedFromCache(ctx);
+                (oldAsset as IDisposable)?.Dispose();
+                Cache.Remove(path);
+            }
+
+            if (asset is not null)
+            {
+                Cache[path] = asset;
+                (asset as IAsset)?.OnAddedToCache(ctx);
+            }
+        }
+        finally { CacheLock.ExitWriteLock(); }
+    }
+
     /// <summary>
     /// Load the specified <paramref name="asset"/> into the cache with the <paramref name="path"/> as key.
     /// </summary>
     /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
     /// <param name="asset">Asset to load into the cache.</param>
-    protected void LoadIntoCache(string path, object asset)
-    {
-        try
-        {
-            CacheLock.EnterWriteLock();
-            if (Cache.TryGetValue(path, out object? oldAsset) && oldAsset is IDisposable disposable) disposable.Dispose();
-            Cache[path] = asset;
-        }
-        finally
-        {
-            CacheLock.ExitWriteLock();
-        }
-    }
-
+    protected void LoadIntoCache(string path, object asset) => StoreAsset(path, asset);
 
     /// <summary>
     /// Remove the specified key (path) from the <see cref="Cache"/>.
     /// </summary>
     /// <param name="path">Path of the asset in this <see cref="AssetLoader"/>.</param>
-    public void RemoveFromCache(string path)
-    {
-        try
-        {
-            CacheLock.EnterWriteLock();
-            if (Cache.TryGetValue(path, out object? asset) && asset is IDisposable disposable) disposable.Dispose();
-            Cache.Remove(path);
-        }
-        finally
-        {
-            CacheLock.ExitWriteLock();
-        }
+    public void RemoveFromCache(string path) => StoreAsset(path, null);
 
-        Assets.Logger.Debug("{This}: Removed asset from the cache: {Path}", this, path);
+    /// <summary>
+    /// Remove all <paramref name="paths"/> from <see cref="Cache"/>.
+    /// </summary>
+    /// <param name="paths">Array of asset paths in this <see cref="AssetLoader"/>.</param>
+    public void RemoveFromCache(string[] paths)
+    {
+        foreach (string p in paths) StoreAsset(p, null);
+        Assets.Logger.Information("{This}: Unloaded {Count} assets", this, paths.Length);
     }
 
     /// <summary>
@@ -403,45 +409,13 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
     public void RemoveDirFromCache(string dirPath)
     {
         if (!dirPath.EndsWith('/')) dirPath += '/';
+        string[] assets;
+        try { CacheLock.EnterReadLock(); assets = Cache.Keys.Where(p => p.StartsWith(dirPath)).ToArray(); }
+        finally { CacheLock.ExitReadLock(); }
+        foreach (string path in assets) StoreAsset(path, null);
 
-        try
-        {
-            CacheLock.EnterWriteLock();
-            foreach (string asset in Cache.Keys)
-            {
-                if (asset.StartsWith(dirPath))
-                    Cache.Remove(asset);
-            }
-
-            Cache.TrimExcess();
-        }
-        finally
-        {
-            CacheLock.ExitWriteLock();
-        }
+        Assets.Logger.Information("{This}: Unloaded {Count} asset in the directory '{DirPath} from the cache", this, assets.Length, dirPath);
     }
-
-    /// <summary>
-    /// Remove all <paramref name="paths"/> from <see cref="Cache"/>.
-    /// </summary>
-    /// <param name="paths">Array of asset paths in this <see cref="AssetLoader"/>.</param>
-    public void RemoveFromCache(string[] paths)
-    {
-        try
-        {
-            CacheLock.EnterWriteLock();
-            foreach (string path in paths)
-                Cache.Remove(path);
-            Cache.TrimExcess();
-        }
-        finally
-        {
-            CacheLock.ExitWriteLock();
-        }
-        Assets.Logger.Information("{This}: Unloaded {Count} assets", this, paths.Length);
-    }
-
-
 
 
     /// <summary>
@@ -462,8 +436,15 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
         }
     }
 
+    ///<inheritdoc/>
     public void Dispose()
     {
+        //Dispose all of the assets properly
+        string[] assets;
+        try { CacheLock.EnterReadLock(); assets = Cache.Keys.ToArray(); }
+        finally { CacheLock.ExitReadLock(); }
+        foreach (string asset in assets) StoreAsset(asset, null);
+
         Watcher?.Dispose();
         CacheLock.Dispose();
         Cache?.Clear();
@@ -472,5 +453,7 @@ public class AssetLoader : CommandRunner<AssetLoaderCommand>, IDisposable
 
         Assets.ReloadThisFrame = true;
         Assets.EmitReloadEvent();
+
+        GC.SuppressFinalize(this);
     }
 }

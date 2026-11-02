@@ -5,28 +5,33 @@ namespace Monod.Graphics.Animations;
 /// <summary>
 /// Object, that is stored as an asset when the animations are loaded. Actual animations are automatically loaded to the <see cref="Animations.Dict"/> when <see cref="AnimationAsset"/> is created.
 /// </summary>
-public class AnimationAsset : IDisposable
+public class AnimationAsset : IAsset
 {
     /// <summary>
-    /// Ids of the animations that were in the asset.
+    /// Animations that were read from the asset.
     /// </summary>
-    public string[] Ids;
+    public Animation[] Anims;
 
     public AnimationAsset(Animation[] anims)
     {
-        Ids = new string[anims.Length];
+        Anims = anims;
+    }
+
+    ///<inheritdoc/>
+    public void OnAddedToCache(AssetCacheContext ctx)
+    {
         try
         {
             Animations.DictLock.EnterWriteLock();
-            for (int i = 0; i < anims.Length; i++)
+            for (int i = 0; i < Anims.Length; i++)
             {
-                var anim = anims[i];
+                var anim = Anims[i];
                 if (Animations.Dict.ContainsKey(anim.Id))
                 {
-                    Assets.Logger.Warning("Tried to add two animations with the same id '{Id}' to the anims dictonary! When an animation is unloaded it removes itself from the dictionary, so if one of those anims is unloaded, the other becomes invalid too!", anim.Id);
+                    Assets.Logger.Error("Tried to add two animations with the same id '{Id}' to the Animations dictonary! When an animation is unloaded it removes itself from the dictionary, so if one of those anims is unloaded, the other becomes invalid too!", anim.Id);
+                    continue;
                 }
                 Animations.Dict.Add(anim.Id, anim);
-                Ids[i] = anim.Id;
             }
         }
         finally
@@ -36,13 +41,13 @@ public class AnimationAsset : IDisposable
     }
 
     ///<inheritdoc/>
-    public void Dispose()
+    public void OnRemovedFromCache(AssetCacheContext ctx)
     {
         try
         {
             Animations.DictLock.EnterWriteLock();
-            foreach (string id in Ids)
-                Animations.Dict.Remove(id);
+            foreach (var anim in Anims)
+                Animations.Dict.Remove(anim.Id);
         }
         finally
         {

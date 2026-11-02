@@ -69,6 +69,7 @@ public class AssetInfo : IDisposable
     ///<inheritdoc/>
     public void Dispose()
     {
+        GC.SuppressFinalize(this);
         AssetStream?.Dispose();
     }
 }
