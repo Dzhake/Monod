@@ -6,9 +6,11 @@ namespace Monod.Graphics.ECS.Sprite;
 
 public class UpdateSpriteSystem : QuerySystem<Sprite2D>
 {
+    private UpdateEach update = new();
+
     protected override void OnUpdate()
     {
-        Query.Each(new UpdateEach());
+        Query.Each(update);
     }
 
     public struct UpdateEach : IEach<Sprite2D>

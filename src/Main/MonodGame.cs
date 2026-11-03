@@ -89,10 +89,16 @@ public abstract class MonodGame : Game
         Window.ClientSizeChanged += OnWindowSizeChanged;
 
         CreateStore();
+
         LogicSystemRoot = new();
-        DrawSystemRoot = new();
+        LogicSystemRoot.SetMonitorPerf(true);
         LogicSystemRoot.AddStore(Store);
+        LogicSystemRoot.SetName("Logic System Root");
+
+        DrawSystemRoot = new();
+        DrawSystemRoot.SetMonitorPerf(true);
         DrawSystemRoot.AddStore(Store);
+        DrawSystemRoot.SetName("Draw System Root");
 
         Exiting += OnExit;
     }
