@@ -13,6 +13,12 @@ dotnet_diagnostic.IDE0040.severity = none
 # when constructing a list:
 # new(existingList) -> [.. existingList]
 dotnet_diagnostic.IDE0306.severity = none
+
+# Simplify member access
+# when accessing a static field:
+# Inheritor.field -> BaseClass.field
+dotnet_diagnostic.IDE0002.severity = none
+
 dotnet_diagnostic.S1104.severity = none
 dotnet_diagnostic.S2696.severity = none
 
