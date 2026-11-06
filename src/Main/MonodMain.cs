@@ -2,7 +2,6 @@
 global using Microsoft.Xna.Framework;
 global using Serilog;
 global using Math = System.Math;
-global using RectangleF = MLEM.Maths.RectangleF;
 using Monod.LogModule;
 
 namespace Monod;
@@ -13,7 +12,7 @@ namespace Monod;
 public static class MonodMain
 {
     /// <summary>
-    /// Call as early as possible. Initializes <see cref="LogHelper"/> and <see cref="OS"/>.
+    /// Call as early as possible. Initializes vital systems, such as <see cref="LogHelper"/>.
     /// </summary>
     public static void EarlyInitialize()
     {
