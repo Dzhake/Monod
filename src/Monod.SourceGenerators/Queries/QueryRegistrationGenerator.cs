@@ -12,22 +12,39 @@ public sealed class QueryRegistrationGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Stage 1 (cached per attributed class): everything that needs symbols or
-        // the compilation happens HERE, and the output is pure data — records with
-        // only strings/bools/immutable arrays. That's what keeps the pipeline
-        // incremental: editing an unrelated file triggers zero work.
-        var models = context.SyntaxProvider.ForAttributeWithMetadataName(
-            WellKnown.GenerateQueryRegistrationAttribute,
-            predicate: static (node, _) => node is ClassDeclarationSyntax,
-            transform: static (ctx, ct) =>
-                QueryClassModel.Create((INamedTypeSymbol)ctx.TargetSymbol, ctx.SemanticModel.Compilation, ct));
+        // [MQuery<...>] is a family of generic attributes — one per arity — and
+        // ForAttributeWithMetadataName matches the exact metadata name including
+        // the `N arity suffix. So one pipeline is registered per arity; every
+        // pipeline builds the SAME whole-class model (the transform reads all
+        // [MQuery] attributes off the class symbol), and Distinct() below
+        // collapses the duplicates. Editing an unrelated file triggers zero work.
+        var collected = new List<IncrementalValueProvider<ImmutableArray<QueryClassModel>>>();
+
+        for (int arity = 1; arity <= WellKnown.MaxMQueryArity; arity++)
+        {
+            collected.Add(
+                context.SyntaxProvider.ForAttributeWithMetadataName(
+                    WellKnown.MQueryAttributeMetadataName(arity),
+                    predicate: static (node, _) => node is ClassDeclarationSyntax,
+                    transform: static (ctx, ct) =>
+                        QueryClassModel.Create((INamedTypeSymbol)ctx.TargetSymbol, ctx.SemanticModel.Compilation, ct))
+                .Collect());
+        }
+
+        var models = collected[0];
+        for (int i = 1; i < collected.Count; i++)
+        {
+            var next = collected[i];
+            models = models.Combine(next).Select(static (pair, _) => pair.Left.AddRange(pair.Right));
+        }
 
         // No CompilationProvider.Combine — it re-runs the output stage on every
         // keystroke project-wide. All compilation access happens in the transform.
-        context.RegisterSourceOutput(models.Collect(), static (spc, models) =>
+        context.RegisterSourceOutput(models, static (spc, allModels) =>
         {
-            // Distinct guards against the attribute being applied to two partial parts.
-            foreach (var model in models.Distinct())
+            // Distinct guards against the same class being reached through several
+            // [MQuery] arities (and against attributes on two partial parts).
+            foreach (var model in allModels.Distinct())
                 model.Execute(spc);
         });
     }
@@ -41,17 +58,38 @@ public sealed class QueryRegistrationGenerator : IIncrementalGenerator
 /// </summary>
 internal static class WellKnown
 {
-    // Attributes — adjust if you move them into the engine.
-    public const string GenerateQueryRegistrationAttribute = "Monod.ECS.Systems.GenerateQueryRegistrationAttribute";
-    public const string QueryRelationAttribute = "Monod.ECS.Systems.QueryRelationAttribute";
-    public const string QueryTagAttribute = "Monod.ECS.Systems.QueryTagAttribute`1";
-    public const string QueryGenIgnoreAttribute = "Monod.ECS.Systems.QueryGenIgnoreAttribute";
+    // ---- the [MQuery<...>] attribute family ----------------------------------
+    // Generic attributes exist once per arity, so the generator needs one
+    // pipeline per arity (see QueryRegistrationGenerator.Initialize). Keep
+    // MaxMQueryArity in sync with the highest MQueryAttribute<...> arity
+    // declared in the engine.
+    public const string MQueryAttributeBase = "Monod.ECS.Systems.MQueryAttribute";
+    public const int MaxMQueryArity = 10;
+
+    public static string MQueryAttributeMetadataName(int arity) => $"{MQueryAttributeBase}`{arity}";
+
+    public static bool IsMQueryAttributeMetadataName(string metadataName)
+    {
+        if (!metadataName.StartsWith(MQueryAttributeBase + "`", StringComparison.Ordinal)) return false;
+
+        string arityText = metadataName[(MQueryAttributeBase.Length + 1)..];
+        return int.TryParse(arityText, out int arity) && arity is >= 1 and <= MaxMQueryArity;
+    }
+
+    // Engine marker interfaces — used to auto-classify [MQuery] type arguments
+    // into components, relations and tags. Tags never contribute to the
+    public const string ComponentInterfaceType = "Friflo.Engine.ECS.IComponent";
+    public const string RelationInterfaceType = "Friflo.Engine.ECS.IRelation`1";
+    public const string TagInterfaceType = "Friflo.Engine.ECS.ITag";
 
     // Engine types — adjust to your real namespaces.
     public const string SystemCtxType = "Monod.ECS.Systems.SystemCtx";
     public const string QueryKeyType = "Monod.ECS.Systems.QueryKey`1";
     public const string TagsType = "Friflo.Engine.ECS.Tags";
     public const string ArchetypeQueryType = "Friflo.Engine.ECS.ArchetypeQuery";
+
+    public static string ArchetypeQueryMetadataName(int arity) =>
+        ArchetypeQueryType + (arity > 0 ? "`" + arity : string.Empty);
 }
 
 internal static class Descriptors
@@ -74,25 +112,9 @@ internal static class Descriptors
         "Class must not be generic",
         "Class '{0}' cannot be generic: its static fields would be per-instantiation and registration would break.");
 
-    public static readonly DiagnosticDescriptor FieldMustBeStatic = Make("MGQ012",
-        "Query field must be static",
-        "Field '{0}' must be static.");
-
-    public static readonly DiagnosticDescriptor FieldMustNotBeReadOnly = Make("MGQ013",
-        "Query field must not be readonly",
-        "Field '{0}' cannot be readonly because Register assigns it. Remove readonly or add [QueryGenIgnore].");
-
-    public static readonly DiagnosticDescriptor QueryMustBeArchetypeQuery = Make("MGQ014",
-        "QueryKey must wrap an engine ArchetypeQuery",
-        "Field '{0}' has type '{1}'; the generator only handles QueryKey<ArchetypeQuery<...>> fields.");
-
     public static readonly DiagnosticDescriptor RelationNeedsSingleTypeArgument = Make("MGQ015",
-        "Relation queries take exactly one type argument",
-        "Field '{0}' is marked [QueryRelation] and must be QueryKey<ArchetypeQuery<TRelation>> with no [QueryTag]s.");
-
-    public static readonly DiagnosticDescriptor QueryNeedsComponentsOrTags = Make("MGQ016",
-        "Query has no components or tags",
-        "Field '{0}' declares an empty query; add type arguments or at least one [QueryTag<T>].");
+        "Relation queries take exactly one relation type",
+        "The [MQuery] query '{0}' contains a relation type; relation queries must list exactly one relation type and no component types (tags are allowed).");
 
     public static readonly DiagnosticDescriptor RegisterIsGenerated = Make("MGQ017",
         "Register is generated",
@@ -106,13 +128,25 @@ internal static class Descriptors
         "Ambiguous RegisterManual",
         "Multiple valid RegisterManual overloads were found; keep exactly one.");
 
-    public static readonly DiagnosticDescriptor BadQueryTagUsage = Make("MGQ020",
-        "Invalid [QueryTag] usage",
-        "The [QueryTag] attribute on field '{0}' must specify its type argument: [QueryTag<MyTag>].");
-
     public static readonly DiagnosticDescriptor EngineApiMissing = Make("MGQ021",
         "Engine API missing",
         "Engine member '{0}' could not be found; the engine and the generator are out of sync.");
+
+    public static readonly DiagnosticDescriptor MQueryTypeNotRecognized = Make("MGQ022",
+        "Type is not a component, relation or tag",
+        "The type '{0}' in [MQuery] does not implement the engine's IComponent, IRelation or ITag marker interfaces, so the generator cannot classify it.");
+
+    public static readonly DiagnosticDescriptor MQueryFieldNameMustBeString = Make("MGQ023",
+        "Query field name must be a string",
+        "The first constructor argument of [MQuery] must be a string containing the query field name; found '{0}'.");
+
+    public static readonly DiagnosticDescriptor MQueryFieldNameInvalid = Make("MGQ024",
+        "Invalid query field name",
+        "The query field name '{0}' is not a valid C# identifier.");
+
+    public static readonly DiagnosticDescriptor MQueryFieldNameCollision = Make("MGQ025",
+        "Query field name collision",
+        "The query field name '{0}' collides with another member of '{1}' or with another [MQuery] query; give one of them an explicit name.");
 
     public static DiagnosticDescriptor? Find(string id) => id switch
     {
@@ -120,16 +154,15 @@ internal static class Descriptors
         "MGQ002" => AttributeMetadataNameMismatch,
         "MGQ010" => ClassMustBePartial,
         "MGQ011" => ClassMustNotBeGeneric,
-        "MGQ012" => FieldMustBeStatic,
-        "MGQ013" => FieldMustNotBeReadOnly,
-        "MGQ014" => QueryMustBeArchetypeQuery,
         "MGQ015" => RelationNeedsSingleTypeArgument,
-        "MGQ016" => QueryNeedsComponentsOrTags,
         "MGQ017" => RegisterIsGenerated,
         "MGQ018" => BadRegisterManualSignature,
         "MGQ019" => AmbiguousRegisterManual,
-        "MGQ020" => BadQueryTagUsage,
         "MGQ021" => EngineApiMissing,
+        "MGQ022" => MQueryTypeNotRecognized,
+        "MGQ023" => MQueryFieldNameMustBeString,
+        "MGQ024" => MQueryFieldNameInvalid,
+        "MGQ025" => MQueryFieldNameCollision,
         _ => null,
     };
 
@@ -148,10 +181,12 @@ internal sealed record QueryClassModel(
     string ClassName,
     bool IsStatic,
     string? SystemCtxFqn,                    // 'global::Monod.ECS.Systems.SystemCtx'
-    string? TagsFqn,                         // 'global::Monod.ECS.Queries.Tags'
+    string? QueryKeyFqn,                     // 'global::Monod.ECS.Systems.QueryKey'
+    string? ArchetypeQueryFqn,               // 'global::Friflo.Engine.ECS.ArchetypeQuery'
+    string? TagsFqn,                         // 'global::Friflo.Engine.ECS.Tags'
     bool CallRegisterManual,
     bool EmitRegister,                       // false → report diagnostics only
-    EquatableArray<QueryFieldModel> Fields,
+    EquatableArray<QueryFieldModel> Fields,  // generated fields, in attribute order
     EquatableArray<DiagnosticInfo> Diagnostics)
 {
     public static QueryClassModel Create(
@@ -165,13 +200,26 @@ internal sealed record QueryClassModel(
         // ---- resolve the engine contract from the CONSUMER's compilation ----
         var systemCtx = compilation.GetTypeByMetadataName(WellKnown.SystemCtxType);
         var queryKey = compilation.GetTypeByMetadataName(WellKnown.QueryKeyType);
+        var archetypeQuery = compilation.GetTypeByMetadataName(WellKnown.ArchetypeQueryType);
         var tagsType = compilation.GetTypeByMetadataName(WellKnown.TagsType);
+        var componentInterface = compilation.GetTypeByMetadataName(WellKnown.ComponentInterfaceType);
+        var relationInterface = compilation.GetTypeByMetadataName(WellKnown.RelationInterfaceType);
+        var tagInterface = compilation.GetTypeByMetadataName(WellKnown.TagInterfaceType);
 
         if (systemCtx is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.SystemCtxType);
         if (queryKey is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.QueryKeyType);
+        if (archetypeQuery is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.ArchetypeQueryType);
         if (tagsType is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.TagsType);
+        if (componentInterface is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.ComponentInterfaceType);
+        if (relationInterface is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.RelationInterfaceType);
+        if (tagInterface is null) Add(diagnostics, Descriptors.EngineTypeMissing, classLocation, WellKnown.TagInterfaceType);
 
-        bool canEmit = systemCtx is not null && queryKey is not null;
+        bool canEmit = systemCtx is not null
+            && queryKey is not null
+            && archetypeQuery is not null
+            && componentInterface is not null
+            && relationInterface is not null
+            && tagInterface is not null;
 
         // ---- class-level gates ------------------------------------------------
         if (symbol.IsGenericType)
@@ -260,138 +308,178 @@ internal sealed record QueryClassModel(
             }
         }
 
-        // ---- fields -----------------------------------------------------------
+        // ---- [MQuery<...>] attributes → generated fields ----------------------
         var fields = new List<QueryFieldModel>();
+        var usedFieldNames = new HashSet<string>(StringComparer.Ordinal);
 
-        foreach (var member in symbol.GetMembers())
+        if (componentInterface is not null && relationInterface is not null && tagInterface is not null)
         {
-            ct.ThrowIfCancellationRequested();
-
-            if (member is not IFieldSymbol field) continue;
-            // Silently skip anything that isn't an engine QueryKey<...> — the class
-            // is allowed to hold other static fields.
-            if (field.Type is not INamedTypeSymbol fieldKey) continue;
-            if (!SymbolEqualityComparer.Default.Equals(fieldKey.OriginalDefinition, queryKey)) continue;
-
-            var location = LocationInfo.From(field.Locations.FirstOrDefault()) ?? LocationInfo.Empty;
-
-            // ---- read the attributes (matched by exact metadata name) ---------
-            bool ignore = false;
-            bool isRelation = false;
-            var tagTypes = new List<string>();
-
-            foreach (var attribute in field.GetAttributes())
+            foreach (var attribute in symbol.GetAttributes())
             {
+                ct.ThrowIfCancellationRequested();
+
                 if (attribute.AttributeClass is not { } attributeClass) continue;
 
                 var definition = attributeClass.OriginalDefinition;
                 string metadataName = MetadataName(definition);
 
-                if (metadataName == WellKnown.QueryGenIgnoreAttribute)
+                if (!WellKnown.IsMQueryAttributeMetadataName(metadataName))
                 {
-                    ignore = true;
-                }
-                else if (metadataName == WellKnown.QueryRelationAttribute)
-                {
-                    isRelation = true;
-                }
-                else if (metadataName == WellKnown.QueryTagAttribute)
-                {
-                    if (attributeClass.TypeArguments.Length == 1)
+                    // An attribute *named* MQueryAttribute the generator does not know —
+                    // wrong namespace, or an arity above MaxMQueryArity. A non-generic
+                    // legacy MQueryAttribute is left alone.
+                    if (definition.Name == "MQueryAttribute"
+                        && metadataName != WellKnown.MQueryAttributeBase)
                     {
-                        tagTypes.Add(attributeClass.TypeArguments[0]
-                            .ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                        Add(diagnostics, Descriptors.AttributeMetadataNameMismatch,
+                            AttributeLocation(attribute, classLocation, ct), definition.Name, metadataName);
                     }
-                    else
-                    {
-                        Add(diagnostics, Descriptors.BadQueryTagUsage, location, field.Name);
-                    }
+                    continue;
                 }
-                else if (definition.Name is "QueryGenIgnoreAttribute"
-                                      or "QueryRelationAttribute"
-                                      or "QueryTagAttribute")
+
+                var location = AttributeLocation(attribute, classLocation, ct);
+
+                // ---- classify the type arguments (attribute order preserved) ----
+                var components = new List<string>();
+                var relations = new List<string>();
+                var tags = new List<string>();
+                var defaultName = new StringBuilder();
+                bool broken = false;
+
+                foreach (var typeArgument in attributeClass.TypeArguments)
                 {
-                    // Same attribute, wrong location → the WellKnown constant drifted.
-                    Add(diagnostics, Descriptors.AttributeMetadataNameMismatch, location,
-                        definition.Name, metadataName);
+                    if (typeArgument.TypeKind == TypeKind.Error)
+                    {
+                        // The attribute references an unresolvable type — the
+                        // compilation is broken anyway; stay quiet.
+                        broken = true;
+                        break;
+                    }
+
+                    if (Classify(typeArgument, componentInterface, relationInterface, tagInterface) is not { } entry)
+                    {
+                        Add(diagnostics, Descriptors.MQueryTypeNotRecognized, location,
+                            typeArgument.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+                        broken = true;
+                        break;
+                    }
+
+                    string fqn = entry.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+                    switch (entry.Kind)
+                    {
+                    case QueryTypeKind.Component:
+                        components.Add(fqn);
+                        break;
+                    case QueryTypeKind.Relation:
+                        relations.Add(fqn);
+                        break;
+                    case QueryTypeKind.Tag:
+                        tags.Add(fqn);
+                        break;
+                    }
+
+                    if (defaultName.Length > 0) defaultName.Append('_');
+                    defaultName.Append(entry.Type.Name);
                 }
-            }
 
-            if (ignore) continue;
+                if (broken) continue;
 
-            // ---- validate the field shape --------------------------------------
-            if (!field.IsStatic)
-            {
-                Add(diagnostics, Descriptors.FieldMustBeStatic, location, field.Name);
-                continue;
-            }
+                // ---- field name: first constructor argument, else the type names ----
+                string fieldName;
+                var firstArgument = attribute.ConstructorArguments.Length > 0
+                    ? attribute.ConstructorArguments[0]
+                    : default;
 
-            if (field.IsReadOnly)
-            {
-                Add(diagnostics, Descriptors.FieldMustNotBeReadOnly, location, field.Name);
-                continue;
-            }
+                if (firstArgument.Value is string provided)
+                {
+                    fieldName = provided;
+                }
+                else if (firstArgument.Value is not null)
+                {
+                    Add(diagnostics, Descriptors.MQueryFieldNameMustBeString, location,
+                        firstArgument.Value!.ToString() ?? "null");
+                    continue;
+                }
+                else
+                {
+                    // No constructor argument, or an explicit null → default name.
+                    fieldName = defaultName.ToString();
+                }
 
-            if (fieldKey.TypeArguments.Length != 1
-                || fieldKey.TypeArguments[0] is not INamedTypeSymbol queryType
-                || MetadataName(queryType.OriginalDefinition) != ArchetypeQueryName(queryType.Arity))
-            {
-                Add(diagnostics, Descriptors.QueryMustBeArchetypeQuery, location,
-                    field.Name, field.Type.ToDisplayString());
-                continue;
-            }
+                if (!SyntaxFacts.IsValidIdentifier(fieldName))
+                {
+                    Add(diagnostics, Descriptors.MQueryFieldNameInvalid, location, fieldName);
+                    continue;
+                }
 
-            var components = queryType.TypeArguments
-                .Select(t => t.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))
-                .ToList();
+                // ---- relation queries: exactly one relation, no components ----
+                if (relations.Count > 0 && (relations.Count > 1 || components.Count > 0))
+                {
+                    Add(diagnostics, Descriptors.RelationNeedsSingleTypeArgument, location, fieldName);
+                    continue;
+                }
 
-            if (isRelation && (components.Count != 1 || tagTypes.Count > 0))
-            {
-                Add(diagnostics, Descriptors.RelationNeedsSingleTypeArgument, location, field.Name);
-                continue;
-            }
+                // ---- name collisions: other [MQuery]s, hand-written members and the
+                //      generated Register method itself ------------------------------
+                if (!usedFieldNames.Add(fieldName)
+                    || symbol.GetMembers(fieldName).Length > 0
+                    || fieldName == "Register")
+                {
+                    Add(diagnostics, Descriptors.MQueryFieldNameCollision, location, fieldName, symbol.Name);
+                    continue;
+                }
 
-            if (components.Count == 0 && tagTypes.Count == 0)
-            {
-                Add(diagnostics, Descriptors.QueryNeedsComponentsOrTags, location, field.Name);
-                continue;
-            }
+                // ---- engine API arity checks (catches "engine doesn't define
+                //      ArchetypeQuery<T1..T7> / Query<T1, T2> yet" before it becomes
+                //      a cryptic CS error) -----------------------------------------
+                bool isRelation = relations.Count == 1;
+                var queryTypeArgs = isRelation ? relations : components;
 
-            // ---- engine API arity checks (catches "engine doesn't define
-            //      Query<T1,T2> yet" before it becomes a cryptic CS error) ------
-            if (storeType is not null)
-            {
-                if (!isRelation && !HasMethod(storeType, "Query", components.Count))
+                if (queryTypeArgs.Count > 0
+                    && compilation.GetTypeByMetadataName(WellKnown.ArchetypeQueryMetadataName(queryTypeArgs.Count)) is null)
                 {
                     Add(diagnostics, Descriptors.EngineApiMissing, location,
-                        $"Store.Query (with {components.Count} type argument(s))");
+                        $"ArchetypeQuery (with {queryTypeArgs.Count} type argument(s))");
                     continue;
                 }
 
-                if (isRelation && !HasMethod(storeType, "QueryRelation", 1))
+                if (isRelation)
                 {
-                    Add(diagnostics, Descriptors.EngineApiMissing, location, "Store.QueryRelation<T>");
+                    if (storeType is not null && !HasMethod(storeType, "QueryRelation", 1))
+                    {
+                        Add(diagnostics, Descriptors.EngineApiMissing, location, "Store.QueryRelation<T>");
+                        continue;
+                    }
+                }
+                else if (components.Count > 0)
+                {
+                    if (storeType is not null && !HasMethod(storeType, "Query", components.Count))
+                    {
+                        Add(diagnostics, Descriptors.EngineApiMissing, location,
+                            $"Store.Query (with {components.Count} type argument(s))");
+                        continue;
+                    }
+                }
+                else if (storeType is not null && !HasMethod(storeType, "Query", 0))
+                {
+                    Add(diagnostics, Descriptors.EngineApiMissing, location, "Store.Query()");
                     continue;
                 }
-            }
 
-            if (tagTypes.Count > 0 && (tagsType is null || !HasMethod(tagsType, "Get", 1)))
-            {
-                Add(diagnostics, Descriptors.EngineApiMissing, location, "Tags.Get<T>");
-                continue;
-            }
+                if (tags.Count > 0 && (tagsType is null || !HasMethod(tagsType, "Get", tags.Count)))
+                {
+                    Add(diagnostics, Descriptors.EngineApiMissing, location,
+                        $"Tags.Get<T> (with {tags.Count} type argument(s))");
+                    continue;
+                }
 
-            if (tagTypes.Count > 0 && !HasMember(queryType, "AllTags"))
-            {
-                Add(diagnostics, Descriptors.EngineApiMissing, location, "ArchetypeQuery.AllTags");
-                continue;
+                fields.Add(new QueryFieldModel(
+                    fieldName,
+                    isRelation,
+                    new EquatableArray<string>(queryTypeArgs.ToImmutableArray()),
+                    new EquatableArray<string>(tags.ToImmutableArray())));
             }
-
-            fields.Add(new QueryFieldModel(
-                field.Name,
-                isRelation,
-                new EquatableArray<string>(components.ToImmutableArray()),
-                new EquatableArray<string>(tagTypes.ToImmutableArray())));
         }
 
         // ---- namespace / nesting -----------------------------------------------
@@ -411,8 +499,10 @@ internal sealed record QueryClassModel(
             new EquatableArray<NestingType>(nesting.ToImmutableArray()),
             symbol.Name,
             symbol.IsStatic,
-            systemCtx?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
-            tagsType?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
+            GlobalFqn(systemCtx),
+            GlobalFqn(queryKey),
+            GlobalFqn(archetypeQuery),
+            GlobalFqn(tagsType),
             callRegisterManual,
             canEmit,
             new EquatableArray<QueryFieldModel>(fields.ToImmutableArray()),
@@ -426,7 +516,10 @@ internal sealed record QueryClassModel(
             diagnostic.Report(context);
         }
 
-        if (!EmitRegister || SystemCtxFqn is null) return;
+        if (!EmitRegister
+            || SystemCtxFqn is null
+            || QueryKeyFqn is null
+            || ArchetypeQueryFqn is null) return;
 
         context.AddSource(BuildHintName(), SourceText.From(BuildSource(), Encoding.UTF8));
     }
@@ -449,6 +542,7 @@ internal sealed record QueryClassModel(
         sb.AppendLine("// </auto-generated>");
         sb.AppendLine("#nullable enable");
         sb.AppendLine("#pragma warning disable CS0612, CS0618 // obsolete members");
+
         sb.AppendLine();
 
         if (Namespace is not null)
@@ -476,6 +570,21 @@ internal sealed record QueryClassModel(
         sb.AppendLine("{");
         indent++;
 
+        // ---- the generated query fields ----
+        foreach (var field in Fields.Values)
+        {
+            AppendIndent(sb, indent);
+            sb.Append("public static ").Append(QueryKeyFqn).Append('<').Append(ArchetypeQueryFqn);
+            if (field.QueryTypeArgs.Values.Length > 0)
+            {
+                sb.Append('<').Append(string.Join(", ", field.QueryTypeArgs.Values)).Append('>');
+            }
+            sb.Append("> ").Append(field.FieldName).AppendLine(";");
+        }
+
+        if (Fields.Values.Length > 0) sb.AppendLine();
+
+        // ---- Register ----
         AppendIndent(sb, indent);
         sb.Append("public static void Register(").Append(SystemCtxFqn).AppendLine(" ctx)");
         AppendIndent(sb, indent);
@@ -497,22 +606,21 @@ internal sealed record QueryClassModel(
             if (field.IsRelation)
             {
                 sb.Append("store.QueryRelation<")
-                  .Append(string.Join(", ", field.Components.Values))
+                  .Append(string.Join(", ", field.QueryTypeArgs.Values))
                   .Append(">()");
             }
-            else if (field.Components.Values.Length == 0)
+            else if (field.QueryTypeArgs.Values.Length == 0)
             {
                 sb.Append("store.Query()");
-                AppendTags(sb, field);
             }
             else
             {
                 sb.Append("store.Query<")
-                  .Append(string.Join(", ", field.Components.Values))
+                  .Append(string.Join(", ", field.QueryTypeArgs.Values))
                   .Append(">()");
-                AppendTags(sb, field);
             }
 
+            AppendTags(sb, field);
             sb.AppendLine(");");
         }
 
@@ -545,13 +653,11 @@ internal sealed record QueryClassModel(
     {
         if (field.Tags.Values.Length == 0) return;
 
-        sb.Append(".AllTags(");
-        for (int i = 0; i < field.Tags.Values.Length; i++)
-        {
-            if (i > 0) sb.Append(", ");
-            sb.Append(TagsFqn).Append(".Get<").Append(field.Tags.Values[i]).Append(">()");
-        }
-        sb.Append(")");
+        sb.Append(".AllTags(")
+          .Append(TagsFqn)
+          .Append(".Get<")
+          .Append(string.Join(", ", field.Tags.Values))
+          .Append(">())");
     }
 
     private static void AppendIndent(StringBuilder sb, int indent) => sb.Append(' ', indent * 4);
@@ -568,8 +674,55 @@ internal sealed record QueryClassModel(
             location,
             new EquatableArray<string>(args.ToImmutableArray())));
 
-    private static string ArchetypeQueryName(int arity) =>
-        WellKnown.ArchetypeQueryType + (arity > 0 ? "`" + arity : string.Empty);
+    private static LocationInfo AttributeLocation(AttributeData attribute, LocationInfo fallback, CancellationToken ct)
+    {
+        var syntax = attribute.ApplicationSyntaxReference?.GetSyntax(ct);
+        return syntax is null ? fallback : LocationInfo.From(syntax.GetLocation()) ?? fallback;
+    }
+
+    /// <summary>
+    /// Classifies a [MQuery] type argument. Order matters: relations are
+    /// components too (IRelation&lt;T&gt; : IComponent), tags are not.
+    /// </summary>
+    private static (QueryTypeKind Kind, INamedTypeSymbol Type)? Classify(
+        ITypeSymbol type,
+        INamedTypeSymbol componentInterface,
+        INamedTypeSymbol relationInterface,
+        INamedTypeSymbol tagInterface)
+    {
+        if (type is not INamedTypeSymbol named) return null;
+
+        if (ImplementsMarker(named, tagInterface)) return (QueryTypeKind.Tag, named);
+        if (ImplementsMarker(named, relationInterface)) return (QueryTypeKind.Relation, named);
+        if (ImplementsMarker(named, componentInterface)) return (QueryTypeKind.Component, named);
+
+        return null;
+    }
+
+    private static bool ImplementsMarker(INamedTypeSymbol type, INamedTypeSymbol marker)
+    {
+        if (SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, marker)) return true;
+
+        foreach (var implemented in type.AllInterfaces)
+        {
+            if (SymbolEqualityComparer.Default.Equals(implemented.OriginalDefinition, marker)) return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Unbound generic definitions render as "QueryKey&lt;T&gt;"; the generator
+    /// appends its own type arguments, so only the open name is wanted.
+    /// </summary>
+    private static string? GlobalFqn(INamedTypeSymbol? type)
+    {
+        if (type is null) return null;
+
+        string metadataName = MetadataName(type);
+        int arityIndex = metadataName.LastIndexOf('`');
+        return "global::" + (arityIndex > 0 ? metadataName[..arityIndex] : metadataName);
+    }
 
     private static string MetadataName(INamedTypeSymbol type)
     {
@@ -638,13 +791,20 @@ internal sealed record QueryClassModel(
     }
 }
 
+internal enum QueryTypeKind
+{
+    Component,
+    Relation,
+    Tag
+}
+
 internal sealed record NestingType(string Name, bool IsStatic);
 
 internal sealed record QueryFieldModel(
     string FieldName,
     bool IsRelation,
-    EquatableArray<string> Components,   // fully-qualified component types
-    EquatableArray<string> Tags);        // fully-qualified tag types
+    EquatableArray<string> QueryTypeArgs,   // fully-qualified component types, or the single relation type; tags excluded
+    EquatableArray<string> Tags);           // fully-qualified tag types
 
 internal sealed record DiagnosticInfo(
     string DescriptorId,
