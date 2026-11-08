@@ -27,7 +27,8 @@
 
 		<ProjectReference Include="../Friflo.Engine.ECS/src/ECS.Boost/Friflo.Engine.ECS.Boost.csproj" />
 		<ProjectReference Include="../Friflo.Engine.ECS/src/ECS/Friflo.Engine.ECS.csproj" />
-		<ProjectReference Include="..\EcGui\Friflo.EcGui.csproj" />
+		<ProjectReference Include="../EcGui/Friflo.EcGui.csproj" />
+		<ProjectReference Include="../Monod.SourceGenerators/Monod.SourceGenerators.csproj" />
 		
 		
 		<!-- Nuget packages: general -->

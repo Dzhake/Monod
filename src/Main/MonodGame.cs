@@ -39,6 +39,8 @@ public abstract class MonodGame : Game
 
     public static EntityStore PrefabsStore;
 
+    public static EntityStore EditorStore;
+
     public static EntitySerializer entitySerializer = new();
     public static EntityConverter entityConverter = new();
 
@@ -93,11 +95,13 @@ public abstract class MonodGame : Game
         LogicSystemRoot = new();
         LogicSystemRoot.SetMonitorPerf(true);
         LogicSystemRoot.AddStore(Store);
+        LogicSystemRoot.AddStore(EditorStore);
         LogicSystemRoot.SetName("Logic System Root");
 
         DrawSystemRoot = new();
         DrawSystemRoot.SetMonitorPerf(true);
         DrawSystemRoot.AddStore(Store);
+        DrawSystemRoot.AddStore(EditorStore);
         DrawSystemRoot.SetName("Draw System Root");
 
         Exiting += OnExit;
