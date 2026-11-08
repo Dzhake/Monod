@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Monod.SourceGenerators": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\..\\..\\DerelictDimension\\src\\DerelictDimension.csproj"
+    }
+  }
+}
