@@ -22,6 +22,11 @@ public sealed class SystemCtx
     /// </summary>
     public CommandBuffer cb;
 
+    /// <summary>
+    /// Whether the systems should track and update performance history.
+    /// </summary>
+    public bool MonitorPerf;
+
     public SystemCtx(EntityStore store)
     {
         Store = store;

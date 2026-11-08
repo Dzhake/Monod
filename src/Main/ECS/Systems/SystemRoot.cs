@@ -10,7 +10,11 @@ public class SystemRoot : SystemGroup
 
     public void Update()
     {
-        if (!Enabled) return;
+        if (!Enabled)
+        {
+            ClearPerfTicks(this, Ctx);
+            return;
+        }
         Update(Ctx);
         Ctx.cb.Playback();
     }
