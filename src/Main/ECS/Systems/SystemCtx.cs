@@ -25,6 +25,7 @@ public sealed class SystemCtx
     public SystemCtx(EntityStore store)
     {
         Store = store;
+        Queries = new();
         cb = store.GetCommandBuffer();
         cb.ReuseBuffer = true;
     }

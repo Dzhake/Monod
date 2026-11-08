@@ -1,10 +1,9 @@
-using Friflo.Engine.ECS.Serialize;
-using Friflo.Engine.ECS.Systems;
 using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework.Graphics;
 using MLEM.Misc;
 using MLEM.Ui.Style;
 using Monod.AssetsModule;
+using Monod.ECS.Systems;
 using Monod.Graphics;
 using Monod.Graphics.Components;
 using Monod.Graphics.Fonts;
@@ -33,27 +32,15 @@ public abstract class MonodGame : Game
     public static AssetManager MainAssetManager = null!;
 
     /// <summary>
-    /// Main <see cref="EntityStore"/> of the game.
-    /// </summary>
-    public static EntityStore Store;
-
-    public static EntityStore PrefabsStore;
-
-    public static EntityStore EditorStore;
-
-    public static EntitySerializer entitySerializer = new();
-    public static EntityConverter entityConverter = new();
-
-    /// <summary>
     /// Root of the systems that should be called in <see cref="Update"/> (more specifically, <see cref="UpdateLogicSystems"/>).
     /// </summary>
-    public required SystemRoot LogicSystemRoot;
+    public static SystemRoot LogicSystemRoot;
 
 
     /// <summary>
     /// Root of the systems that should be called in <see cref="Draw"/> (more specifically, <see cref="UpdateDrawSystems"/>).
     /// </summary>
-    public required SystemRoot DrawSystemRoot;
+    public static SystemRoot DrawSystemRoot;
 
     /// <summary>
     /// Object that handles rendering of <see cref="ImGui"/> calls.
@@ -66,6 +53,11 @@ public abstract class MonodGame : Game
     /// Aspect ratio of the game (X divided by Y).
     /// </summary>
     public static float AspectRatio => 16f / 9f;
+
+    /// <summary>
+    /// Store, used by the prefabs asset parser.
+    /// </summary>
+    public static EntityStore PrefabsStore;
 
 
     /// <summary>
@@ -90,19 +82,7 @@ public abstract class MonodGame : Game
         Window.AllowUserResizing = true;
         Window.ClientSizeChanged += OnWindowSizeChanged;
 
-        CreateStore();
-
-        LogicSystemRoot = new();
-        LogicSystemRoot.SetMonitorPerf(true);
-        LogicSystemRoot.AddStore(Store);
-        LogicSystemRoot.AddStore(EditorStore);
-        LogicSystemRoot.SetName("Logic System Root");
-
-        DrawSystemRoot = new();
-        DrawSystemRoot.SetMonitorPerf(true);
-        DrawSystemRoot.AddStore(Store);
-        DrawSystemRoot.AddStore(EditorStore);
-        DrawSystemRoot.SetName("Draw System Root");
+        InitializeEcs();
 
         Exiting += OnExit;
     }
@@ -112,9 +92,8 @@ public abstract class MonodGame : Game
         soloud?.deinit();
     }
 
-    public virtual void CreateStore()
+    public virtual void InitializeEcs()
     {
-        Store = new();
     }
 
     private void OnWindowSizeChanged(object? sender, EventArgs e)
@@ -202,17 +181,12 @@ public abstract class MonodGame : Game
 
     public void UpdateLogicSystems()
     {
-        LogicSystemRoot.Update(GetUpdateTick());
+        LogicSystemRoot.Update();
     }
 
     public void UpdateDrawSystems()
     {
-        DrawSystemRoot.Update(GetUpdateTick());
-    }
-
-    public static UpdateTick GetUpdateTick()
-    {
-        return new UpdateTick(Time.RawDeltaTime, Time.RawTotalTime);
+        DrawSystemRoot.Update();
     }
 
     /// <inheritdoc/>
