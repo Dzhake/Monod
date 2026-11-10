@@ -5,12 +5,15 @@
 		<PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
 		
 		<!-- Compile-time only analyzers -->
-		<PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
+		<PackageReference Include="Roslynator.Analyzers" Version="5.0.1">
 			<IncludeAssets>build; native; contentfiles; analyzers</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.15">
+		<PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="18.12.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 		</PackageReference>
+		
+		<!-- Compile-time only source generators -->
+		<ProjectReference Include="$(MSBuildThisFileDirectory)/Monod.SourceGenerators/Monod.SourceGenerators.csproj" OutputItemType="Analyzer" PrivateAssets="All"/>
 	</ItemGroup>
 </Project>
