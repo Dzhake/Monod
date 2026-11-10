@@ -14,11 +14,11 @@ public static class EntityExtensions
     /// <returns>Position of the entity accounting for the parent's transform.</returns>
     public static Vector2 GetWorldPos(this Entity entity)
     {
-        Vector2 pos = entity.GetLocalPos();
-        Entity parent = entity.Parent;
+        var pos = entity.GetLocalPos();
+        var parent = entity.Parent;
         while (!parent.IsNull)
         {
-            Vector2 parentPos = parent.GetLocalPos(out float rotation);
+            var parentPos = parent.GetLocalPos(out float rotation);
             pos.Rotate(rotation);
             pos += parentPos;
             parent = parent.Parent;
@@ -34,11 +34,11 @@ public static class EntityExtensions
     /// <returns>Position of the entity accounting for the parent's transform.</returns>
     public static Vector2 GetWorldPos(this Entity entity, out float rotation)
     {
-        Vector2 pos = entity.GetLocalPos(out rotation);
-        Entity parent = entity.Parent;
+        var pos = entity.GetLocalPos(out rotation);
+        var parent = entity.Parent;
         while (!parent.IsNull)
         {
-            Vector2 parentPos = parent.GetLocalPos(out float parentRot);
+            var parentPos = parent.GetLocalPos(out float parentRot);
             pos.Rotate(parentRot);
             rotation += parentRot;
             pos += parentPos;
@@ -49,12 +49,12 @@ public static class EntityExtensions
 
     public static Vector2 GetParentPos(this Entity entity, out float parentRotation)
     {
-        Vector2 pos = Vector2.Zero;
+        var pos = Vector2.Zero;
         parentRotation = 0;
-        Entity parent = entity.Parent;
+        var parent = entity.Parent;
         while (!parent.IsNull)
         {
-            Vector2 parentPos = parent.GetLocalPos(out float parentRot);
+            var parentPos = parent.GetLocalPos(out float parentRot);
             pos.Rotate(parentRot);
             parentRotation += parentRot;
             pos += parentPos;
@@ -89,7 +89,7 @@ public static class EntityExtensions
         }
         else
         {
-            ref Transform2D transform = ref entity.GetComponent<Transform2D>();
+            ref var transform = ref entity.GetComponent<Transform2D>();
             rotation = transform.GetFlippedRotation();
             return transform.Position;
         }
@@ -157,7 +157,7 @@ public static class EntityExtensions
     public static void ApplyRecursive<T>(in this Entity entity, ApplyRecursiveAction<T> callback) where T : struct, IComponent
     {
         if (entity.HasComponent<T>()) callback(in entity, ref entity.GetComponent<T>());
-        foreach (Entity child in entity.ChildEntities)
+        foreach (var child in entity.ChildEntities)
             ApplyRecursive(child, callback);
     }
 
@@ -175,8 +175,22 @@ public static class EntityExtensions
     /// <returns>Entity with the <typeparamref name="T"/> component.</returns>
     public static Entity GetFirstEntityWithComp<T>(in this Entity entity) where T : struct, IComponent
     {
-        Entity bodyEntity = entity;
+        var bodyEntity = entity;
         while (!bodyEntity.IsNull && !bodyEntity.HasComponent<T>())
+            bodyEntity = bodyEntity.Parent;
+        return bodyEntity;
+    }
+
+    /// <summary>
+    /// Get the first entity with the <typeparamref name="T"/> tag, starting with the <paramref name="entity"/> and going up the hierarchy.
+    /// </summary>
+    /// <typeparam name="T">Type of the tag.</typeparam>
+    /// <param name="entity"></param>
+    /// <returns>Entity with the <typeparamref name="T"/> tag.</returns>
+    public static Entity GetFirstEntityWithTag<T>(in this Entity entity) where T : struct, ITag
+    {
+        var bodyEntity = entity;
+        while (!bodyEntity.IsNull && !bodyEntity.Tags.Has<T>())
             bodyEntity = bodyEntity.Parent;
         return bodyEntity;
     }
