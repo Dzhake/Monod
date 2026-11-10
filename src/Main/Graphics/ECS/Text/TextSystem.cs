@@ -42,7 +42,7 @@ public class TextSystem : QuerySystem<TextComponent>
 
         float depth;
         if (data.TryGet<RenderDepth>(out var renderDepth))
-            depth = renderDepth.Depth;
+            depth = renderDepth.BaseDepth;
         else
             depth = 0;
 

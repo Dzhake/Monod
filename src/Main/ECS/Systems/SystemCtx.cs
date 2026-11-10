@@ -1,4 +1,5 @@
-﻿using Monod.Shared.Exceptions;
+﻿using DerelictDimension.ECS.Drawing.Batching;
+using Monod.Shared.Exceptions;
 
 namespace Monod.ECS.Systems;
 
@@ -27,12 +28,18 @@ public sealed class SystemCtx
     /// </summary>
     public bool MonitorPerf;
 
+    /// <summary>
+    /// Batcher used by systems that draw entities to defer the rendering, to sort the draws by depth.
+    /// </summary>
+    public DrawBatcher drawBatcher;
+
     public SystemCtx(EntityStore store)
     {
         Store = store;
         Queries = new();
         cb = store.GetCommandBuffer();
         cb.ReuseBuffer = true;
+        drawBatcher = new();
     }
 
     /// <summary>
