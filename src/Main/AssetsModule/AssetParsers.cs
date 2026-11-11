@@ -4,7 +4,7 @@ using Monod.ECS.Prefabs;
 using Monod.Graphics;
 using Monod.Graphics.Animations;
 using Monod.Localization;
-using Monod.Shared.Extensions;
+using Monod.Utils.Extensions;
 using Monod.Utils.General;
 using ShadowDusk.Compiler;
 using ShadowDusk.Core;

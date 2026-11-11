@@ -1,6 +1,6 @@
 ﻿using Monod.ECS.DefaultComponents;
 
-namespace DerelictDimension.ECS.Drawing;
+namespace Monod.Graphics.ECS;
 
 /// <summary>
 /// Indicates, that the entity's <see cref="RenderDepth.YSortOffset"/> should be changed based on the entity's own <see cref="Transform2D"/>.

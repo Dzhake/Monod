@@ -1,4 +1,4 @@
-namespace Monod.Shared.Enums;
+namespace Monod.Utils.Enums;
 
 /// <summary>
 /// Class, which is meant to be used like an <see cref="Enum"/>, but with the ability to add more values at runtime.

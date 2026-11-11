@@ -1,9 +1,9 @@
-﻿using Monod.Shared.Exceptions;
+﻿using Monod.Utils.Exceptions;
 using Monod.Utils.General;
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Monod.ModsModule.ModdingOld;
+namespace Monod.ModsModule;
 
 /// <summary>
 /// <see cref="AssemblyLoadContext"/> for one <see cref="Mod"/>.

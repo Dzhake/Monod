@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
-namespace Monod.Shared.Exceptions;
+namespace Monod.Utils.Exceptions;
 
 /// <summary>
 /// Class for methods that only throw exception, for performance.

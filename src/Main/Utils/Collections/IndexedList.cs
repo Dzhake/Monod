@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Runtime.CompilerServices;
 
-namespace Monod.Shared.Collections;
+namespace Monod.Utils.Collections;
 
 /// <summary>
 /// <b>Read all this text before using.</b>

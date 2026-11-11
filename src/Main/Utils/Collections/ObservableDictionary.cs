@@ -1,4 +1,4 @@
-﻿using Monod.Shared.Exceptions;
+﻿using Monod.Utils.Exceptions;
 
 namespace Monod.Utils.Collections;
 

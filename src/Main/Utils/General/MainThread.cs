@@ -1,5 +1,5 @@
-using Monod.Shared.Collections;
-using Monod.Shared.Extensions;
+using Monod.Utils.Collections;
+using Monod.Utils.Extensions;
 
 namespace Monod.Utils.General;
 

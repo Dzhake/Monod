@@ -1,6 +1,6 @@
 ﻿using Monod.ECS.Systems;
 
-namespace DerelictDimension.ECS.Drawing.Batching;
+namespace Monod.Graphics.Batching;
 
 public interface IDrawer
 {

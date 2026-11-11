@@ -1,4 +1,4 @@
-﻿using Monod.Shared.Exceptions;
+﻿using Monod.Utils.Exceptions;
 using System.Text.RegularExpressions;
 
 namespace Monod.AssetsModule;

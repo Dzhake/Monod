@@ -2,8 +2,8 @@
 using Monod.AssetsModule.Exceptions;
 using Monod.AssetsModule.Utils;
 using Monod.LogModule;
-using Monod.Shared.Collections;
-using Monod.Shared.Extensions;
+using Monod.Utils.Collections;
+using Monod.Utils.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 

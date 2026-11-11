@@ -1,5 +1,5 @@
 ﻿using Friflo.Engine.ECS.Serialize;
-using Monod.Shared.Exceptions;
+using Monod.Utils.Exceptions;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace Monod.Shared.Collections;
+namespace Monod.Utils.Collections;
 
 /// <summary>
 /// Class for storing and invoking a bunch of <see cref="Action"/>s.

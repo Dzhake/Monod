@@ -1,6 +1,6 @@
 using System;
 
-namespace Monod.Shared.Exceptions;
+namespace Monod.Utils.Exceptions;
 
 /// <summary>
 /// The exception that is thrown when received type of some object was not what expected.

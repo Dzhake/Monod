@@ -1,4 +1,4 @@
-namespace Monod.Shared.Extensions;
+namespace Monod.Utils.Extensions;
 
 /// <summary>
 /// Extensions for <see cref="ICollection{T}"/>, <see cref="IEnumerable{T}"/>, and <see cref="IList{T}"/>. 

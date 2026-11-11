@@ -1,6 +1,6 @@
 ﻿using Monod.ECS.DefaultComponents;
 
-namespace DerelictDimension.ECS.Drawing.Batching;
+namespace Monod.Graphics.Batching;
 
 public record struct DrawBatch : IComparable<DrawBatch>
 {

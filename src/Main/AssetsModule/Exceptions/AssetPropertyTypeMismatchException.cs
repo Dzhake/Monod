@@ -1,4 +1,4 @@
-﻿using Monod.Shared.Exceptions;
+﻿using Monod.Utils.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Monod.AssetsModule.Exceptions;

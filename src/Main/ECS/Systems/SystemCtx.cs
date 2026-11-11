@@ -1,6 +1,6 @@
-﻿using DerelictDimension.ECS.Drawing.Batching;
+﻿using Monod.Graphics.Batching;
 using Monod.Graphics.ECS;
-using Monod.Shared.Exceptions;
+using Monod.Utils.Exceptions;
 
 namespace Monod.ECS.Systems;
 

@@ -1,7 +1,7 @@
 ﻿using Hexa.NET.ImGui;
 using Microsoft.Xna.Framework.Input;
 using Monod.LogModule;
-using Monod.Shared.Extensions;
+using Monod.Utils.Extensions;
 using System.Diagnostics.Contracts;
 using System.Text;
 

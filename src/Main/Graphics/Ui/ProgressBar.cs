@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
 
-namespace Monod.Graphics.Components;
+namespace Monod.Graphics.Ui;
 
 /// <summary>
 /// Allows drawing of simple progress bars based on given numbers.

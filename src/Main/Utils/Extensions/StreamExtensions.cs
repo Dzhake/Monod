@@ -16,7 +16,7 @@
 using System.Diagnostics.Contracts;
 using System.Text;
 
-namespace Monod.Shared.Extensions;
+namespace Monod.Utils.Extensions;
 
 /// <summary>
 ///   <para>Provides a set of extension methods for the <see cref="Stream"/> class.</para>

@@ -153,7 +153,7 @@ public static class Renderer
     public static void Begin(SpriteSortMode? sortMode = null, BlendState? blendState = null, SamplerState? samplerState = null, DepthStencilState? depthStencilState = null, RasterizerState? rasterizerState = null, Effect? effect = null, Matrix? transformMatrix = null)
     {
         spriteBatchActive = true;
-        SpriteSortMode sortModeValue = sortMode ?? DefaultSpriteSortMode ?? SpriteSortMode.Deferred;
+        var sortModeValue = sortMode ?? DefaultSpriteSortMode ?? SpriteSortMode.Deferred;
         blendState ??= DefaultBlendState;
         samplerState ??= DefaultSamplerState;
         depthStencilState ??= DefaultDepthStencilState;

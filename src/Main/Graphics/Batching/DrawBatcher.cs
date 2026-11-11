@@ -3,7 +3,7 @@ using Monod.ECS.Systems;
 using Monod.Graphics;
 using Monod.Utils.Extensions;
 
-namespace DerelictDimension.ECS.Drawing.Batching;
+namespace Monod.Graphics.Batching;
 
 public class DrawBatcher
 {
