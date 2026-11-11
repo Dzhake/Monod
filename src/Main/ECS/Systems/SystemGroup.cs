@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Monod.Graphics.ECS;
+using System.Collections;
 using System.Diagnostics;
 
 namespace Monod.ECS.Systems;
@@ -7,7 +8,8 @@ public class SystemGroup : SystemBase, IEnumerable
 {
     public readonly List<SystemBase> ChildSystems;
 
-    public SystemGroup(string name) : base(name)
+    ///<inheritdoc/>
+    public SystemGroup(string name, Stores? activeInStores = null) : base(name, activeInStores)
     {
         ChildSystems = new();
     }
@@ -16,7 +18,6 @@ public class SystemGroup : SystemBase, IEnumerable
     {
         foreach (var system in ChildSystems)
         {
-            if (!system.Enabled) continue;
             system.OnCtxChanged(ctx);
         }
     }
@@ -26,7 +27,7 @@ public class SystemGroup : SystemBase, IEnumerable
         var selfPerf = ctx.MonitorPerf ? new PerfResource() : default;
         foreach (var system in ChildSystems)
         {
-            if (!system.Enabled)
+            if (!system.IsEnabled(ctx))
             {
                 ClearPerfTicks(system, ctx);
                 continue;
@@ -49,6 +50,7 @@ public class SystemGroup : SystemBase, IEnumerable
         ChildSystems.Clear();
     }
 
+    ///<inheritdoc/>
     public IEnumerator GetEnumerator()
     {
         return ChildSystems.GetEnumerator();
@@ -59,6 +61,9 @@ public class SystemGroup : SystemBase, IEnumerable
         ChildSystems.Add(system);
     }
 
+    /// <summary>
+    /// Update <paramref name="system"/>'s Perf with the info from the <paramref name="start"/>.
+    /// </summary>
     protected static void SetPerfTicks(SystemBase system, in PerfResource start)
     {
         if (start.time == 0)
@@ -77,6 +82,9 @@ public class SystemGroup : SystemBase, IEnumerable
         system.Perf.sumMemory += memory;
     }
 
+    /// <summary>
+    /// Set <paramref name="system"/>'s <see cref="SystemPerf.lastTicks"/> to -1. Used when the system was not active.
+    /// </summary>
     protected void ClearPerfTicks(SystemBase system, SystemCtx ctx)
     {
         if (!ctx.MonitorPerf) return;

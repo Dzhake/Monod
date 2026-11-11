@@ -1,4 +1,5 @@
 ﻿using DerelictDimension.ECS.Drawing.Batching;
+using Monod.Graphics.ECS;
 using Monod.Shared.Exceptions;
 
 namespace Monod.ECS.Systems;
@@ -33,9 +34,15 @@ public sealed class SystemCtx
     /// </summary>
     public DrawBatcher drawBatcher;
 
-    public SystemCtx(EntityStore store)
+    /// <summary>
+    /// Id of the current <see cref="Store"/>.
+    /// </summary>
+    public Stores Stores;
+
+    public SystemCtx(EntityStore store, Stores stores)
     {
         Store = store;
+        Stores = stores;
         Queries = new();
         cb = store.GetCommandBuffer();
         cb.ReuseBuffer = true;

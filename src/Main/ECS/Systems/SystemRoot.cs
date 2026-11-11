@@ -10,13 +10,14 @@ public class SystemRoot : SystemGroup
 
     public void Update()
     {
-        if (!Enabled)
+        var ctx = Ctx;
+        if (!IsEnabled(ctx))
         {
-            ClearPerfTicks(this, Ctx);
+            ClearPerfTicks(this, ctx);
             return;
         }
-        Update(Ctx);
-        Ctx.cb.Playback();
+        Update(ctx);
+        ctx.cb.Playback();
     }
 
     public void SetContext(SystemCtx ctx)
