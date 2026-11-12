@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Monod.Graphics.Settings;
+﻿using Monod.Graphics.Settings;
 
 namespace Monod.TimeModule;
 
@@ -78,7 +77,7 @@ public static class Time
         Time.gameTime = gameTime;
         if (GraphicsSettings.FocusLossBehaviour == OnFocusLossBehaviour.Continue) isActive = true;
 
-        if (wasActive || GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco)
+        if (wasActive || OnFocusLossHelper.ShouldPauseWhenWindowOutOfFocus(GraphicsSettings.FocusLossBehaviour))
             RawDeltaTimeSpan = gameTime.ElapsedGameTime;
         else
             RawDeltaTimeSpan += gameTime.ElapsedGameTime;

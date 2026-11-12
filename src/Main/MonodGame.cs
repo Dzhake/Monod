@@ -158,7 +158,7 @@ public abstract class MonodGame : Game
         // Meta-modules update (responsible to tracking time and pausing)
         Time.Update(gameTime, IsActive);
         GraphicsSettings.WindowPosition = Window.Position;
-        if (GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco && !IsActive) return;
+        if (OnFocusLossHelper.ShouldPauseWhenWindowOutOfFocus(GraphicsSettings.FocusLossBehaviour) && !IsActive) return;
 
         // Pre-update
         base.Update(gameTime);
@@ -192,7 +192,7 @@ public abstract class MonodGame : Game
     /// <inheritdoc/>
     protected override void Draw(GameTime gameTime)
     {
-        if (GraphicsSettings.FocusLossBehaviour > OnFocusLossBehaviour.Eco && !IsActive) return;
+        if (OnFocusLossHelper.ShouldPauseWhenWindowOutOfFocus(GraphicsSettings.FocusLossBehaviour) && !IsActive) return;
         GraphicsDevice.Clear(Color.Black);
         if (ModManager.InProgress)
         {
