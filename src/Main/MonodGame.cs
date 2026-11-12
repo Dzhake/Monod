@@ -232,14 +232,11 @@ public abstract class MonodGame : Game
             return;
         }
 
+        imGuiRenderer.BeforeLayout(Time.DeltaTime);
         DrawM();
         base.Draw(gameTime);
-        imGuiRenderer.BeforeLayout(Time.DeltaTime);
-        DrawImGui();
         imGuiRenderer.AfterLayout();
     }
-
-    public virtual void DrawImGui() { }
 
     /// <summary>
     /// Called when the game should update. Override this to update your game.
