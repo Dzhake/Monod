@@ -202,7 +202,7 @@ public abstract class MonodGame : Game
             int finished = ModManager.FinishedTasksThisCommand;
             int total = ModManager.TotalTasksThisCommand;
 
-            Renderer.Begin(SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
+            Renderer.Begin();
             font.DrawString(Renderer.spriteBatch, $"Loading mods: {finished}/{total}", Vector2.Zero, Color.White);
             ProgressBar.Draw((float)finished / total, new(width * 0.1f, height * 0.8f), new(width * 0.8f, height * 0.1f));
             Renderer.End();
@@ -215,7 +215,7 @@ public abstract class MonodGame : Game
             float width = Window.ClientBounds.Width;
             float height = Window.ClientBounds.Height;
 
-            Renderer.Begin(SpriteSortMode.Immediate, samplerState: SamplerState.PointClamp);
+            Renderer.Begin();
 
             if (Assets.ActiveCommand is null) return;
 

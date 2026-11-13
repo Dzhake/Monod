@@ -163,6 +163,11 @@ public static class Renderer
     }
 
     /// <summary>
+    /// Begins a new sprite and text batch with the specified render options.
+    /// </summary>
+    public static void Begin(SbOptions op) => Begin(op.SortMode, op.blendState, op.samplerState, op.depthStencilState, op.rasterizerState, op.effect, op.TransformMatrix);
+
+    /// <summary>
     /// Start the <see cref="shapeBatch"/>. The view matrix is where a camera goes, and shapes stay crisp under it because they are rasterized at the size they end up on screen rather than scaled up.
     /// </summary>
     /// <param name="view">Camera transform. Defaults to identity.</param>
