@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace Monod.Utils.Exceptions;
@@ -37,6 +38,9 @@ public static class Guard
 
     [DoesNotReturn]
     public static void Exception(string message) => throw new Exception(message);
+
+    public static void InvalidEnumValue<TEnum>(TEnum value, [CallerArgumentExpression(nameof(value))] string? caller = null) => throw new InvalidEnumValueException<TEnum>(value, caller);
+    public static void InvalidEnumValue<TEnum>(string message, TEnum value) => throw new InvalidEnumValueException<TEnum>(message, value);
 
     [DoesNotReturn]
     public static void JsonException(string message) => throw new JsonException(message);

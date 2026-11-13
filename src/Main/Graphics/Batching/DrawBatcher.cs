@@ -1,7 +1,5 @@
 ﻿using Monod.ECS.DefaultComponents;
 using Monod.ECS.Systems;
-using Monod.Graphics;
-using Monod.Utils.Extensions;
 
 namespace Monod.Graphics.Batching;
 
@@ -9,9 +7,9 @@ public class DrawBatcher
 {
     public List<DrawBatch> Batches = new();
 
-    public void Add(Entity entity, IDrawer drawer, SystemCtx ctx)
+    public void Add(Entity entity, IDrawer drawer, RenderDepth depth, SystemCtx ctx)
     {
-        Batches.Add(new(entity, entity.Data.Ensure<RenderDepth>(ctx.cb), drawer));
+        Batches.Add(new(entity, depth, drawer));
     }
 
     public void Flush(SystemCtx ctx)
